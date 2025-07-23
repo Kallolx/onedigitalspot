@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'pixel': ['Press Start 2P', 'monospace'],
+				'sans': ['DM Sans', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -61,7 +65,23 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				retro: {
+					mint: 'hsl(var(--retro-mint))',
+					coral: 'hsl(var(--retro-coral))',
+					purple: 'hsl(var(--retro-purple))',
+					blue: 'hsl(var(--retro-blue))',
+					yellow: 'hsl(var(--retro-yellow))'
 				}
+			},
+			backgroundImage: {
+				'gradient-retro': 'var(--gradient-retro)',
+				'gradient-card': 'var(--gradient-card)',
+			},
+			boxShadow: {
+				'retro': 'var(--shadow-retro)',
+				'card': 'var(--shadow-card)',
+				'button': 'var(--shadow-button)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
