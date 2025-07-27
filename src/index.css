@@ -122,3 +122,11 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+.marquee-loop {
+  animation: marquee-loop 22s linear infinite;
+}
+@keyframes marquee-loop {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}

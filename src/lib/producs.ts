@@ -1,0 +1,700 @@
+export const mobileGames = [
+  {
+    title: "Mobile Legends",
+    image: "/placeholder.svg",
+    price: "299",
+    rating: 5,
+    category: "MOBA",
+    buttonText: "Buy Diamonds"
+  },
+  {
+    title: "Call of Duty Mobile",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Action",
+    buttonText: "Buy CP"
+  },
+  {
+    title: "PUBG Mobile",
+    image: "/placeholder.svg",
+    price: "499",
+    rating: 5,
+    category: "Battle Royale",
+    buttonText: "Buy UC"
+  },
+  {
+    title: "Free Fire",
+    image: "/placeholder.svg",
+    price: "199",
+    rating: 5,
+    category: "Battle Royale",
+    buttonText: "Buy Diamonds"
+  },
+  {
+    title: "Delta Force",
+    image: "/placeholder.svg",
+    price: "599",
+    rating: 5,
+    category: "Action",
+    buttonText: "Buy Credits"
+  },
+  {
+    title: "Blood Strike",
+    image: "/placeholder.svg",
+    price: "349",
+    rating: 5,
+    category: "Action",
+    buttonText: "Buy Gold"
+  },
+  {
+    title: "Clash of Clans",
+    image: "/placeholder.svg",
+    price: "299",
+    rating: 5,
+    category: "Strategy",
+    buttonText: "Buy Gems"
+  },
+  {
+    title: "Clash Royale",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Strategy",
+    buttonText: "Buy Gems"
+  },
+  {
+    title: "Brawl Stars",
+    image: "/placeholder.svg",
+    price: "299",
+    rating: 5,
+    category: "Action",
+    buttonText: "Buy Gems"
+  },
+  {
+    title: "Standoff 2",
+    image: "/placeholder.svg",
+    price: "449",
+    rating: 5,
+    category: "Action",
+    buttonText: "Buy Gold"
+  },
+  {
+    title: "Genshin Impact",
+    image: "/placeholder.svg",
+    price: "799",
+    rating: 5,
+    category: "RPG",
+    buttonText: "Buy Primogems"
+  },
+  {
+    title: "Wuthering Waves",
+    image: "/placeholder.svg",
+    price: "699",
+    rating: 5,
+    category: "RPG",
+    buttonText: "Buy Lunite"
+  },
+  {
+    title: "Roblox",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Sandbox",
+    buttonText: "Buy Robux"
+  },
+  {
+    title: "eFootball",
+    image: "/placeholder.svg",
+    price: "599",
+    rating: 5,
+    category: "Sports",
+    buttonText: "Buy Coins"
+  },
+  {
+    title: "FIFA Mobile",
+    image: "/placeholder.svg",
+    price: "699",
+    rating: 5,
+    category: "Sports",
+    buttonText: "Buy Points"
+  }
+];
+
+export const pcGames = [
+  {
+    title: "Valorant",
+    image: "/placeholder.svg",
+    price: "799",
+    rating: 5,
+    category: "FPS",
+    buttonText: "Buy VP"
+  },
+  {
+    title: "Apex Legends",
+    image: "/placeholder.svg",
+    price: "899",
+    rating: 5,
+    category: "Battle Royale",
+    buttonText: "Buy Coins"
+  }
+];
+
+export const giftCards = [
+  {
+    title: "Google Play",
+    image: "/placeholder.svg",
+    price: "500",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "iTunes",
+    image: "/placeholder.svg",
+    price: "1000",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "Steam Wallet",
+    image: "/placeholder.svg",
+    price: "1500",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "PlayStation",
+    image: "/placeholder.svg",
+    price: "2000",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "Valorant Gift Cards",
+    image: "/placeholder.svg",
+    price: "1200",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "Roblox Gift Cards",
+    image: "/placeholder.svg",
+    price: "800",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "Minecraft Minecoins",
+    image: "/placeholder.svg",
+    price: "699",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "Fortnite V-Bucks",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  },
+  {
+    title: "AWS Credits",
+    image: "/placeholder.svg",
+    price: "2999",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now"
+  }
+];
+
+export const aiTools = [
+  {
+    title: "ChatGPT Pro",
+    image: "/placeholder.svg",
+    price: "1999",
+    rating: 5,
+    category: "AI Assistant",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Perplexity Pro",
+    image: "/placeholder.svg",
+    price: "1599",
+    rating: 5,
+    category: "AI Assistant",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Claude Pro",
+    image: "/placeholder.svg",
+    price: "1799",
+    rating: 5,
+    category: "AI Assistant",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Grok Pro",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "AI Assistant",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Gemini Pro",
+    image: "/placeholder.svg",
+    price: "1899",
+    rating: 5,
+    category: "AI Assistant",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "GitHub Copilot",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "AI Coding",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Cursor IDE",
+    image: "/placeholder.svg",
+    price: "1499",
+    rating: 5,
+    category: "AI Coding",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Windsurf IDE",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "AI Coding",
+    buttonText: "Subscribe"
+  }
+];
+
+export const subscriptions = [
+  // Entertainment
+  {
+    title: "Netflix",
+    image: "/placeholder.svg",
+    price: "1499",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Hulu",
+    image: "/placeholder.svg",
+    price: "899",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Amazon Prime",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Disney Plus",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "ZEE5",
+    image: "/placeholder.svg",
+    price: "599",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Hotstar",
+    image: "/placeholder.svg",
+    price: "1499",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Sony Live",
+    image: "/placeholder.svg",
+    price: "699",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Ullu",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Alt Balaji",
+    image: "/placeholder.svg",
+    price: "499",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "HBO Max",
+    image: "/placeholder.svg",
+    price: "1199",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Apple TV",
+    image: "/placeholder.svg",
+    price: "799",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "YouTube Premium",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Apple Music",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "SoundCloud Pro",
+    image: "/placeholder.svg",
+    price: "599",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Twitch Turbo",
+    image: "/placeholder.svg",
+    price: "899",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Crunchyroll",
+    image: "/placeholder.svg",
+    price: "799",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Voot",
+    image: "/placeholder.svg",
+    price: "699",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Hoichoi",
+    image: "/placeholder.svg",
+    price: "599",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Spotify",
+    image: "/placeholder.svg",
+    price: "299",
+    rating: 5,
+    category: "Entertainment",
+    buttonText: "Subscribe"
+  },
+  // Gaming
+  {
+    title: "Xbox Game Pass",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "Gaming",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Ubisoft+",
+    image: "/placeholder.svg",
+    price: "1599",
+    rating: 5,
+    category: "Gaming",
+    buttonText: "Subscribe"
+  },
+  // Productivity
+  {
+    title: "Canva Pro",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Duolingo",
+    image: "/placeholder.svg",
+    price: "899",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "QuillBot",
+    image: "/placeholder.svg",
+    price: "599",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Grammarly",
+    image: "/placeholder.svg",
+    price: "1199",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Office 365",
+    image: "/placeholder.svg",
+    price: "1999",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Google One",
+    image: "/placeholder.svg",
+    price: "699",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "CapCut Pro",
+    image: "/placeholder.svg",
+    price: "799",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Figma Professional",
+    image: "/placeholder.svg",
+    price: "1499",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Notion Pro",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Zoom Pro",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Microsoft Teams",
+    image: "/placeholder.svg",
+    price: "1199",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "iCloud+",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "GitHub Pro",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "CodePen Pro",
+    image: "/placeholder.svg",
+    price: "899",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Visual Studio Professional",
+    image: "/placeholder.svg",
+    price: "2999",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Vercel Pro",
+    image: "/placeholder.svg",
+    price: "1999",
+    rating: 5,
+    category: "Productivity",
+    buttonText: "Subscribe"
+  },
+  // Security & VPN  
+  {
+    title: "NordVPN",
+    image: "/placeholder.svg",
+    price: "899",
+    rating: 5,
+    category: "Security",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "ExpressVPN",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "Security",
+    buttonText: "Subscribe"
+  },
+  // Social
+  {
+    title: "Tinder Plus",
+    image: "/placeholder.svg",
+    price: "799",
+    rating: 5,
+    category: "Social",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Bumble Plus",
+    image: "/placeholder.svg",
+    price: "899",
+    rating: 5,
+    category: "Social",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "Telegram Stars",
+    image: "/placeholder.svg",
+    price: "299",
+    rating: 5,
+    category: "Social",
+    buttonText: "Buy Stars"
+  },
+  {
+    title: "Discord Nitro",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "Social",
+    buttonText: "Subscribe"
+  },
+  {
+    title: "LinkedIn Pro",
+    image: "/placeholder.svg",
+    price: "1599",
+    rating: 5,
+    category: "Social",
+    buttonText: "Subscribe"
+  }
+];
+
+export const topUpCards = [
+  {
+    title: "Mobile Legends",
+    image: "/placeholder.svg",
+    price: "399",
+    rating: 5,
+    category: "Mobile Games",
+    buttonText: "Top Up",
+    isTopup: true
+  },
+  {
+    title: "PUBG Mobile UC",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "Mobile Games",
+    buttonText: "Top Up",
+    isTopup: true
+  },
+  {
+    title: "Steam Wallet",
+    image: "/placeholder.svg",
+    price: "1000",
+    rating: 5,
+    category: "PC Games",
+    buttonText: "Top Up",
+    isTopup: true
+  },
+  {
+    title: "Valorant Points",
+    image: "/placeholder.svg",
+    price: "799",
+    rating: 5,
+    category: "PC Games",
+    buttonText: "Top Up",
+    isTopup: true
+  },
+  {
+    title: "Free Fire Diamonds",
+    image: "/placeholder.svg",
+    price: "299",
+    rating: 5,
+    category: "Mobile Games",
+    buttonText: "Top Up",
+    isTopup: true
+  },
+  {
+    title: "Genshin Impact",
+    image: "/placeholder.svg",
+    price: "1299",
+    rating: 5,
+    category: "Mobile Games",
+    buttonText: "Top Up",
+    isTopup: true
+  }
+];
