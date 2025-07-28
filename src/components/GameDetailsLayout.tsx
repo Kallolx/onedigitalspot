@@ -120,9 +120,8 @@ const GameDetailsLayout: React.FC<GameDetailsLayoutProps> = ({
                             )}
                             {item.label}
                             {item.hot && (
-                              <span className="bg-orange-400 text-white text-xs px-2 py-0.5 rounded-full font-pixel font-semibold ml-1">
+                              <span className="ml-1">
                                 <img src="/src/assets/icons/fire.svg" alt="Popular" className="inline-block mr-1 w-4 h-4" />
-                                Popular
                               </span>
                             )}
                           </span>
