@@ -119,7 +119,7 @@ const GiftCardDetailsLayout: React.FC<GiftCardDetailsLayoutProps> = ({
                             {item.hot && (
                               <span className="ml-1">
                                 <img
-                                  src="/src/assets/icons/fire.svg"
+                                  src="/assets/icons/fire.svg"
                                   alt="Popular"
                                   className="inline-block mr-1 w-4 h-4"
                                 />

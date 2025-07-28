@@ -121,7 +121,7 @@ const GameDetailsLayout: React.FC<GameDetailsLayoutProps> = ({
                             {item.label}
                             {item.hot && (
                               <span className="ml-1">
-                                <img src="/src/assets/icons/fire.svg" alt="Popular" className="inline-block mr-1 w-4 h-4" />
+                                <img src="/assets/icons/fire.svg" alt="Popular" className="inline-block mr-1 w-4 h-4" />
                               </span>
                             )}
                           </span>
