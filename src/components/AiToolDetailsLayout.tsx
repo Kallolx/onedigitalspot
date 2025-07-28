@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ServiceCard from "@/components/ServiceCard";
 
 interface PriceItem {
@@ -52,6 +52,11 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   } | null>(null);
   const [quantity, setQuantity] = useState(1);
 
+    // Always scroll to top when this layout mounts
+    useEffect(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }, []);
+    
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -328,18 +333,19 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                     </span>
                   </div>
                   <span className="font-pixel text-2xl text-primary font-bold whitespace-nowrap">
-                    {selected &&
-                    priceList[selected.categoryIdx]?.items[selected.itemIdx]
-                      ? (() => {
-                          const item =
-                            priceList[selected.categoryIdx]?.items[
-                              selected.itemIdx
-                            ];
-                          return typeof item.price === "number"
-                            ? item.price * quantity
-                            : item.price;
-                        })()
-                      : 0}
+                    {(() => {
+                      const filteredList = priceList.filter(category =>
+                        purchaseType === "shared"
+                          ? category.title.toLowerCase().includes("shared")
+                          : category.title.toLowerCase().includes("personal")
+                      );
+                      if (!selected) return 0;
+                      const item =
+                        filteredList[selected.categoryIdx]?.items[selected.itemIdx];
+                      return item && typeof item.price === "number"
+                        ? item.price * quantity
+                        : item?.price || 0;
+                    })()}
                     <span className="text-lg font-normal ml-1">৳</span>
                   </span>
                 </div>

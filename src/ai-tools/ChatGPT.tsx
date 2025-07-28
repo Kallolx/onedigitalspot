@@ -62,10 +62,6 @@ const infoSections = [
   },
 ];
 
-const similarProducts = [
-  // Add other AI tools or related products here
-];
-
 export default function ChatGPT() {
   const cg = aiTools.find((g) => g.title === "ChatGPT Pro");
   const similar = aiTools.filter((g) => g.title !== "ChatGPT Pro").slice(0, 4);

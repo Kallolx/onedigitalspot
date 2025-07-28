@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import React from "react";
+import React, { useEffect } from "react";
 import ServiceCard from "@/components/ServiceCard";
 
 interface PriceItem {
@@ -50,6 +50,12 @@ const GiftCardDetailsLayout: React.FC<GiftCardDetailsLayoutProps> = ({
   onSubmit,
   notes = [],
 }) => {
+      
+  // Always scroll to top when this layout mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -142,13 +148,16 @@ const GiftCardDetailsLayout: React.FC<GiftCardDetailsLayoutProps> = ({
             {/* Quantity, Order Summary, and Proceed Button as a Card above info sections */}
             <Card className="mb-8 p-4">
               <div className="flex items-center gap-4 mb-4">
-                <label className="font-pixel text-base text-primary">Quantity</label>
+                <label className="font-pixel text-base text-primary">
+                  Quantity
+                </label>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     className="w-10 h-10 border-2 border-border rounded-lg flex items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
                     onClick={() =>
-                      setQuantity && setQuantity(Math.max(1, (quantity || 1) - 1))
+                      setQuantity &&
+                      setQuantity(Math.max(1, (quantity || 1) - 1))
                     }
                   >
                     -
@@ -166,7 +175,9 @@ const GiftCardDetailsLayout: React.FC<GiftCardDetailsLayoutProps> = ({
                   <button
                     type="button"
                     className="w-10 h-10 border-2 border-border rounded-lg flex items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
-                    onClick={() => setQuantity && setQuantity((quantity || 1) + 1)}
+                    onClick={() =>
+                      setQuantity && setQuantity((quantity || 1) + 1)
+                    }
                   >
                     +
                   </button>
@@ -181,9 +192,13 @@ const GiftCardDetailsLayout: React.FC<GiftCardDetailsLayoutProps> = ({
                     </span>
                   </div>
                   <span className="font-pixel text-2xl text-primary font-bold whitespace-nowrap">
-                    {selected && priceList[selected.categoryIdx]?.items[selected.itemIdx]
+                    {selected &&
+                    priceList[selected.categoryIdx]?.items[selected.itemIdx]
                       ? (() => {
-                          const item = priceList[selected.categoryIdx]?.items[selected.itemIdx];
+                          const item =
+                            priceList[selected.categoryIdx]?.items[
+                              selected.itemIdx
+                            ];
                           return typeof item.price === "number"
                             ? item.price * (quantity || 1)
                             : item.price;
@@ -199,7 +214,7 @@ const GiftCardDetailsLayout: React.FC<GiftCardDetailsLayoutProps> = ({
                   onClick={() => {
                     if (selected !== null) {
                       // Placeholder for proceed action
-                      alert('Proceeding to payment...');
+                      alert("Proceeding to payment...");
                     }
                   }}
                 >
