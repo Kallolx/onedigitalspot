@@ -5,7 +5,7 @@ import GameDetailsLayout from "@/components/GameDetailsLayout";
 const priceList = [
   {
     title: "Passes & Vouchers",
-    categoryIcon: "/src/assets/icons/voucher.svg",
+    categoryIcon: "/assets/icons/voucher.svg",
     items: [
       { label: "Weekly Pass", price: 200, hot: true },
       { label: "Twilight Pass", price: 1040 },
@@ -13,7 +13,7 @@ const priceList = [
   },
   {
     title: "Diamonds",
-    categoryIcon: "/src/assets/icons/diamond.svg",
+    categoryIcon: "/assets/icons/diamond.svg",
     items: [
       { label: "165+135 Diamond", price: 305 },
       { label: "275+225 Diamond", price: 490 },

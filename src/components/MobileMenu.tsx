@@ -72,8 +72,8 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   { name: "PC Games", path: "/pc-games" },
                 ].map((dropItem) => {
                   const productImages = {
-                    "Mobile Games": "/src/assets/icons/mobile-games.svg",
-                    "PC Games": "/src/assets/icons/pc-games.svg",
+                    "Mobile Games": "/assets/icons/mobile-games.svg",
+                    "PC Games": "/assets/icons/pc-games.svg",
                   };
                   const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
                   return (
@@ -123,10 +123,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   { name: "More", path: "/top-up-games" },
                 ].map((dropItem) => {
                   const productImages = {
-                    "Mobile Legends": "/src/assets/icons/mobile-legends.svg",
-                    "PUBG Mobile": "/src/assets/icons/pubg-mobile.svg",
-                    "Free Fire": "/src/assets/icons/free-fire.svg",
-                    "Roblox": "/src/assets/icons/roblox-banner.svg",
+                    "Mobile Legends": "/assets/icons/mobile-legends.svg",
+                    "PUBG Mobile": "/assets/icons/pubg-mobile.svg",
+                    "Free Fire": "/assets/icons/free-fire.svg",
+                    "Roblox": "/assets/icons/roblox-banner.svg",
                   };
                   const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
                   return (
@@ -183,10 +183,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   { name: "More", path: "/ai-tools" },
                 ].map((dropItem) => {
                   const productImages = {
-                    "ChatGPT Pro": "/src/assets/icons/chatgpt.svg",
-                    "Claude Pro": "/src/assets/icons/claude.svg",
-                    "Midjourney Pro": "/src/assets/icons/midjourney.svg",
-                    "Github Pro": "/src/assets/icons/github.svg",
+                    "ChatGPT Pro": "/assets/icons/chatgpt.svg",
+                    "Claude Pro": "/assets/icons/claude.svg",
+                    "Midjourney Pro": "/assets/icons/midjourney.svg",
+                    "Github Pro": "/assets/icons/github.svg",
                   };
                   const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
                   return (
@@ -243,10 +243,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   { name: "More", path: "/gift-cards" },
                 ].map((dropItem) => {
                   const productImages = {
-                    "Steam": "/src/assets/icons/steam-card.svg",
-                    "Google Play": "/src/assets/icons/google-play.svg",
-                    "Apple Store": "/src/assets/icons/apple-store.svg",
-                    "PlayStation": "/src/assets/icons/playstation.svg",
+                    "Steam": "/assets/icons/steam-card.svg",
+                    "Google Play": "/assets/icons/google-play.svg",
+                    "Apple Store": "/assets/icons/apple-store.svg",
+                    "PlayStation": "/assets/icons/playstation.svg",
                   };
                   const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
                   return (
@@ -303,10 +303,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   { name: "More", path: "/subscriptions" },
                 ].map((dropItem) => {
                   const productImages = {
-                    "Netflix": "/src/assets/icons/netflix.svg",
-                    "Crunchyroll": "/src/assets/icons/crunchyroll.svg",
-                    "Tinder": "/src/assets/icons/tinder.svg",
-                    "Youtube Premium": "/src/assets/icons/youtube-premium.svg",
+                    "Netflix": "/assets/icons/netflix.svg",
+                    "Crunchyroll": "/assets/icons/crunchyroll.svg",
+                    "Tinder": "/assets/icons/tinder.svg",
+                    "Youtube Premium": "/assets/icons/youtube-premium.svg",
                   };
                   const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
                   return (

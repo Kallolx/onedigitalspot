@@ -5,7 +5,7 @@ import { aiTools } from "@/lib/producs";
 const priceList = [
   {
     title: "ChatGPT Pro Shared Account",
-    categoryIcon: "/src/assets/icons/chatgpt.svg",
+    categoryIcon: "/assets/icons/chatgpt.svg",
     items: [
       { label: "1 Month Access", price: 350, hot: true },
       { label: "3 Months Access", price: 900 },
@@ -15,7 +15,7 @@ const priceList = [
   },
   {
     title: "ChatGPT Pro Personal Account",
-    categoryIcon: "/src/assets/icons/chatgpt.svg",
+    categoryIcon: "/assets/icons/chatgpt.svg",
     items: [
       { label: "1 Month Personal", price: 650 },
       { label: "3 Months Personal", price: 1800, hot: true },

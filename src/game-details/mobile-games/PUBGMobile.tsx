@@ -5,7 +5,7 @@ import GameDetailsLayout from "@/components/GameDetailsLayout";
 const priceList = [
   {
     title: "Passes & Vouchers",
-    categoryIcon: "/src/assets/icons/battle-pass.svg",
+    categoryIcon: "/assets/icons/battle-pass.svg",
     items: [
       { label: "Royale Pass Lv50", price: 740, hot: true },
       { label: "Royale Pass Lv100", price: 1360},
@@ -14,7 +14,7 @@ const priceList = [
   },
   {
     title: "UC Packages",
-    categoryIcon: "/src/assets/icons/uc.svg",
+    categoryIcon: "/assets/icons/uc.svg",
     items: [
       { label: "PUBG 60 UC", price: 125 },
       { label: "PUBG 120 UC", price: 245 },

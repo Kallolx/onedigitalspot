@@ -5,7 +5,7 @@ import GiftCardDetailsLayout from "@/components/GiftCardDetailsLayout";
 const priceList = [
   {
     title: "Steam Wallet Codes (USD)",
-    categoryIcon: "/src/assets/icons/steam-card.svg",
+    categoryIcon: "/assets/icons/steam-card.svg",
     items: [
       { label: "Steam Wallet - $1.10", price: 140 },
       { label: "Steam Wallet - $1.75", price: 220 },

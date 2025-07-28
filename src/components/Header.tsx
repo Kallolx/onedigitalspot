@@ -92,7 +92,7 @@ const Header = () => {
             <a href="/" className="flex items-center gap-4">
               <div className="flex font-anekbangla font-bold text-2xl md:text-3xl text-primary gap-2">
                 <img
-                  src="/src/assets/logo.svg"
+                  src="/assets/logo.svg"
                   alt="LootBox Logo"
                   className="w-6 h-6 md:w-10 md:h-10"
                 />
@@ -125,35 +125,35 @@ const Header = () => {
                             // Map product names to images (fallback to placeholder)
                             const productImages = {
                               "Mobile Games":
-                                "/src/assets/icons/mobile-games.svg",
-                              "PC Games": "/src/assets/icons/pc-games.svg",
+                                "/assets/icons/mobile-games.svg",
+                              "PC Games": "/assets/icons/pc-games.svg",
                               "Mobile Legends":
-                                "/src/assets/icons/mobile-legends.svg",
+                                "/assets/icons/mobile-legends.svg",
                               "PUBG Mobile":
-                                "/src/assets/icons/pubg-mobile.svg",
-                              "Free Fire": "/src/assets/icons/free-fire.svg",
-                              Roblox: "/src/assets/icons/roblox-banner.svg",
-                              Steam: "/src/assets/icons/steam-card.svg",
+                                "/assets/icons/pubg-mobile.svg",
+                              "Free Fire": "/assets/icons/free-fire.svg",
+                              Roblox: "/assets/icons/roblox-banner.svg",
+                              Steam: "/assets/icons/steam-card.svg",
                               "Google Play":
-                                "/src/assets/icons/google-play.svg",
+                                "/assets/icons/google-play.svg",
                               "Apple Store":
-                                "/src/assets/icons/apple-store.svg",
-                              PlayStation: "/src/assets/icons/playstation.svg",
-                              Netflix: "/src/assets/icons/netflix.svg",
-                              Crunchyroll: "/src/assets/icons/crunchyroll.svg",
-                              Tinder: "/src/assets/icons/tinder.svg",
+                                "/assets/icons/apple-store.svg",
+                              PlayStation: "/assets/icons/playstation.svg",
+                              Netflix: "/assets/icons/netflix.svg",
+                              Crunchyroll: "/assets/icons/crunchyroll.svg",
+                              Tinder: "/assets/icons/tinder.svg",
                               "Youtube Premium":
-                                "/src/assets/icons/youtube-premium.svg",
-                              "ChatGPT Pro": "/src/assets/icons/chatgpt.svg",
-                              "Claude Pro": "/src/assets/icons/claude.svg",
+                                "/assets/icons/youtube-premium.svg",
+                              "ChatGPT Pro": "/assets/icons/chatgpt.svg",
+                              "Claude Pro": "/assets/icons/claude.svg",
                               "Midjourney Pro":
-                                "/src/assets/icons/midjourney.svg",
-                              "Github Pro": "/src/assets/icons/github.svg",
+                                "/assets/icons/midjourney.svg",
+                              "Github Pro": "/assets/icons/github.svg",
                               // Add more mappings as needed
                             };
                             const imgSrc =
                               productImages[dropItem.name] ||
-                              "/src/assets/icons/placeholder.svg";
+                              "/assets/icons/placeholder.svg";
                             return (
                               <a
                                 key={dropItem.name}
