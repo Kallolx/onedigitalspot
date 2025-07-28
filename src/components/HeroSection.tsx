@@ -13,17 +13,20 @@ import * as React from "react";
 
 const heroSlides = [
   {
-    image: "/src/assets/roblox-banner.jpg",
+    imageMobile: "/src/assets/1.png",
+    imageDesktop: "/src/assets/1.1.png",
     title: "Roblox",
     discount: "70% OFF"
   },
   {
-    image: "/src/assets/pubg-mobile.jpg",
+    imageMobile: "/src/assets/2.png",
+    imageDesktop: "/src/assets/2.1.png",
     title: "PUBG Mobile",
     discount: "50% OFF"
   },
   {
-    image: "/src/assets/mobile-legends.jpg",
+    imageMobile: "/src/assets/3.png",
+    imageDesktop: "/src/assets/3.1.png",
     title: "Mobile Legends",
     discount: "30% OFF"
   }
@@ -54,11 +57,14 @@ const HeroSection = () => {
             {heroSlides.map((slide, index) => (
               <CarouselItem key={index} className="pl-4">
                 <Card className="relative overflow-hidden rounded-lg md:rounded-xl border border-border/50 md:border-2">
-                  <img 
-                    src={slide.image} 
-                    alt={slide.title} 
-                    className="h-[200px] md:h-[400px] w-full object-cover"
-                  />
+                  <picture>
+                    <source srcSet={slide.imageDesktop} media="(min-width: 768px)" />
+                    <img
+                      src={slide.imageMobile}
+                      alt={slide.title}
+                      className="h-[200px] md:h-[400px] w-full object-cover"
+                    />
+                  </picture>
                   {slide.discount && (
                     <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1.5 md:px-4 md:py-2 rounded-full font-pixel text-xs md:text-sm">
                       {slide.discount}

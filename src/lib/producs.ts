@@ -1,11 +1,12 @@
 export const mobileGames = [
   {
     title: "Mobile Legends",
-    image: "/placeholder.svg",
+    image: "/products/mobile-legends.png",
     price: "299",
     rating: 5,
     category: "MOBA",
-    buttonText: "Buy Diamonds"
+    buttonText: "Buy Diamonds",
+    route: "/mobile-games/mobile-legends",
   },
   {
     title: "Call of Duty Mobile",
@@ -13,15 +14,17 @@ export const mobileGames = [
     price: "399",
     rating: 5,
     category: "Action",
-    buttonText: "Buy CP"
+    buttonText: "Buy CP",
+    route: "/mobile-games/call-of-duty-mobile",
   },
   {
     title: "PUBG Mobile",
-    image: "/placeholder.svg",
+    image: "/products/pubg-mobile.png",
     price: "499",
     rating: 5,
     category: "Battle Royale",
-    buttonText: "Buy UC"
+    buttonText: "Buy UC",
+    route: "/mobile-games/pubg-mobile",
   },
   {
     title: "Free Fire",
@@ -29,7 +32,8 @@ export const mobileGames = [
     price: "199",
     rating: 5,
     category: "Battle Royale",
-    buttonText: "Buy Diamonds"
+    buttonText: "Buy Diamonds",
+    route: "/mobile-games/free-fire",
   },
   {
     title: "Delta Force",
@@ -37,7 +41,7 @@ export const mobileGames = [
     price: "599",
     rating: 5,
     category: "Action",
-    buttonText: "Buy Credits"
+    buttonText: "Buy Credits",
   },
   {
     title: "Blood Strike",
@@ -45,7 +49,7 @@ export const mobileGames = [
     price: "349",
     rating: 5,
     category: "Action",
-    buttonText: "Buy Gold"
+    buttonText: "Buy Gold",
   },
   {
     title: "Clash of Clans",
@@ -53,7 +57,7 @@ export const mobileGames = [
     price: "299",
     rating: 5,
     category: "Strategy",
-    buttonText: "Buy Gems"
+    buttonText: "Buy Gems",
   },
   {
     title: "Clash Royale",
@@ -61,7 +65,7 @@ export const mobileGames = [
     price: "399",
     rating: 5,
     category: "Strategy",
-    buttonText: "Buy Gems"
+    buttonText: "Buy Gems",
   },
   {
     title: "Brawl Stars",
@@ -69,7 +73,7 @@ export const mobileGames = [
     price: "299",
     rating: 5,
     category: "Action",
-    buttonText: "Buy Gems"
+    buttonText: "Buy Gems",
   },
   {
     title: "Standoff 2",
@@ -77,7 +81,7 @@ export const mobileGames = [
     price: "449",
     rating: 5,
     category: "Action",
-    buttonText: "Buy Gold"
+    buttonText: "Buy Gold",
   },
   {
     title: "Genshin Impact",
@@ -85,7 +89,7 @@ export const mobileGames = [
     price: "799",
     rating: 5,
     category: "RPG",
-    buttonText: "Buy Primogems"
+    buttonText: "Buy Primogems",
   },
   {
     title: "Wuthering Waves",
@@ -93,7 +97,7 @@ export const mobileGames = [
     price: "699",
     rating: 5,
     category: "RPG",
-    buttonText: "Buy Lunite"
+    buttonText: "Buy Lunite",
   },
   {
     title: "Roblox",
@@ -101,7 +105,7 @@ export const mobileGames = [
     price: "399",
     rating: 5,
     category: "Sandbox",
-    buttonText: "Buy Robux"
+    buttonText: "Buy Robux",
   },
   {
     title: "eFootball",
@@ -109,7 +113,7 @@ export const mobileGames = [
     price: "599",
     rating: 5,
     category: "Sports",
-    buttonText: "Buy Coins"
+    buttonText: "Buy Coins",
   },
   {
     title: "FIFA Mobile",
@@ -117,8 +121,8 @@ export const mobileGames = [
     price: "699",
     rating: 5,
     category: "Sports",
-    buttonText: "Buy Points"
-  }
+    buttonText: "Buy Points",
+  },
 ];
 
 export const pcGames = [
@@ -128,7 +132,7 @@ export const pcGames = [
     price: "799",
     rating: 5,
     category: "FPS",
-    buttonText: "Buy VP"
+    buttonText: "Buy VP",
   },
   {
     title: "Apex Legends",
@@ -136,8 +140,8 @@ export const pcGames = [
     price: "899",
     rating: 5,
     category: "Battle Royale",
-    buttonText: "Buy Coins"
-  }
+    buttonText: "Buy Coins",
+  },
 ];
 
 export const giftCards = [
@@ -147,7 +151,7 @@ export const giftCards = [
     price: "500",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
   },
   {
     title: "iTunes",
@@ -155,15 +159,16 @@ export const giftCards = [
     price: "1000",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
   },
   {
     title: "Steam Wallet",
-    image: "/placeholder.svg",
+    image: "/products/steam-wallet.png",
     price: "1500",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
+    route: "/gift-cards/steam-wallet",
   },
   {
     title: "PlayStation",
@@ -171,7 +176,7 @@ export const giftCards = [
     price: "2000",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
   },
   {
     title: "Valorant Gift Cards",
@@ -179,7 +184,7 @@ export const giftCards = [
     price: "1200",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
   },
   {
     title: "Roblox Gift Cards",
@@ -187,7 +192,7 @@ export const giftCards = [
     price: "800",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
   },
   {
     title: "Minecraft Minecoins",
@@ -195,7 +200,7 @@ export const giftCards = [
     price: "699",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
   },
   {
     title: "Fortnite V-Bucks",
@@ -203,7 +208,7 @@ export const giftCards = [
     price: "999",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
+    buttonText: "Buy Now",
   },
   {
     title: "AWS Credits",
@@ -211,18 +216,19 @@ export const giftCards = [
     price: "2999",
     rating: 5,
     category: "Gift Cards",
-    buttonText: "Buy Now"
-  }
+    buttonText: "Buy Now",
+  },
 ];
 
 export const aiTools = [
   {
     title: "ChatGPT Pro",
-    image: "/placeholder.svg",
+    image: "/products/pubg-mobile.png",
     price: "1999",
     rating: 5,
     category: "AI Assistant",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
+    route: "/ai-tools/chatgpt",
   },
   {
     title: "Perplexity Pro",
@@ -230,7 +236,7 @@ export const aiTools = [
     price: "1599",
     rating: 5,
     category: "AI Assistant",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Claude Pro",
@@ -238,7 +244,7 @@ export const aiTools = [
     price: "1799",
     rating: 5,
     category: "AI Assistant",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Grok Pro",
@@ -246,7 +252,7 @@ export const aiTools = [
     price: "1299",
     rating: 5,
     category: "AI Assistant",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Gemini Pro",
@@ -254,7 +260,7 @@ export const aiTools = [
     price: "1899",
     rating: 5,
     category: "AI Assistant",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "GitHub Copilot",
@@ -262,7 +268,7 @@ export const aiTools = [
     price: "999",
     rating: 5,
     category: "AI Coding",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Cursor IDE",
@@ -270,7 +276,7 @@ export const aiTools = [
     price: "1499",
     rating: 5,
     category: "AI Coding",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Windsurf IDE",
@@ -278,8 +284,8 @@ export const aiTools = [
     price: "1299",
     rating: 5,
     category: "AI Coding",
-    buttonText: "Subscribe"
-  }
+    buttonText: "Subscribe",
+  },
 ];
 
 export const subscriptions = [
@@ -290,7 +296,7 @@ export const subscriptions = [
     price: "1499",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Hulu",
@@ -298,7 +304,7 @@ export const subscriptions = [
     price: "899",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Amazon Prime",
@@ -306,7 +312,7 @@ export const subscriptions = [
     price: "1299",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Disney Plus",
@@ -314,7 +320,7 @@ export const subscriptions = [
     price: "999",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "ZEE5",
@@ -322,7 +328,7 @@ export const subscriptions = [
     price: "599",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Hotstar",
@@ -330,7 +336,7 @@ export const subscriptions = [
     price: "1499",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Sony Live",
@@ -338,7 +344,7 @@ export const subscriptions = [
     price: "699",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Ullu",
@@ -346,7 +352,7 @@ export const subscriptions = [
     price: "399",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Alt Balaji",
@@ -354,7 +360,7 @@ export const subscriptions = [
     price: "499",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "HBO Max",
@@ -362,7 +368,7 @@ export const subscriptions = [
     price: "1199",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Apple TV",
@@ -370,7 +376,7 @@ export const subscriptions = [
     price: "799",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "YouTube Premium",
@@ -378,7 +384,7 @@ export const subscriptions = [
     price: "399",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Apple Music",
@@ -386,7 +392,7 @@ export const subscriptions = [
     price: "399",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "SoundCloud Pro",
@@ -394,7 +400,7 @@ export const subscriptions = [
     price: "599",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Twitch Turbo",
@@ -402,7 +408,7 @@ export const subscriptions = [
     price: "899",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Crunchyroll",
@@ -410,7 +416,7 @@ export const subscriptions = [
     price: "799",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Voot",
@@ -418,7 +424,7 @@ export const subscriptions = [
     price: "699",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Hoichoi",
@@ -426,7 +432,7 @@ export const subscriptions = [
     price: "599",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Spotify",
@@ -434,7 +440,7 @@ export const subscriptions = [
     price: "299",
     rating: 5,
     category: "Entertainment",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   // Gaming
   {
@@ -443,7 +449,7 @@ export const subscriptions = [
     price: "1299",
     rating: 5,
     category: "Gaming",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Ubisoft+",
@@ -451,7 +457,7 @@ export const subscriptions = [
     price: "1599",
     rating: 5,
     category: "Gaming",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   // Productivity
   {
@@ -460,7 +466,7 @@ export const subscriptions = [
     price: "1299",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Duolingo",
@@ -468,7 +474,7 @@ export const subscriptions = [
     price: "899",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "QuillBot",
@@ -476,7 +482,7 @@ export const subscriptions = [
     price: "599",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Grammarly",
@@ -484,7 +490,7 @@ export const subscriptions = [
     price: "1199",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Office 365",
@@ -492,7 +498,7 @@ export const subscriptions = [
     price: "1999",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Google One",
@@ -500,7 +506,7 @@ export const subscriptions = [
     price: "699",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "CapCut Pro",
@@ -508,7 +514,7 @@ export const subscriptions = [
     price: "799",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Figma Professional",
@@ -516,7 +522,7 @@ export const subscriptions = [
     price: "1499",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Notion Pro",
@@ -524,7 +530,7 @@ export const subscriptions = [
     price: "999",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Zoom Pro",
@@ -532,7 +538,7 @@ export const subscriptions = [
     price: "1299",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Microsoft Teams",
@@ -540,7 +546,7 @@ export const subscriptions = [
     price: "1199",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "iCloud+",
@@ -548,7 +554,7 @@ export const subscriptions = [
     price: "399",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "GitHub Pro",
@@ -556,7 +562,7 @@ export const subscriptions = [
     price: "999",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "CodePen Pro",
@@ -564,7 +570,7 @@ export const subscriptions = [
     price: "899",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Visual Studio Professional",
@@ -572,7 +578,7 @@ export const subscriptions = [
     price: "2999",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Vercel Pro",
@@ -580,16 +586,16 @@ export const subscriptions = [
     price: "1999",
     rating: 5,
     category: "Productivity",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
-  // Security & VPN  
+  // Security & VPN
   {
     title: "NordVPN",
     image: "/placeholder.svg",
     price: "899",
     rating: 5,
     category: "Security",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "ExpressVPN",
@@ -597,7 +603,7 @@ export const subscriptions = [
     price: "1299",
     rating: 5,
     category: "Security",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   // Social
   {
@@ -606,7 +612,7 @@ export const subscriptions = [
     price: "799",
     rating: 5,
     category: "Social",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Bumble Plus",
@@ -614,7 +620,7 @@ export const subscriptions = [
     price: "899",
     rating: 5,
     category: "Social",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "Telegram Stars",
@@ -622,7 +628,7 @@ export const subscriptions = [
     price: "299",
     rating: 5,
     category: "Social",
-    buttonText: "Buy Stars"
+    buttonText: "Buy Stars",
   },
   {
     title: "Discord Nitro",
@@ -630,7 +636,7 @@ export const subscriptions = [
     price: "999",
     rating: 5,
     category: "Social",
-    buttonText: "Subscribe"
+    buttonText: "Subscribe",
   },
   {
     title: "LinkedIn Pro",
@@ -638,37 +644,40 @@ export const subscriptions = [
     price: "1599",
     rating: 5,
     category: "Social",
-    buttonText: "Subscribe"
-  }
+    buttonText: "Subscribe",
+  },
 ];
 
 export const topUpCards = [
   {
     title: "Mobile Legends",
-    image: "/placeholder.svg",
+    image: "/products/mobile-legends.png",
     price: "399",
     rating: 5,
     category: "Mobile Games",
     buttonText: "Top Up",
-    isTopup: true
+    isTopup: true,
+    route: "/mobile-games/mobile-legends",
   },
   {
     title: "PUBG Mobile UC",
-    image: "/placeholder.svg",
+    image: "/products/pubg-mobile.png",
     price: "999",
     rating: 5,
     category: "Mobile Games",
     buttonText: "Top Up",
-    isTopup: true
+    isTopup: true,
+    route: "/mobile-games/pubg-mobile",
   },
   {
     title: "Steam Wallet",
-    image: "/placeholder.svg",
+    image: "/products/mobile-legends.png",
     price: "1000",
     rating: 5,
     category: "PC Games",
     buttonText: "Top Up",
-    isTopup: true
+    isTopup: true,
+    route: "/gift-cards/steam-wallet",
   },
   {
     title: "Valorant Points",
@@ -677,7 +686,7 @@ export const topUpCards = [
     rating: 5,
     category: "PC Games",
     buttonText: "Top Up",
-    isTopup: true
+    isTopup: true,
   },
   {
     title: "Free Fire Diamonds",
@@ -686,7 +695,7 @@ export const topUpCards = [
     rating: 5,
     category: "Mobile Games",
     buttonText: "Top Up",
-    isTopup: true
+    isTopup: true,
   },
   {
     title: "Genshin Impact",
@@ -695,6 +704,6 @@ export const topUpCards = [
     rating: 5,
     category: "Mobile Games",
     buttonText: "Top Up",
-    isTopup: true
-  }
+    isTopup: true,
+  },
 ];

@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  ShoppingCart,
-  User,
-  ChevronDown,
-  Menu,
-  X,
-  Store,
-  Gamepad,
-  Gift,
-} from "lucide-react";
+  ShopSignIcon,
+  CoinsDollarIcon,
+  AiMagicIcon,
+  GiftCardIcon,
+  Tv01Icon,
+  ShoppingCart02Icon,
+  Logout03Icon,
+  Menu03Icon,
+  Cancel01Icon,
+  ArrowDown01Icon
+} from "hugeicons-react";
+
 import MobileMenu from "./MobileMenu";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const location = { pathname: "/" }; // Mock location for demo
+  const location = { pathname: "/" };
 
   const navigationItems = [
     {
       name: "Shop",
-      icon: Store,
+      icon: ShopSignIcon,
       isActive: ["/mobile-games", "/pc-games"].some((p) =>
         location.pathname.startsWith(p)
       ),
@@ -32,31 +35,31 @@ const Header = () => {
     {
       name: "Top Up",
       path: "/top-up-games",
-      icon: Gamepad,
+      icon: CoinsDollarIcon,
       dropdown: [
-        { name: "Mobile Legends", path: "/top-up-games/mobile-legends" },
-        { name: "PUBG Mobile", path: "/top-up-games/pubg" },
-        { name: "Free Fire", path: "/top-up-games/free-fire" },
-        { name: "Roblox", path: "/top-up-games/roblox" },
+        { name: "Mobile Legends", path: "/mobile-games/mobile-legends" },
+        { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
+        { name: "Free Fire", path: "/mobile-games/free-fire" },
+        { name: "Roblox", path: "/mobile-games/roblox" },
         { name: "More", path: "/top-up-games" },
       ],
     },
     {
       name: "AI Tools",
       path: "/ai-tools",
-      icon: Gift,
+      icon: AiMagicIcon,
       dropdown: [
         { name: "ChatGPT Pro", path: "/ai/chatgpt" },
         { name: "Claude Pro", path: "/ai/claude" },
         { name: "Midjourney Pro", path: "/ai/midjourney" },
-        { name: "DALL-E Credits", path: "/ai/dalle" },
+        { name: "Github Pro", path: "/ai/dalle" },
         { name: "More", path: "/ai-tools" },
       ],
     },
     {
       name: "Gift Cards",
       path: "/gift-cards",
-      icon: Gift,
+      icon: GiftCardIcon,
       dropdown: [
         { name: "Steam", path: "/gift/steam" },
         { name: "Google Play", path: "/gift/google" },
@@ -68,7 +71,7 @@ const Header = () => {
     {
       name: "Subscriptions",
       path: "/subscriptions",
-      icon: Gift,
+      icon: Tv01Icon,
       dropdown: [
         { name: "Netflix", path: "/sub/netflix" },
         { name: "Crunchyroll", path: "/sub/crunchyroll" },
@@ -78,8 +81,6 @@ const Header = () => {
       ],
     },
   ];
-
-  // Broadcast ticker always visible, no close button
 
   return (
     <>
@@ -112,53 +113,96 @@ const Header = () => {
                           : "text-foreground hover:bg-muted"
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-5 h-5" />
                       {item.name}
-                      {item.dropdown && <ChevronDown className="w-4 h-4" />}
+                      {item.dropdown && <ArrowDown01Icon className="w-4 h-4" />}
                     </a>
                     {/* Desktop Dropdown */}
                     {item.dropdown && (
                       <div className="absolute hidden group-hover:block top-full left-0 w-48 p-2 bg-background border-2 border-border rounded-md shadow-card text-foreground z-50">
                         <div className="space-y-1">
-                          {item.dropdown.map((dropItem) => (
-                            <a
-                              key={dropItem.name}
-                              href={dropItem.path}
-                              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                            >
-                              {dropItem.name}
-                              {dropItem.name === "More" && (
-                                <span className="inline-block">
-                                  <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 16 16"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <circle
-                                      cx="3"
-                                      cy="8"
-                                      r="1.5"
-                                      fill="currentColor"
+                          {item.dropdown.map((dropItem) => {
+                            // Map product names to images (fallback to placeholder)
+                            const productImages = {
+                              "Mobile Games":
+                                "/src/assets/icons/mobile-games.svg",
+                              "PC Games": "/src/assets/icons/pc-games.svg",
+                              "Mobile Legends":
+                                "/src/assets/icons/mobile-legends.svg",
+                              "PUBG Mobile":
+                                "/src/assets/icons/pubg-mobile.svg",
+                              "Free Fire": "/src/assets/icons/free-fire.svg",
+                              Roblox: "/src/assets/icons/roblox-banner.svg",
+                              Steam: "/src/assets/icons/steam-card.svg",
+                              "Google Play":
+                                "/src/assets/icons/google-play.svg",
+                              "Apple Store":
+                                "/src/assets/icons/apple-store.svg",
+                              PlayStation: "/src/assets/icons/playstation.svg",
+                              Netflix: "/src/assets/icons/netflix.svg",
+                              Crunchyroll: "/src/assets/icons/crunchyroll.svg",
+                              Tinder: "/src/assets/icons/tinder.svg",
+                              "Youtube Premium":
+                                "/src/assets/icons/youtube-premium.svg",
+                              "ChatGPT Pro": "/src/assets/icons/chatgpt.svg",
+                              "Claude Pro": "/src/assets/icons/claude.svg",
+                              "Midjourney Pro":
+                                "/src/assets/icons/midjourney.svg",
+                              "Github Pro": "/src/assets/icons/github.svg",
+                              // Add more mappings as needed
+                            };
+                            const imgSrc =
+                              productImages[dropItem.name] ||
+                              "/src/assets/icons/placeholder.svg";
+                            return (
+                              <a
+                                key={dropItem.name}
+                                href={dropItem.path}
+                                className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+                              >
+                                {dropItem.name !== "More" && (
+                                  <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
+                                    <img
+                                      src={imgSrc}
+                                      alt={dropItem.name}
+                                      className="w-full h-full object-cover"
                                     />
-                                    <circle
-                                      cx="8"
-                                      cy="8"
-                                      r="1.5"
-                                      fill="currentColor"
-                                    />
-                                    <circle
-                                      cx="13"
-                                      cy="8"
-                                      r="1.5"
-                                      fill="currentColor"
-                                    />
-                                  </svg>
-                                </span>
-                              )}
-                            </a>
-                          ))}
+                                  </span>
+                                )}
+                                {dropItem.name}
+                                {dropItem.name === "More" && (
+                                  <span className="inline-block">
+                                    <svg
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 16 16"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <circle
+                                        cx="3"
+                                        cy="8"
+                                        r="1.5"
+                                        fill="currentColor"
+                                      />
+                                      <circle
+                                        cx="8"
+                                        cy="8"
+                                        r="1.5"
+                                        fill="currentColor"
+                                      />
+                                      <circle
+                                        cx="13"
+                                        cy="8"
+                                        r="1.5"
+                                        fill="currentColor"
+                                      />
+                                    </svg>
+                                  </span>
+                                )}
+                              </a>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -174,14 +218,14 @@ const Header = () => {
                 size="icon"
                 className="relative p-1 h-9 w-9 min-w-0 hidden xl:inline-flex"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart02Icon className="w-4 h-4" />
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-[10px] font-semibold text-primary-foreground rounded-full flex items-center justify-center">
                   0
                 </span>
               </Button>
               {/* Login Button */}
               <Button variant="pixel" size="default" className="h-10 px-4">
-                <User className="w-4 h-4 mr-2" />
+                <Logout03Icon className="w-5 h-5" />
                 <span className="text-sm font-medium">LOG IN</span>
               </Button>
               {/* Mobile Menu Toggle (below xl) */}
@@ -192,9 +236,9 @@ const Header = () => {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 {isMobileMenuOpen ? (
-                  <X className="w-4 h-4" />
+                  <Cancel01Icon className="w-5 h-5" />
                 ) : (
-                  <Menu className="w-4 h-4" />
+                  <Menu03Icon className="w-5 h-5" />
                 )}
               </Button>
             </div>

@@ -1,10 +1,10 @@
 import Header from "@/components/Header";
 import { useState } from "react";
-import { mobileGames, pcGames } from "../lib/producs";
+import { topUpCards } from "../lib/producs";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/ServiceCard";
 
-const allGames = [...mobileGames, ...pcGames];
+const allGames = topUpCards;
 const categories = Array.from(new Set(allGames.map(g => g.category)));
 
 const priceRanges = [
