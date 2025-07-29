@@ -292,11 +292,12 @@ export const subscriptions = [
   // Entertainment
   {
     title: "Netflix",
-    image: "/placeholder.svg",
+    image: "/products/netflix.png",
     price: "1499",
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/netflix",
   },
   {
     title: "Hulu",

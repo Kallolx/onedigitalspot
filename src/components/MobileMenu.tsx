@@ -116,10 +116,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
             {activeSubmenu === "topup" && (
               <div className="mt-2 space-y-1">
                 {[
-                  { name: "Mobile Legends", path: "/top-up-games/mobile-legends" },
-                  { name: "PUBG Mobile", path: "/top-up-games/pubg" },
-                  { name: "Free Fire", path: "/top-up-games/free-fire" },
-                  { name: "Roblox", path: "/top-up-games/roblox" },
+                  { name: "Mobile Legends", path: "/mobile-games/mobile-legends" },
+                  { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
+                  { name: "Free Fire", path: "/mobile-games/free-fire" },
+                  { name: "Roblox", path: "/mobile-games/roblox" },
                   { name: "More", path: "/top-up-games" },
                 ].map((dropItem) => {
                   const productImages = {
@@ -176,10 +176,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
             {activeSubmenu === "aitools" && (
               <div className="mt-2 space-y-1">
                 {[
-                  { name: "ChatGPT Pro", path: "/ai/chatgpt" },
-                  { name: "Claude Pro", path: "/ai/claude" },
-                  { name: "Midjourney Pro", path: "/ai/midjourney" },
-                  { name: "Github Pro", path: "/ai/dalle" },
+                  { name: "ChatGPT Pro", path: "/ai-tools/chatgpt" },
+                  { name: "Claude Pro", path: "/ai-tools/claude" },
+                  { name: "Midjourney Pro", path: "/ai-tools/midjourney" },
+                  { name: "Github Pro", path: "/ai-tools/github" },
                   { name: "More", path: "/ai-tools" },
                 ].map((dropItem) => {
                   const productImages = {
@@ -236,10 +236,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
             {activeSubmenu === "giftcards" && (
               <div className="mt-2 space-y-1">
                 {[
-                  { name: "Steam", path: "/gift/steam" },
-                  { name: "Google Play", path: "/gift/google" },
-                  { name: "Apple Store", path: "/gift/apple" },
-                  { name: "PlayStation", path: "/gift/ps" },
+                  { name: "Steam", path: "/gift-cards/steam-wallet" },
+                  { name: "Google Play", path: "/gift-cards/google-play" },
+                  { name: "Apple Store", path: "/gift-cards/apple-store" },
+                  { name: "PlayStation", path: "/gift-cards/playstation" },
                   { name: "More", path: "/gift-cards" },
                 ].map((dropItem) => {
                   const productImages = {
@@ -296,10 +296,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
             {activeSubmenu === "subscriptions" && (
               <div className="mt-2 space-y-1">
                 {[
-                  { name: "Netflix", path: "/sub/netflix" },
-                  { name: "Crunchyroll", path: "/sub/crunchyroll" },
-                  { name: "Tinder", path: "/sub/tinder" },
-                  { name: "Youtube Premium", path: "/sub/youtube" },
+                  { name: "Netflix", path: "/subscriptions/netflix" },
+                  { name: "Crunchyroll", path: "/subscriptions/crunchyroll" },
+                  { name: "Tinder", path: "/subscriptions/tinder" },
+                  { name: "Youtube Premium", path: "/subscriptions/youtube" },
                   { name: "More", path: "/subscriptions" },
                 ].map((dropItem) => {
                   const productImages = {

@@ -47,7 +47,6 @@ const GiftCardDetailsLayout: React.FC<GiftCardDetailsLayoutProps> = ({
   setQuantity,
   selected,
   setSelected,
-  onSubmit,
   notes = [],
 }) => {
       
