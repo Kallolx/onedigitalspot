@@ -1,10 +1,9 @@
-import React from "react";
+
 import { useNavigate } from "react-router-dom";
 import { adminNavConfig } from "../lib/adminNavConfig";
 import {
   ShopSignIcon,
   CoinsDollarIcon,
-  Tv01Icon,
   UserIcon,
   Settings02Icon,
   DashboardSpeed01Icon,
@@ -20,7 +19,6 @@ const Sidebar = ({ adminNav, activeRoute, setActiveRoute, sidebarOpen, onClose }
     orders: CoinsDollarIcon,
     products: ShopSignIcon,
     users: UserIcon,
-    subscriptions: Tv01Icon,
     settings: Settings02Icon,
     main: ShopSignIcon,
   };

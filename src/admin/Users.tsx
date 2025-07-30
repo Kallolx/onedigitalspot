@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { account } from "@/lib/appwrite";
+import { account, databases } from "@/lib/appwrite";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,6 +10,9 @@ import {
   TableHead,
 } from "@/components/ui/table";
 import { UserIcon, Plus, Search, Filter, MoreVertical, Eye, Trash2, Users as UsersIcon } from "lucide-react";
+
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const USERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_USERS_ID;
 
 // Appwrite Users API returns only the current user for frontend SDKs
 // For full user listing, you need to use Appwrite's Admin API (server-side)
@@ -22,27 +25,26 @@ const Users = () => {
   const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
-    async function fetchUser() {
+    async function fetchUsers() {
       setLoading(true);
       try {
-        const user = await account.get();
-        setUsers([
-          {
-            id: user.$id,
-            name: user.name || user.email,
-            email: user.email,
-            status: user.emailVerification ? "Verified" : "Unverified",
-            labels: user.labels || [],
-            joinDate: new Date(user.$createdAt).toLocaleDateString(),
-            lastLogin: "Recently"
-          },
-        ]);
+        const res = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID);
+        const usersData = res.documents.map(user => ({
+          id: user.userId,
+          name: user.name || user.email,
+          email: user.email,
+          status: user.status === "active" ? "Verified" : "Unverified",
+          labels: user.labels || [],
+          joinDate: new Date(user.createdAt).toLocaleDateString(),
+          lastLogin: "Recently"
+        }));
+        setUsers(usersData);
       } catch (err) {
         setUsers([]);
       }
       setLoading(false);
     }
-    fetchUser();
+    fetchUsers();
   }, []);
 
   const admins = users.filter(u => Array.isArray(u.labels) && u.labels.includes('admin'));
@@ -51,13 +53,9 @@ const Users = () => {
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
     if (activeFilter === "all") return matchesSearch;
     if (activeFilter === "admins") return matchesSearch && user.labels?.includes('admin');
     if (activeFilter === "customers") return matchesSearch && !user.labels?.includes('admin');
-    if (activeFilter === "verified") return matchesSearch && user.status === "Verified";
-    if (activeFilter === "unverified") return matchesSearch && user.status === "Unverified";
-    
     return matchesSearch;
   });
 
@@ -136,7 +134,7 @@ const Users = () => {
       <div className="flex flex-col md:flex-row gap-4 bg-background border-2 border-border rounded-lg p-4 shadow-retro items-stretch md:items-center">
         {/* Tabs/Filters - left, prioritized */}
         <div className="flex gap-2 flex-wrap md:flex-nowrap md:gap-2 md:mr-auto order-2 md:order-1">
-          {["all", "admins", "customers", "verified", "unverified"].map((filter) => (
+          {["all", "admins", "customers"].map((filter) => (
             <Button
               key={filter}
               variant={activeFilter === filter ? "default" : "ghost"}
@@ -236,7 +234,6 @@ const Users = () => {
                   <TableRow className="bg-gradient-to-r from-muted/60 to-muted/30">
                     <TableHead className="px-6 py-4 text-left font-bold text-muted-foreground uppercase tracking-wider font-pixel">User</TableHead>
                     <TableHead className="px-6 py-4 text-left font-bold text-muted-foreground uppercase tracking-wider font-pixel">Role</TableHead>
-                    <TableHead className="px-6 py-4 text-left font-bold text-muted-foreground uppercase tracking-wider font-pixel">Status</TableHead>
                     <TableHead className="px-6 py-4 text-left font-bold text-muted-foreground uppercase tracking-wider font-pixel">Joined</TableHead>
                     <TableHead className="px-6 py-4 text-left font-bold text-muted-foreground uppercase tracking-wider font-pixel">Actions</TableHead>
                   </TableRow>
@@ -272,9 +269,7 @@ const Users = () => {
                             {user.labels?.includes('admin') ? 'Admin' : 'Customer'}
                           </span>
                         </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <StatusBadge status={user.status} />
-                        </TableCell>
+                        {/* Status column removed */}
                         <TableCell className="px-6 py-4 text-muted-foreground font-pixel">
                           {user.joinDate}
                         </TableCell>

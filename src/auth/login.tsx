@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { account } from '@/lib/appwrite';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -11,6 +13,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const redirectPath = params.get("redirect") || "/";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,17 +28,21 @@ export default function LoginPage() {
       const user = await account.get();
       // Appwrite labels are usually in user.labels or user.prefs.labels
       const labels = user.labels || user.prefs?.labels || [];
+
       if (Array.isArray(labels) && labels.includes('admin')) {
         window.location.href = '/admin';
       } else {
-        window.location.href = '/';
+        navigate(redirectPath);
       }
+
+
     } catch (err: any) {
       setError(err?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -1,35 +1,38 @@
-import { useState } from "react";
-import { mobileGames } from "@/lib/producs";
+import { useState, useEffect } from "react";
+import { databases, account } from "@/lib/appwrite";
+import { mobileGames } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
 
-const priceList = [
-  {
-    title: "Passes & Vouchers",
-    categoryIcon: "/assets/icons/voucher.svg",
-    items: [
-      { label: "Weekly Pass", price: 200, hot: true },
-      { label: "Twilight Pass", price: 1040 },
-    ],
-  },
-  {
-    title: "Diamonds",
-    categoryIcon: "/assets/icons/diamond.svg",
-    items: [
-      { label: "165+135 Diamond", price: 305 },
-      { label: "275+225 Diamond", price: 490 },
-      { label: "11 Diamonds", price: 30 },
-      { label: "22 Diamonds", price: 50, hot: true },
-      { label: "56 Diamonds", price: 110 },
-      { label: "112 Diamonds", price: 220 },
-      { label: "223 Diamonds", price: 440 },
-      { label: "336 Diamonds", price: 660 },
-      { label: "570 Diamonds", price: 1100, hot: true },
-      { label: "1163 Diamonds", price: 2205 },
-      { label: "2398 Diamonds", price: 4405 },
-      { label: "6042 Diamonds", price: 11020 },
-    ],
-  },
-];
+const categoryIcons = {
+  "Passes & Vouchers": "/assets/icons/voucher.svg",
+  Diamonds: "/assets/icons/diamond.svg",
+};
+
+function groupPriceList(priceList) {
+  const passes = [];
+  const diamonds = [];
+  priceList.forEach((item) => {
+    const [label, price, hot, type] = item.split("|");
+    const obj = { label, price: Number(price), hot: hot === "true" };
+    if (type === "pass" || type === "voucher") {
+      passes.push(obj);
+    } else if (type === "diamond") {
+      diamonds.push(obj);
+    }
+  });
+  return [
+    {
+      title: "Passes & Vouchers",
+      categoryIcon: categoryIcons["Passes & Vouchers"],
+      items: passes,
+    },
+    {
+      title: "Diamonds",
+      categoryIcon: categoryIcons["Diamonds"],
+      items: diamonds,
+    },
+  ];
+}
 
 const infoSections = [
   {
@@ -68,14 +71,52 @@ export default function MobileLegends() {
   const [playerId, setPlayerId] = useState("");
   const [zoneId, setZoneId] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const ml = mobileGames.find((g) => g.title === "Mobile Legends");
-  const similar = mobileGames
-    .filter((g) => g.title !== "Mobile Legends")
-    .slice(0, 4);
+  const [ml, setMl] = useState(null);
+  const [priceList, setPriceList] = useState([]);
+  const [similar, setSimilar] = useState([]);
+  const [isSignedIn, setIsSignedIn] = useState(false); // <-- Add this state
   const infoImage = "/products/mobile-legends.png";
+
+  useEffect(() => {
+    async function fetchProduct() {
+      try {
+        const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_MOBILE_GAMES_ID;
+        // Get all mobile games
+        const response = await databases.listDocuments(databaseId, collectionId);
+        const products = response.documents;
+        // Find Mobile Legends (case-insensitive)
+        const mlProduct = products.find((g) => g.title && g.title.toLowerCase() === "mobile legends");
+        setMl(mlProduct);
+        // Group priceList
+        if (mlProduct && Array.isArray(mlProduct.priceList)) {
+          setPriceList(groupPriceList(mlProduct.priceList));
+        }
+        // Get similar products
+        setSimilar(mobileGames.filter((g) => g.title !== "Mobile Legends").slice(0, 4));
+      } catch (err) {
+        setMl(null);
+        setPriceList([]);
+        setSimilar([]);
+      }
+    }
+
+    async function checkAuth() {
+      try {
+        await account.get();
+        setIsSignedIn(true);
+      } catch {
+        setIsSignedIn(false);
+      }
+    }
+
+    fetchProduct();
+    checkAuth(); // <-- Check Appwrite auth
+  }, []);
 
   return (
     <GameDetailsLayout
+      isSignedIn={isSignedIn}
       title="Mobile Legends"
       image={ml?.image || ""}
       priceList={priceList}

@@ -1,25 +1,11 @@
-import { useState } from "react";
-import { giftCards } from "@/lib/producs";
-import GiftCardDetailsLayout from "@/components/GiftCardDetailsLayout";
+import { useState, useEffect } from "react";
+import { databases, account } from "@/lib/appwrite";
+import { giftCards } from "@/lib/products";
+import GameDetailsLayout from "@/components/GameDetailsLayout";
 
-const priceList = [
-  {
-    title: "Steam Wallet Codes (USD)",
-    categoryIcon: "/assets/icons/steam-card.svg",
-    items: [
-      { label: "Steam Wallet - $1.10", price: 140 },
-      { label: "Steam Wallet - $1.75", price: 220 },
-      { label: "Steam Wallet - $2.25", price: 300 },
-      { label: "Steam Wallet - $3.60", price: 450 },
-      { label: "Steam Wallet - $4.50", price: 580 },
-      { label: "Steam Wallet - $5.50", price: 700 },
-      { label: "Steam Wallet - $11.50", price: 1420 },
-      { label: "Steam Wallet - $23.25", price: 2860 },
-      { label: "Steam Wallet - $46.50", price: 5700 },
-      { label: "Steam Wallet - $100.00", price: 12250 },
-    ],
-  },
-];
+const categoryIcons = {
+  "Steam Wallet Codes (USD)": "/assets/icons/steam-card.svg",
+};
 
 const infoSections = [
   {
@@ -39,21 +25,78 @@ const infoSections = [
   },
 ];
 
-
 export default function SteamWallet() {
   const [selected, setSelected] = useState<{
     categoryIdx: number;
     itemIdx: number;
   } | null>(null);
-  const sw = giftCards.find((g) => g.title === "Steam Wallet");
+  const [sw, setSw] = useState(null);
+  const [priceList, setPriceList] = useState([]);
   const [quantity, setQuantity] = useState(1);
-    const similar = giftCards
-      .filter((g) => g.title !== "Steam Wallet")
-      .slice(0, 4);
-  
+  const [similar, setSimilar] = useState([]);
+
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  useEffect(() => {
+    async function fetchGiftCards() {
+      try {
+        const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+        const collectionId = import.meta.env
+          .VITE_APPWRITE_COLLECTION_GIFT_CARDS_ID;
+        const response = await databases.listDocuments(
+          databaseId,
+          collectionId
+        );
+        const products = response.documents;
+        // Find Steam Wallet (case-insensitive)
+        const steamWallet = products.find(
+          (g) => g.title && g.title.toLowerCase() === "steam wallet"
+        );
+        setSw(steamWallet);
+        // Group priceList if available
+        if (steamWallet && Array.isArray(steamWallet.priceList)) {
+          // Group into Steam Wallet Codes (USD)
+          const codes = [];
+          steamWallet.priceList.forEach((item) => {
+            const [label, price] = item.split("|");
+            codes.push({ label, price: Number(price) });
+          });
+          setPriceList([
+            {
+              title: "Steam Wallet Codes (USD)",
+              categoryIcon: categoryIcons["Steam Wallet Codes (USD)"],
+              items: codes,
+            },
+          ]);
+        }
+        // Get similar products from static array if available, else from DB
+        setSimilar(
+          giftCards.filter((g) => g.title !== "Steam Wallet").slice(0, 4)
+        );
+      } catch (err) {
+        setSw(null);
+        setPriceList([]);
+        setSimilar([]);
+      }
+    }
+
+    async function checkSignIn() {
+      try {
+        await account.get();
+        setIsSignedIn(true);
+      } catch {
+        setIsSignedIn(false);
+      }
+    }
+
+    fetchGiftCards();
+    checkSignIn();
+  }, []);
+
   return (
-    <GiftCardDetailsLayout
-      title="Steam Wallet"     
+    <GameDetailsLayout
+      isSignedIn={isSignedIn}
+      title="Steam Wallet"
       image={sw?.image || ""}
       priceList={priceList}
       infoSections={infoSections}
@@ -62,6 +105,10 @@ export default function SteamWallet() {
       similarProducts={similar}
       selected={selected}
       setSelected={setSelected}
+      playerId={undefined} // Hide Player ID
+      setPlayerId={undefined} // Hide Player ID
+      zoneId={undefined} // Hide Zone ID
+      setZoneId={undefined}
     />
   );
 }

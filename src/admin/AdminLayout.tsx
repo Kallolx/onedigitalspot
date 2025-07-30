@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { adminNavConfig } from "../lib/adminNavConfig";
-import { Home, ShoppingCart, Package,Users, Tv, Settings, Menu } from "lucide-react";
+import { Home, ShoppingCart, Package,Users, Settings, Menu } from "lucide-react";
 import { ShopSignIcon } from "hugeicons-react";
 
 const iconMap = {
@@ -10,7 +10,6 @@ const iconMap = {
   orders: ShoppingCart,
   products: Package,
   users: Users,
-  subscriptions: Tv,
   settings: Settings,
   main: ShopSignIcon,
 };

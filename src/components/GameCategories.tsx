@@ -8,7 +8,7 @@ import {
   giftCards,
   subscriptions,
   aiTools,
-} from "@/lib/producs";
+} from "@/lib/products";
 
 const GameCategories = () => (
   <section className="bg-background">

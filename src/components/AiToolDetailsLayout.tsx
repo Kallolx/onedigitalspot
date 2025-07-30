@@ -27,6 +27,8 @@ interface AiToolDetailsLayoutProps {
   priceList: PriceCategory[];
   infoSections: InfoSection[];
   similarProducts: any[];
+  quantity: number;
+  setQuantity: React.Dispatch<React.SetStateAction<number>>;
   children?: React.ReactNode;
 }
 
@@ -36,6 +38,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   priceList,
   infoSections,
   similarProducts,
+  quantity,
+  setQuantity,
   children,
 }) => {
   const [purchaseType, setPurchaseType] = useState<"shared" | "personal">(
@@ -50,7 +54,6 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
     categoryIdx: number;
     itemIdx: number;
   } | null>(null);
-  const [quantity, setQuantity] = useState(1);
 
     // Always scroll to top when this layout mounts
     useEffect(() => {
@@ -332,21 +335,31 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                       Total
                     </span>
                   </div>
-                  <span className="font-pixel text-2xl text-primary font-bold whitespace-nowrap">
+                  <span className="font-pixel text-2xl text-primary font-bold whitespace-nowrap flex items-center gap-2">
                     {(() => {
                       const filteredList = priceList.filter(category =>
                         purchaseType === "shared"
                           ? category.title.toLowerCase().includes("shared")
                           : category.title.toLowerCase().includes("personal")
                       );
-                      if (!selected) return 0;
+                      if (!selected) return null;
                       const item =
                         filteredList[selected.categoryIdx]?.items[selected.itemIdx];
-                      return item && typeof item.price === "number"
-                        ? item.price * quantity
-                        : item?.price || 0;
+                      if (!item) return null;
+                      return (
+                        <>
+                          <span className="block text-base font-normal text-primary mr-2">
+                            {item.label} x{quantity}
+                          </span>
+                          <span className="block text-xl font-bold text-primary">
+                            {typeof item.price === "number"
+                              ? item.price * quantity
+                              : item?.price || 0}
+                            <span className="text-lg font-normal ml-1">৳</span>
+                          </span>
+                        </>
+                      );
                     })()}
-                    <span className="text-lg font-normal ml-1">৳</span>
                   </span>
                 </div>
                 <Button

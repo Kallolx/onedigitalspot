@@ -13,20 +13,23 @@ import GiftCards from "./pages/GiftCards";
 import AiTools from "./pages/AiTools";
 import MobileLegends from "@/game-details/mobile-games/MobileLegends";
 import PUBGMobile from "@/game-details/mobile-games/PUBGMobile";
+import Valorant from "@/game-details/pc-games/Valorant";
 import SteamWallet from "./gift-cards/SteamWallet";
 import ChatGPT from "./ai-tools/ChatGPT";
 import Netflix from "./subscriptions/Netflix";
 import Login from "./auth/login";
 import Signup from "./auth/signup";
+import AdminGuard from "./admin/AdminGuard";
 import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
 import Products from "./admin/Products";
 import Stock from "./admin/Stock";
 import Users from "./admin/Users";
-import Subscriptions from "./admin/Subscriptions";
-import AdminSubscriptions from "./admin/Subscriptions";
+import Subscriptions from "./pages/Subscriptions";
+
 import Settings from "./admin/Settings";
+
 
 const queryClient = new QueryClient();
 
@@ -52,16 +55,18 @@ const App = () => {
             <Route path="/gift-cards/steam-wallet" element={<SteamWallet />} />
             <Route path="/ai-tools/chatgpt" element={<ChatGPT />} />
             <Route path="/subscriptions/netflix" element={<Netflix />} />
+            <Route path="/pc-games/valorant" element={<Valorant />} />
+
             {/* Admin Panel Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="orders" element={<Orders />} />
-              <Route path="products" element={<Products />} />
-              <Route path="stock" element={<Stock />} />
-              <Route path="users" element={<Users />} />
-              <Route path="subscriptions" element={<AdminSubscriptions />} />
-              <Route path="settings" element={<Settings />} />
-             
+            <Route path="/admin" element={<AdminGuard />}>
+              <Route element={<AdminLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="products" element={<Products />} />
+                <Route path="stock" element={<Stock />} />
+                <Route path="users" element={<Users />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
             </Route>
             {/* Add more routes as needed */}
             <Route path="*" element={<NotFound />} />

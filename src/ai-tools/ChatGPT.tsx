@@ -1,29 +1,13 @@
+
+import { useState, useEffect } from "react";
+import { databases } from "@/lib/appwrite";
+import { aiTools } from "@/lib/products";
 import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
-import { aiTools } from "@/lib/producs";
 
-
-const priceList = [
-  {
-    title: "ChatGPT Pro Shared Account",
-    categoryIcon: "/assets/icons/chatgpt.svg",
-    items: [
-      { label: "1 Month Access", price: 350, hot: true },
-      { label: "3 Months Access", price: 900 },
-      { label: "6 Months Access", price: 1700 },
-      { label: "1 Year Access", price: 3200, hot: true },
-    ],
-  },
-  {
-    title: "ChatGPT Pro Personal Account",
-    categoryIcon: "/assets/icons/chatgpt.svg",
-    items: [
-      { label: "1 Month Personal", price: 650 },
-      { label: "3 Months Personal", price: 1800, hot: true },
-      { label: "6 Months Personal", price: 3500 },
-      { label: "1 Year Personal", price: 6800 },
-    ],
-  },
-];
+const categoryIcons = {
+  Shared: "/assets/icons/chatgpt.svg",
+  Personal: "/assets/icons/chatgpt.svg",
+};
 
 const infoSections = [
   {
@@ -62,9 +46,61 @@ const infoSections = [
   },
 ];
 
+
 export default function ChatGPT() {
-  const cg = aiTools.find((g) => g.title === "ChatGPT Pro");
-  const similar = aiTools.filter((g) => g.title !== "ChatGPT Pro").slice(0, 4);
+  const [cg, setCg] = useState(null);
+  const [priceList, setPriceList] = useState([]);
+  const [similar, setSimilar] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    async function fetchAiTools() {
+      try {
+        const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID;
+        const response = await databases.listDocuments(databaseId, collectionId);
+        const products = response.documents;
+        // Find ChatGPT Pro (case-insensitive)
+        const chatgpt = products.find((g) => g.title && g.title.toLowerCase() === "chatgpt pro");
+        setCg(chatgpt);
+        // Group priceList if available
+        if (chatgpt && Array.isArray(chatgpt.priceList)) {
+          // Group into Shared and Personal
+          const shared = [];
+          const personal = [];
+          chatgpt.priceList.forEach((item) => {
+            const [label, price, hot, type] = item.split("|");
+            const obj = { label, price: Number(price), hot: hot === "true" };
+            if (type === "shared") {
+              shared.push(obj);
+            } else if (type === "personal") {
+              personal.push(obj);
+            }
+          });
+          setPriceList([
+            {
+              title: "ChatGPT Pro Shared Account",
+              categoryIcon: categoryIcons.Shared,
+              items: shared,
+            },
+            {
+              title: "ChatGPT Pro Personal Account",
+              categoryIcon: categoryIcons.Personal,
+              items: personal,
+            },
+          ]);
+        }
+        // Get similar products from static aiTools array
+        setSimilar(aiTools.filter((g) => g.title !== "ChatGPT Pro").slice(0, 4));
+      } catch (err) {
+        setCg(null);
+        setPriceList([]);
+        setSimilar([]);
+      }
+    }
+    fetchAiTools();
+  }, []);
+
   return (
     <AiToolDetailsLayout
       title="ChatGPT Pro"
@@ -72,6 +108,8 @@ export default function ChatGPT() {
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
+      quantity={quantity}
+      setQuantity={setQuantity}
     />
   );
 }

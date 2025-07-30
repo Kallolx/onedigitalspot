@@ -27,6 +27,8 @@ interface SubscriptionsDetailsLayoutProps {
   priceList: PriceCategory[];
   infoSections: InfoSection[];
   similarProducts: any[];
+  quantity: number;
+  setQuantity: React.Dispatch<React.SetStateAction<number>>;
   children?: React.ReactNode;
 }
 
@@ -36,6 +38,8 @@ const SubscriptionsDetailsLayout: React.FC<SubscriptionsDetailsLayoutProps> = ({
   priceList,
   infoSections,
   similarProducts,
+  quantity,
+  setQuantity,
   children,
 }) => {
   const [activeTab, setActiveTab] = useState<"renewable" | "non-renewable">("renewable");
@@ -43,7 +47,6 @@ const SubscriptionsDetailsLayout: React.FC<SubscriptionsDetailsLayoutProps> = ({
     categoryIdx: number;
     itemIdx: number;
   } | null>(null);
-  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });

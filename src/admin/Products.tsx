@@ -64,11 +64,23 @@ const Products = () => {
   const [viewProduct, setViewProduct] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [deleteProduct, setDeleteProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Add product states
+  const [newProduct, setNewProduct] = useState({
+    title: "",
+    category: "",
+    description: "",
+    image: "",
+    priceList: [],
+  });
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   // Filter states
   const [activeCategory, setActiveCategory] = useState("all");
@@ -96,7 +108,8 @@ const Products = () => {
         pcGames: import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID,
         giftCards: import.meta.env.VITE_APPWRITE_COLLECTION_GIFT_CARDS_ID,
         aiTools: import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID,
-        subscriptions: import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID,
+        subscriptions: import.meta.env
+          .VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID,
       };
 
       const results = await Promise.all(
@@ -154,11 +167,93 @@ const Products = () => {
 
     // Find which category this product belongs to
     for (const [category, products] of Object.entries(productsByCategory)) {
-      if (products.some(p => p.$id === product.$id)) {
+      if (products.some((p) => p.$id === product.$id)) {
         return collectionMap[category];
       }
     }
     return null;
+  };
+
+  // Handle changes for new product
+  const handleNewProductChange = (field, value) => {
+    setNewProduct((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Handle changes for edit product
+  const handleEditChange = (field, value) => {
+    setEditProduct((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Handle price list changes for new product
+  const handleNewProductPriceListChange = (index, value) => {
+    const newPriceList = [...(newProduct.priceList || [])];
+    newPriceList[index] = value;
+    setNewProduct((prev) => ({
+      ...prev,
+      priceList: newPriceList,
+    }));
+  };
+
+  // Handle price list changes for edit product
+  const handlePriceListChange = (index, value) => {
+    const newPriceList = [...(editProduct.priceList || [])];
+    newPriceList[index] = value;
+    setEditProduct((prev) => ({
+      ...prev,
+      priceList: newPriceList,
+    }));
+  };
+
+  // Add new price list item for new product
+  const addNewProductPriceListItem = () => {
+    const newPriceList = [
+      ...(newProduct.priceList || []),
+      "New Item|0৳|false|type",
+    ];
+    setNewProduct((prev) => ({
+      ...prev,
+      priceList: newPriceList,
+    }));
+  };
+
+  // Add new price list item for edit product
+  const addPriceListItem = () => {
+    const newPriceList = [
+      ...(editProduct.priceList || []),
+      "New Item|0৳|false",
+    ];
+    setEditProduct((prev) => ({
+      ...prev,
+      priceList: newPriceList,
+    }));
+  };
+
+  // Remove price list item for new product
+  const removeNewProductPriceListItem = (index) => {
+    const newPriceList = (newProduct.priceList || []).filter(
+      (_, i) => i !== index
+    );
+    setNewProduct((prev) => ({
+      ...prev,
+      priceList: newPriceList,
+    }));
+  };
+
+  // Remove price list item for edit product
+  const removePriceListItem = (index) => {
+    const newPriceList = (editProduct.priceList || []).filter(
+      (_, i) => i !== index
+    );
+    setEditProduct((prev) => ({
+      ...prev,
+      priceList: newPriceList,
+    }));
   };
 
   // Update product in database
@@ -175,25 +270,15 @@ const Products = () => {
       }
 
       // Prepare update data
-      const updateData: {
-        title: any;
-        category: any;
-        price: any;
-        description: any;
-        image: any;
-        priceList?: any;
-      } = {
+      const updateData = {
         title: editProduct.title,
         category: editProduct.category,
         price: editProduct.price,
         description: editProduct.description,
         image: editProduct.image,
+        priceList: editProduct.priceList || [],
+        status: true,
       };
-
-      // Add priceList if it exists
-      if (editProduct.priceList) {
-        updateData.priceList = editProduct.priceList;
-      }
 
       await databases.updateDocument(
         databaseId,
@@ -255,7 +340,9 @@ const Products = () => {
       const deletePromises = [];
 
       // Find products to delete
-      const productsToDelete = products.filter(p => selected.includes(p.title));
+      const productsToDelete = products.filter((p) =>
+        selected.includes(p.title)
+      );
 
       for (const product of productsToDelete) {
         const collectionId = getCollectionId(product);
@@ -280,57 +367,155 @@ const Products = () => {
     }
   };
 
-  // Handle edit form changes
-  const handleEditChange = (field, value) => {
-    setEditProduct(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  // Cloudinary upload function
+  const uploadToCloudinary = async (file) => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset =
+      import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "ml_default";
+
+    if (!cloudName) {
+      throw new Error("Cloudinary cloud name not configured");
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    // Only add folder if it's specified
+    const folder = import.meta.env.VITE_CLOUDINARY_FOLDER_MODE;
+    if (folder) {
+      formData.append("folder", folder);
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Upload failed");
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      throw error;
+    }
+  };
+
+  // Handle image upload
+  const handleImageUpload = async (file, isEdit = false) => {
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const imageUrl = await uploadToCloudinary(file);
+
+      if (isEdit) {
+        setEditProduct((prev) => ({
+          ...prev,
+          image: imageUrl,
+        }));
+      } else {
+        setNewProduct((prev) => ({
+          ...prev,
+          image: imageUrl,
+        }));
+      }
+
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Add new product to database
+  const handleAddProduct = async () => {
+    if (!selectedCategory || !newProduct.title) {
+      toast.error("Please select category and enter product title");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+      const collectionMap = {
+        mobileGames: import.meta.env.VITE_APPWRITE_COLLECTION_MOBILE_GAMES_ID,
+        pcGames: import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID,
+        giftCards: import.meta.env.VITE_APPWRITE_COLLECTION_GIFT_CARDS_ID,
+        aiTools: import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID,
+        subscriptions: import.meta.env
+          .VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID,
+      };
+
+      const collectionId = collectionMap[selectedCategory];
+      if (!collectionId) {
+        throw new Error("Invalid category selected");
+      }
+
+      // Set category name based on selected key
+      const categoryNames = {
+        mobileGames: "Mobile Games",
+        pcGames: "PC Games",
+        giftCards: "Gift Cards",
+        aiTools: "AI Tools",
+        subscriptions: "Subscriptions",
+      };
+
+      const productData = {
+        title: newProduct.title,
+        category: categoryNames[selectedCategory],
+        description: newProduct.description,
+        image: newProduct.image,
+        priceList: newProduct.priceList,
+        status: true,
+      };
+
+      await databases.createDocument(
+        databaseId,
+        collectionId,
+        "unique()", // Auto-generate ID
+        productData
+      );
+
+      toast.success("Product added successfully");
+      setShowAddModal(false);
+      resetNewProduct();
+      await loadProducts(); // Reload products
+    } catch (error) {
+      console.error("Error adding product:", error);
+      toast.error("Failed to add product");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset new product form
+  const resetNewProduct = () => {
+    setNewProduct({
+      title: "",
+      category: "",
+      description: "",
+      image: "",
+      priceList: [],
+    });
+    setSelectedCategory("");
   };
 
   // Handle file reset to default
   const resetToDefault = () => {
-    // Reset all states to default
-    setActiveCategory("all");
-    setSearch("");
-    setSelected([]);
-    setViewProduct(null);
-    setShowViewModal(false);
-    setShowEditModal(false);
-    setShowDeleteDialog(false);
-    setShowBulkDeleteDialog(false);
-    setEditProduct(null);
-    setDeleteProduct(null);
-    setPreview({ src: null, x: 0, y: 0 });
-    
-    // Reload products
-    loadProducts();
-  };
-  const handlePriceListChange = (index, value) => {
-    const newPriceList = [...(editProduct.priceList || [])];
-    newPriceList[index] = value;
-    setEditProduct(prev => ({
-      ...prev,
-      priceList: newPriceList
-    }));
-  };
-
-  // Add new price list item
-  const addPriceListItem = () => {
-    const newPriceList = [...(editProduct.priceList || []), "New Item|0৳|false"];
-    setEditProduct(prev => ({
-      ...prev,
-      priceList: newPriceList
-    }));
-  };
-
-  // Remove price list item
-  const removePriceListItem = (index) => {
-    const newPriceList = (editProduct.priceList || []).filter((_, i) => i !== index);
-    setEditProduct(prev => ({
-      ...prev,
-      priceList: newPriceList
-    }));
+    // Show add product modal instead of resetting
+    setShowAddModal(true);
+    resetNewProduct();
   };
 
   // Filtered products for active category
@@ -392,7 +577,7 @@ const Products = () => {
   return (
     <div className="space-y-8">
       {ImagePreview}
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-pixel font-bold text-primary">
@@ -505,7 +690,7 @@ const Products = () => {
                 </div>
               </CardHeader>
             )}
-            
+
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
@@ -520,7 +705,9 @@ const Products = () => {
                           }
                           onChange={(e) =>
                             setSelected(
-                              e.target.checked ? products.map((p) => p.title) : []
+                              e.target.checked
+                                ? products.map((p) => p.title)
+                                : []
                             )
                           }
                           disabled={isLoading}
@@ -531,7 +718,9 @@ const Products = () => {
                       <TableHead className="font-pixel">Title</TableHead>
                       <TableHead className="font-pixel">Category</TableHead>
                       <TableHead className="font-pixel">Price</TableHead>
-                      <TableHead className="font-pixel text-right">Actions</TableHead>
+                      <TableHead className="font-pixel text-right">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -541,7 +730,9 @@ const Products = () => {
                           colSpan={6}
                           className="h-24 text-center text-muted-foreground font-pixel"
                         >
-                          {isLoading ? "Loading products..." : "No products found."}
+                          {isLoading
+                            ? "Loading products..."
+                            : "No products found."}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -681,49 +872,326 @@ const Products = () => {
                   </Badge>
                 </div>
 
-
+                {/* Price List */}
+                {Array.isArray(viewProduct.priceList) &&
+                  viewProduct.priceList.length > 0 && (
+                    <div>
+                      <h4 className="font-pixel text-sm font-medium mb-3">
+                        Price Options:
+                      </h4>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {viewProduct.priceList.map((item, idx) => {
+                          const [label, price, hot] = item.split("|");
+                          return (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between p-2 bg-muted/50 rounded-md"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="font-pixel text-sm">
+                                  {label}
+                                </span>
+                                {hot === "true" && (
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs"
+                                  >
+                                    🔥 Hot
+                                  </Badge>
+                                )}
+                              </div>
+                              <span className="font-pixel font-bold text-primary">
+                                {price}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                 {viewProduct.description && (
                   <div>
-                    <h4 className="font-pixel text-sm font-medium mb-2">Description:</h4>
+                    <h4 className="font-pixel text-sm font-medium mb-2">
+                      Description:
+                    </h4>
                     <p className="text-sm text-muted-foreground">
                       {viewProduct.description}
                     </p>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
-                {/* Price List */}
-                {Array.isArray(viewProduct.priceList) && viewProduct.priceList.length > 0 && (
+      {/* Add Product Modal */}
+      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-pixel text-xl text-primary">
+              Add New Product
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Category Selection */}
+            <div>
+              <label className="font-pixel text-sm font-medium mb-3 block">
+                Select Category *
+              </label>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+                {categories.slice(1).map((cat) => {
+                  // Skip "All" category
+                  const IconComp = cat.icon;
+                  const isSelected = selectedCategory === cat.key;
+                  return (
+                    <Button
+                      key={cat.key}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      className={`p-2 rounded w-32 h-auto flex flex-col items-center gap-2 font-pixel text-xs ${
+                        isSelected
+                          ? "bg-primary text-white"
+                          : "hover:bg-primary"
+                      }`}
+                      onClick={() => setSelectedCategory(cat.key)}
+                    >
+                      {IconComp && <IconComp className="w-5 h-5" />}
+                      {cat.name}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Product Details Form */}
+            {selectedCategory && (
+              <div className="space-y-4 pt-4 border-t">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-pixel text-sm font-medium mb-3">Price Options:</h4>
+                    <label className="font-pixel text-sm font-medium mb-2 block">
+                      Title *
+                    </label>
+                    <Input
+                      value={newProduct.title}
+                      onChange={(e) =>
+                        handleNewProductChange("title", e.target.value)
+                      }
+                      className="font-pixel border-2 border-border"
+                      placeholder="Enter product title"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-pixel text-sm font-medium mb-2 block">
+                      Category
+                    </label>
+                    <Input
+                      value={
+                        categories.find((c) => c.key === selectedCategory)
+                          ?.name || ""
+                      }
+                      className="font-pixel bg-muted border-2 border-border"
+                      disabled
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-pixel text-sm font-medium mb-2 block">
+                    Image
+                  </label>
+                  <div className="space-y-2">
+                    <Input
+                      value={newProduct.image}
+                      onChange={(e) =>
+                        handleNewProductChange("image", e.target.value)
+                      }
+                      className="font-pixel border-2 border-border"
+                      placeholder="Paste image URL or upload below"
+                    />
+                    <div>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleImageUpload(file, false);
+                          }
+                        }}
+                        className="font-pixel text-xs border-2 border-border"
+                        disabled={isUploading}
+                      />
+                      {isUploading && (
+                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
+                          Uploading to Cloudinary...
+                        </div>
+                      )}
+                    </div>
+                    {newProduct.image && (
+                      <div className="mt-2">
+                        <img
+                          src={newProduct.image}
+                          alt="Preview"
+                          className="w-20 h-20 object-cover rounded border"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Price List Editor */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="font-pixel text-sm font-medium">
+                      Price List
+                    </label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addNewProductPriceListItem}
+                      className="font-pixel"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Price
+                    </Button>
+                  </div>
+
+                  {newProduct.priceList.length === 0 ? (
+                    <div className="text-center py-4 text-muted-foreground font-pixel text-sm">
+                      No price options added yet.
+                    </div>
+                  ) : (
                     <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {viewProduct.priceList.map((item, idx) => {
-                        const [label, price, hot] = item.split("|");
+                      {newProduct.priceList.map((item, idx) => {
+                        const [label, price, hot, type] = item.split("|");
                         return (
                           <div
                             key={idx}
-                            className="flex items-center justify-between p-2 bg-muted/50 rounded-md"
+                            className="flex items-center gap-2 p-2 bg-muted/50 rounded-md"
                           >
-                            <div className="flex items-center gap-2">
-                              <span className="font-pixel text-sm">{label}</span>
-                              {hot === "true" && (
-                                <Badge variant="destructive" className="text-xs">
-                                  🔥 Hot
-                                </Badge>
-                              )}
-                            </div>
-                            <span className="font-pixel font-bold text-primary">
-                              {price}
-                            </span>
+                            <Input
+                              placeholder="Label (e.g., 60 UC)"
+                              value={label || ""}
+                              onChange={(e) => {
+                                const newValue = `${e.target.value}|${price}|${hot}|${type}`;
+                                handleNewProductPriceListChange(idx, newValue);
+                              }}
+                              className="font-pixel text-xs"
+                            />
+                            <Input
+                              placeholder="Price (e.g., 85৳)"
+                              value={price || ""}
+                              onChange={(e) => {
+                                const newValue = `${label}|${e.target.value}|${hot}|${type}`;
+                                handleNewProductPriceListChange(idx, newValue);
+                              }}
+                              className="font-pixel text-xs"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newHot =
+                                  hot === "true" ? "false" : "true";
+                                const newValue = `${label}|${price}|${newHot}|${type}`;
+                                handleNewProductPriceListChange(idx, newValue);
+                              }}
+                              className={`font-pixel text-xs ${
+                                hot === "true" ? "bg-primary text-white" : ""
+                              }`}
+                              title="Toggle hot item"
+                            >
+                              Populer
+                            </Button>
+                            <select
+                              value={type || ""}
+                              onChange={(e) => {
+                                const newValue = `${label}|${price}|${hot}|${e.target.value}`;
+                                handleNewProductPriceListChange(idx, newValue);
+                              }}
+                              className="font-pixel text-xs border border-muted rounded px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
+                            >
+                              <option value="">Type</option>
+                              <option value="diamond">Diamond</option>
+                              <option value="voucher">Voucher</option>
+                              <option value="other">Shared</option>
+                              <option value="subscription">Personal</option>
+                              <option value="codes">Codes</option>
+                            </select>
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => removeNewProductPriceListItem(idx)}
+                              className="font-pixel"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
                           </div>
                         );
                       })}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+
+                <div>
+                  <label className="font-pixel text-sm font-medium mb-2 block">
+                    Description
+                  </label>
+                  <Textarea
+                    value={newProduct.description}
+                    onChange={(e) =>
+                      handleNewProductChange("description", e.target.value)
+                    }
+                    className="font-pixel border-2 border-border"
+                    rows={3}
+                    placeholder="Enter product description"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      resetNewProduct();
+                    }}
+                    disabled={isLoading}
+                    className="font-pixel"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleAddProduct}
+                    disabled={
+                      isLoading || !selectedCategory || !newProduct.title
+                    }
+                    className="font-pixel"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Product
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -754,7 +1222,9 @@ const Products = () => {
                   </label>
                   <Input
                     value={editProduct.category || ""}
-                    onChange={(e) => handleEditChange("category", e.target.value)}
+                    onChange={(e) =>
+                      handleEditChange("category", e.target.value)
+                    }
                     className="font-pixel"
                   />
                 </div>
@@ -764,23 +1234,37 @@ const Products = () => {
                 <label className="font-pixel text-sm font-medium mb-2 block">
                   Image URL
                 </label>
-                <Input
-                  value={editProduct.image || ""}
-                  onChange={(e) => handleEditChange("image", e.target.value)}
-                  className="font-pixel"
-                />
-              </div>
-
-              <div>
-                <label className="font-pixel text-sm font-medium mb-2 block">
-                  Description
-                </label>
-                <Textarea
-                  value={editProduct.description || ""}
-                  onChange={(e) => handleEditChange("description", e.target.value)}
-                  className="font-pixel"
-                  rows={3}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    value={editProduct.image || ""}
+                    onChange={(e) => handleEditChange("image", e.target.value)}
+                    className="font-pixel flex-1"
+                    placeholder="Paste image URL or upload below"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="font-pixel text-xs text-muted-foreground mb-1 block">
+                    Or upload image:
+                  </label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleImageUpload(file, true);
+                      }
+                    }}
+                    className="font-pixel text-xs"
+                    disabled={isUploading}
+                  />
+                  {isUploading && (
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
+                      Uploading to Cloudinary...
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Price List Editor */}
@@ -802,14 +1286,17 @@ const Products = () => {
                 </div>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {(editProduct.priceList || []).map((item, idx) => {
-                    const [label, price, hot] = item.split("|");
+                    const [label, price, hot, type] = item.split("|");
                     return (
-                      <div key={idx} className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 p-2 bg-muted/50 rounded-md"
+                      >
                         <Input
                           placeholder="Label"
                           value={label || ""}
                           onChange={(e) => {
-                            const newValue = `${e.target.value}|${price}|${hot}`;
+                            const newValue = `${e.target.value}|${price}|${hot}|${type}`;
                             handlePriceListChange(idx, newValue);
                           }}
                           className="font-pixel text-xs"
@@ -818,7 +1305,7 @@ const Products = () => {
                           placeholder="Price"
                           value={price || ""}
                           onChange={(e) => {
-                            const newValue = `${label}|${e.target.value}|${hot}`;
+                            const newValue = `${label}|${e.target.value}|${hot}|${type}`;
                             handlePriceListChange(idx, newValue);
                           }}
                           className="font-pixel text-xs"
@@ -829,14 +1316,30 @@ const Products = () => {
                           size="sm"
                           onClick={() => {
                             const newHot = hot === "true" ? "false" : "true";
-                            const newValue = `${label}|${price}|${newHot}`;
+                            const newValue = `${label}|${price}|${newHot}|${type}`;
                             handlePriceListChange(idx, newValue);
                           }}
-                          className={`font-pixel text-xs ${hot === "true" ? "bg-red-100 text-red-700" : ""
+                          className={`font-pixel text-xs ${
+                            hot === "true" ? "bg-primary text-white" : ""
                           }`}
                         >
-                          🔥
+                          Populer
                         </Button>
+                        <select
+                          value={type || ""}
+                          onChange={(e) => {
+                            const newValue = `${label}|${price}|${hot}|${e.target.value}`;
+                            handlePriceListChange(idx, newValue);
+                          }}
+                          className="font-pixel text-xs border border-muted rounded px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
+                        >
+                          <option value="">Type</option>
+                          <option value="diamond">Diamond</option>
+                          <option value="voucher">Voucher</option>
+                          <option value="shared">Shared</option>
+                          <option value="personal">Personal</option>
+                          <option value="codes">Codes</option>
+                        </select>
                         <Button
                           type="button"
                           variant="destructive"
@@ -850,6 +1353,20 @@ const Products = () => {
                     );
                   })}
                 </div>
+              </div>
+
+              <div>
+                <label className="font-pixel text-sm font-medium mb-2 block">
+                  Description
+                </label>
+                <Textarea
+                  value={editProduct.description || ""}
+                  onChange={(e) =>
+                    handleEditChange("description", e.target.value)
+                  }
+                  className="font-pixel"
+                  rows={3}
+                />
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
@@ -895,14 +1412,12 @@ const Products = () => {
               Delete Product
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteProduct?.title}"? This action cannot be undone.
+              Are you sure you want to delete "{deleteProduct?.title}"? This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
-              className="font-pixel"
-              disabled={isLoading}
-            >
+            <AlertDialogCancel className="font-pixel" disabled={isLoading}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -927,7 +1442,10 @@ const Products = () => {
       </AlertDialog>
 
       {/* Bulk Delete Confirmation Dialog */}
-      <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+      <AlertDialog
+        open={showBulkDeleteDialog}
+        onOpenChange={setShowBulkDeleteDialog}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="font-pixel text-destructive flex items-center gap-2">
@@ -935,14 +1453,12 @@ const Products = () => {
               Delete Multiple Products
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {selected.length} selected products? This action cannot be undone.
+              Are you sure you want to delete {selected.length} selected
+              products? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
-              className="font-pixel"
-              disabled={isLoading}
-            >
+            <AlertDialogCancel className="font-pixel" disabled={isLoading}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction

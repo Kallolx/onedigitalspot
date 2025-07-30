@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import { useState } from "react";
-import { aiTools } from "../lib/producs";
+import { aiTools } from "../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/ServiceCard";
 

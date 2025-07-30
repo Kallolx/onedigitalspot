@@ -3,7 +3,10 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { account } from "@/lib/appwrite";
+import { account, databases } from "@/lib/appwrite";
+
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const USERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_USERS_ID;
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -52,6 +55,25 @@ export default function SignupPage() {
       // Automatically log in the user after successful signup
       await account.createEmailPasswordSession(email, password);
       
+      // Get the logged-in user
+      const user = await account.get();
+
+      // Create a document in the users collection
+      await databases.createDocument(
+        DATABASE_ID,
+        USERS_COLLECTION_ID,
+        user.$id, // Use Appwrite user ID as document ID
+        {
+          userId: user.$id,
+          email: user.email,
+          name: user.name,
+          createdAt: user.$createdAt,
+          labels: user.labels || [],
+          status: "active",
+          avatarUrl: user.prefs?.avatarUrl || "",
+        }
+      );
+
       // Redirect to dashboard or home page
       window.location.href = '/';
     } catch (err) {

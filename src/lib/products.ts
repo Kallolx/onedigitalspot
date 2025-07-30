@@ -128,11 +128,12 @@ export const mobileGames = [
 export const pcGames = [
   {
     title: "Valorant",
-    image: "/placeholder.svg",
+    image: "/products/pubg-mobile.png",
     price: "799",
     rating: 5,
     category: "FPS",
     buttonText: "Buy VP",
+    route: "/pc-games/valorant",
   },
   {
     title: "Apex Legends",
