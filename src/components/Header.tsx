@@ -13,7 +13,7 @@ import {
   ArrowDown01Icon,
   Settings02Icon,
   UserIcon,
-  MailValidation01Icon
+  MailValidation01Icon,
 } from "hugeicons-react";
 import { account } from "@/lib/appwrite";
 
@@ -45,23 +45,23 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await account.deleteSession('current');
+      await account.deleteSession("current");
       setUser(null);
       setIsUserMenuOpen(false);
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
   const handleSendVerification = async () => {
     try {
-      await account.createVerification(window.location.origin + '/verify');
-      alert('Verification email sent! Please check your inbox.');
+      await account.createVerification(window.location.origin + "/verify");
+      alert("Verification email sent! Please check your inbox.");
       setIsUserMenuOpen(false);
     } catch (error) {
-      console.error('Failed to send verification:', error);
-      alert('Failed to send verification email. Please try again.');
+      console.error("Failed to send verification:", error);
+      alert("Failed to send verification email. Please try again.");
     }
   };
 
@@ -131,9 +131,9 @@ const Header = () => {
   const getUserDisplayName = () => {
     if (!user) return "";
     if (user.name) {
-      return user.name.split(' ')[0]; // Get first name only
+      return user.name.split(" ")[0]; // Get first name only
     }
-    return user.email.split('@')[0]; // Use email prefix as fallback
+    return user.email.split("@")[0]; // Use email prefix as fallback
   };
 
   return (
@@ -142,18 +142,14 @@ const Header = () => {
         <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-8 py-4">
           {/* Single Top Bar */}
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a href="/" className="flex items-center gap-4">
-              <div className="flex font-anekbangla font-bold text-2xl md:text-3xl text-primary gap-2">
-                <img
-                  src="/assets/logo.svg"
-                  alt="LootBox Logo"
-                  className="w-6 h-6 md:w-10 md:h-10"
-                />
-                লুটবক্স
-              </div>
+            <a href="/" className="flex items-center h-full">
+              <img
+                src="/assets/logo.svg"
+                alt="LootBox Logo"
+                className="h-full object-contain"
+                style={{ width: "auto", maxHeight: "48px" }}
+              />
             </a>
-            
             {/* Desktop Navigation - Middle (xl and up) */}
             <nav className="hidden xl:flex items-center gap-1">
               {navigationItems.map((item) => {
@@ -181,7 +177,8 @@ const Header = () => {
                             const productImages = {
                               "Mobile Games": "/assets/icons/mobile-games.svg",
                               "PC Games": "/assets/icons/pc-games.svg",
-                              "Mobile Legends": "/assets/icons/mobile-legends.svg",
+                              "Mobile Legends":
+                                "/assets/icons/mobile-legends.svg",
                               "PUBG Mobile": "/assets/icons/pubg-mobile.svg",
                               "Free Fire": "/assets/icons/free-fire.svg",
                               Roblox: "/assets/icons/roblox-banner.svg",
@@ -192,13 +189,16 @@ const Header = () => {
                               Netflix: "/assets/icons/netflix.svg",
                               Crunchyroll: "/assets/icons/crunchyroll.svg",
                               Tinder: "/assets/icons/tinder.svg",
-                              "Youtube Premium": "/assets/icons/youtube-premium.svg",
+                              "Youtube Premium":
+                                "/assets/icons/youtube-premium.svg",
                               "ChatGPT Pro": "/assets/icons/chatgpt.svg",
                               "Claude Pro": "/assets/icons/claude.svg",
                               "Midjourney Pro": "/assets/icons/midjourney.svg",
                               "Github Pro": "/assets/icons/github.svg",
                             };
-                            const imgSrc = productImages[dropItem.name] || "/assets/icons/placeholder.svg";
+                            const imgSrc =
+                              productImages[dropItem.name] ||
+                              "/assets/icons/placeholder.svg";
                             return (
                               <a
                                 key={dropItem.name}
@@ -224,9 +224,24 @@ const Header = () => {
                                       fill="none"
                                       xmlns="http://www.w3.org/2000/svg"
                                     >
-                                      <circle cx="3" cy="8" r="1.5" fill="currentColor" />
-                                      <circle cx="8" cy="8" r="1.5" fill="currentColor" />
-                                      <circle cx="13" cy="8" r="1.5" fill="currentColor" />
+                                      <circle
+                                        cx="3"
+                                        cy="8"
+                                        r="1.5"
+                                        fill="currentColor"
+                                      />
+                                      <circle
+                                        cx="8"
+                                        cy="8"
+                                        r="1.5"
+                                        fill="currentColor"
+                                      />
+                                      <circle
+                                        cx="13"
+                                        cy="8"
+                                        r="1.5"
+                                        fill="currentColor"
+                                      />
                                     </svg>
                                   </span>
                                 )}
@@ -240,7 +255,7 @@ const Header = () => {
                 );
               })}
             </nav>
-            
+
             {/* Right Actions */}
             <div className="flex items-center gap-4">
               {/* Cart Button */}
@@ -254,7 +269,7 @@ const Header = () => {
                   0
                 </span>
               </Button>
-              
+
               {/* Authentication Section */}
               {loading ? (
                 <div className="w-10 h-10 bg-muted animate-pulse rounded-md"></div>
@@ -267,21 +282,25 @@ const Header = () => {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   >
                     <UserIcon className="w-5 h-5" />
-                    <span className="text-md font-medium hidden sm:inline">
+                    <span className="text-md font-medium">
                       {getUserDisplayName()}
                     </span>
                     <ArrowDown01Icon className="w-3 h-3" />
                   </Button>
-                  
+
                   {/* User Dropdown Menu */}
                   {isUserMenuOpen && (
                     <div className="absolute right-0 top-full mt-2 w-48 p-2 bg-background border-2 border-border rounded-md shadow-card text-foreground z-50">
                       <div className="space-y-1">
                         <div className="px-3 py-2 border-b border-border">
-                          <p className="text-sm font-medium text-foreground">{user.name || 'User'}</p>
-                          <p className="text-xs text-muted-foreground">{user.email}</p>
+                          <p className="text-sm font-medium text-foreground">
+                            {user.name || "User"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.email}
+                          </p>
                         </div>
-                        
+
                         {/* Show verify account option for unverified users */}
                         {!user.emailVerification && (
                           <button
@@ -292,17 +311,18 @@ const Header = () => {
                             Verify Account
                           </button>
                         )}
-                        
+
                         {/* Admin Panel link for admin users */}
-                        {Array.isArray(user?.labels) && user.labels.includes('admin') && (
-                          <a
-                            href="/admin"
-                            className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-blue-600 flex items-center gap-2"
-                          >
-                            <Settings02Icon className="w-4 h-4" />
-                            Admin Panel
-                          </a>
-                        )}
+                        {Array.isArray(user?.labels) &&
+                          user.labels.includes("admin") && (
+                            <a
+                              href="/admin"
+                              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-blue-600 flex items-center gap-2"
+                            >
+                              <Settings02Icon className="w-4 h-4" />
+                              Admin Panel
+                            </a>
+                          )}
                         <a
                           href="/profile"
                           className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
@@ -337,14 +357,19 @@ const Header = () => {
                 </div>
               ) : (
                 /* Login Button */
-                <Button asChild variant="pixel" size="default" className="h-10 px-4">
+                <Button
+                  asChild
+                  variant="pixel"
+                  size="default"
+                  className="h-10 px-4"
+                >
                   <a href="/auth/login" className="flex items-center gap-2">
                     <Logout03Icon className="w-5 h-5" />
                     <span className="text-sm font-medium">LOG IN</span>
                   </a>
                 </Button>
               )}
-              
+
               {/* Mobile Menu Toggle (below xl) */}
               <Button
                 variant="outline"
@@ -360,13 +385,13 @@ const Header = () => {
               </Button>
             </div>
           </div>
-          
+
           {/* Mobile Menu (below xl) */}
           <div className="xl:hidden">
             <MobileMenu isOpen={isMobileMenuOpen} />
           </div>
         </div>
-        
+
         {/* Broadcast Ticker - sticky below navbar, seamless infinite loop */}
         <div className="sticky top-[64px] z-40 w-full bg-gradient-to-r from-primary to-primary/80 border-b border-primary/30 shadow-sm">
           <div className="w-full max-w-[1440px] mx-auto flex items-center px-2 sm:px-4 lg:px-8 py-1 relative">
