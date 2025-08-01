@@ -45,11 +45,19 @@ All colors MUST be HSL.
     --retro-purple: 270 50% 70%;
     --retro-blue: 210 70% 65%;
     --retro-yellow: 45 90% 70%;
-    
+
     /* Gradients */
-    --gradient-retro: linear-gradient(135deg, hsl(var(--retro-mint)), hsl(var(--retro-blue)));
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
-    
+    --gradient-retro: linear-gradient(
+      135deg,
+      hsl(var(--retro-mint)),
+      hsl(var(--retro-blue))
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--card)),
+      hsl(var(--muted))
+    );
+
     /* Shadows */
     --shadow-retro: 8px 8px 0px hsl(142 45% 45%);
     --shadow-card: 6px 6px 0px hsl(142 20% 75%);
@@ -127,6 +135,23 @@ All colors MUST be HSL.
   animation: marquee-loop 22s linear infinite;
 }
 @keyframes marquee-loop {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+
+@media (max-width: 1249px) {
+  .hide-1250 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1249px) {
+  .grow-1250 {
+    width: 100% !important;
+  }
 }

@@ -67,7 +67,7 @@ const Header = () => {
 
   const navigationItems = [
     {
-      name: "Shop",
+      name: "Gaming",
       icon: ShopSignIcon,
       isActive: ["/mobile-games", "/pc-games"].some((p) =>
         location.pathname.startsWith(p)

@@ -3,12 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ServiceCard from "@/components/ServiceCard";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Info, X, Copy, Check } from "lucide-react";
 import { LockKeyIcon, SentIcon } from "hugeicons-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import BkashIcon from "/assets/icons/bKash.svg";
-
+import { RotateLoader } from "react-spinners";
 
 interface PriceItem {
   label: string;
@@ -75,6 +74,9 @@ const GameDetailsLayout: React.FC<
   const [userAccount, setUserAccount] = useState("");
   const [trxId, setTrxId] = useState("");
   const [copiedText, setCopiedText] = useState("");
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -163,6 +165,21 @@ const GameDetailsLayout: React.FC<
     }
   }, []);
 
+  useEffect(() => {
+    setImgLoaded(false);
+    setImgError(false);
+  }, [image]);
+
+  useEffect(() => {
+    if (
+      imgRef.current &&
+      imgRef.current.complete &&
+      imgRef.current.naturalWidth !== 0
+    ) {
+      setImgLoaded(true);
+    }
+  }, [image]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -174,11 +191,28 @@ const GameDetailsLayout: React.FC<
           {/* Game Image Section - Compact */}
           <div className="lg:col-span-4">
             <div className="bg-white rounded-2xl shadow-card p-6 sticky top-8">
-              <div className="aspect-square rounded-xl overflow-hidden mb-4">
+              <div
+                className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto"
+              >
+                {/* Loader while loading or error */}
+                {(!imgLoaded || imgError) && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+                    <RotateLoader color="green" size={10} />
+                  </div>
+                )}
                 <img
+                  ref={imgRef}
                   src={image}
                   alt={title}
-                  className="w-full h-full object-cover"
+                  width={800}
+                  height={800}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                    imgLoaded && !imgError ? "opacity-100" : "opacity-0"
+                  }`}
+                  onLoad={() => setImgLoaded(true)}
+                  onError={() => setImgError(true)}
+                  style={{ minHeight: 0, minWidth: 0 }}
+                  draggable={false}
                 />
               </div>
               <h2 className="font-pixel text-xl tracking-tighter text-primary font-semibold text-center">
