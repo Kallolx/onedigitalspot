@@ -2,6 +2,13 @@ import { useState } from "react";
 import { pcGames } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout"; // <-- Use GameDetailsLayout
 
+// Define the SelectedItem interface here since it's needed by the component
+interface SelectedItem {
+  categoryIdx: number;
+  itemIdx: number;
+  quantity: number;
+}
+
 const priceList = [
   {
     title: "Valorant Points Packages",
@@ -43,9 +50,8 @@ const infoSections = [
 ];
 
 export default function Valorant() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [riotId, setRiotId] = useState("");
-  const [quantity, setQuantity] = useState(1);
   const valorant = pcGames?.find((g) => g.title === "Valorant");
   const similar = pcGames?.filter((g) => g.title !== "Valorant").slice(0, 4) || [];
   const infoImage = "/products/valorant.png";
@@ -57,10 +63,8 @@ export default function Valorant() {
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selected={selected}
-      setSelected={setSelected}
-      quantity={quantity}
-      setQuantity={setQuantity}
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
       playerId={riotId}
       setPlayerId={setRiotId}
       infoImage={infoImage}

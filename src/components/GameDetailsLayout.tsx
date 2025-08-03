@@ -3,11 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ServiceCard from "@/components/ServiceCard";
+import OrderStatusModal from "@/components/OrderStatusModal";
 import React, { useState, useEffect, useRef } from "react";
 import { Info, X, Copy, Check } from "lucide-react";
 import { LockKeyIcon, SentIcon } from "hugeicons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RotateLoader } from "react-spinners";
+import { createOrder, getCurrentUser, OrderData } from "../lib/orders";
 
 interface PriceItem {
   label: string;
@@ -26,6 +28,12 @@ interface InfoSection {
   content: React.ReactNode;
 }
 
+interface SelectedItem {
+  categoryIdx: number;
+  itemIdx: number;
+  quantity: number;
+}
+
 interface GameDetailsLayoutProps {
   title: string;
   image: string;
@@ -37,10 +45,9 @@ interface GameDetailsLayoutProps {
   setPlayerId?: (v: string) => void;
   zoneId?: string;
   setZoneId?: (v: string) => void;
-  quantity?: number;
-  setQuantity?: (v: number) => void;
-  selected?: { categoryIdx: number; itemIdx: number } | null;
-  setSelected?: (v: { categoryIdx: number; itemIdx: number } | null) => void;
+  // Remove the legacy single selection props - now using multiple selection
+  selectedItems?: SelectedItem[];
+  setSelectedItems?: (v: SelectedItem[]) => void;
   onSubmit?: (e: React.FormEvent) => void;
   infoImage?: string;
 }
@@ -58,10 +65,8 @@ const GameDetailsLayout: React.FC<
   setPlayerId,
   zoneId,
   setZoneId,
-  quantity,
-  setQuantity,
-  selected,
-  setSelected,
+  selectedItems = [],
+  setSelectedItems,
   onSubmit,
   infoImage,
   isSignedIn = false, // default to false if not provided
@@ -76,25 +81,134 @@ const GameDetailsLayout: React.FC<
   const [copiedText, setCopiedText] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [orderModal, setOrderModal] = useState<{
+    isOpen: boolean;
+    status: "success" | "error";
+    title?: string;
+    message?: string;
+    orderData?: any;
+  }>({
+    isOpen: false,
+    status: "success",
+  });
   const imgRef = useRef<HTMLImageElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Calculate selected item and total amount
-  const selectedItem = selected
-    ? priceList[selected.categoryIdx]?.items[selected.itemIdx]
-    : null;
-
-  const totalAmount =
-    selectedItem && typeof selectedItem.price === "number"
-      ? selectedItem.price * (quantity || 1)
-      : selectedItem?.price;
+  // Calculate total amount from all selected items
+  const totalAmount = selectedItems.reduce((total, item) => {
+    const selectedItem = priceList[item.categoryIdx]?.items[item.itemIdx];
+    if (!selectedItem) return total;
+    
+    const itemPrice = typeof selectedItem.price === "number" ? selectedItem.price : 0;
+    return total + (itemPrice * item.quantity);
+  }, 0);
 
   // Copy to clipboard function
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     setCopiedText(label);
     setTimeout(() => setCopiedText(""), 2000);
+  };
+
+  // Handle order creation
+  const handleCompletePayment = async () => {
+    if (!paymentMethod || !userAccount || !trxId || selectedItems.length === 0) {
+      setOrderModal({
+        isOpen: true,
+        status: "error",
+        title: "Missing Information",
+        message: "Please fill in all payment details and select at least one item before proceeding.",
+      });
+      return;
+    }
+
+    setIsProcessingOrder(true);
+
+    try {
+      // Get current user details
+      const user = await getCurrentUser();
+      
+      // Determine product type from URL
+      let productType = "Unknown";
+      if (location.pathname.includes('/mobile-games/')) {
+        productType = "Mobile Games";
+      } else if (location.pathname.includes('/pc-games/')) {
+        productType = "PC Games";
+      } else if (location.pathname.includes('/gift-cards/')) {
+        productType = "Gift Cards";
+      } else if (location.pathname.includes('/ai-tools/')) {
+        productType = "AI Tools";
+      } else if (location.pathname.includes('/subscriptions/')) {
+        productType = "Subscriptions";
+      }
+
+      // Create orders for each selected item
+      const orderPromises = selectedItems.map(async (selectedItem) => {
+        const item = priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
+        if (!item) throw new Error("Invalid item selection");
+
+        const itemPrice = typeof item.price === "number" ? item.price : 0;
+        const itemTotal = itemPrice * selectedItem.quantity;
+
+        const orderData: Omit<OrderData, 'id' | 'orderID' | 'createdAt' | 'updatedAt'> = {
+          userId: user.$id,
+          userName: user.name || "Guest User",
+          userEmail: user.email || "",
+          productType,
+          productName: title,
+          productImage: image,
+          itemLabel: item.label,
+          quantity: selectedItem.quantity,
+          unitPrice: itemPrice,
+          totalAmount: itemTotal,
+          playerId: playerId || "",
+          zoneId: zoneId || "",
+          paymentMethod: paymentMethod,
+          paymentAccountNumber: userAccount,
+          transactionId: trxId,
+          status: "Pending",
+        };
+
+        return await createOrder(orderData);
+      });
+
+      // Wait for all orders to be created
+      const newOrders = await Promise.all(orderPromises);
+      
+      // Show success modal
+      setOrderModal({
+        isOpen: true,
+        status: "success",
+        title: "Orders Placed Successfully!",
+        message: `${newOrders.length} order(s) have been successfully placed and are being processed. You will receive updates via email.`,
+        orderData: {
+          orderId: newOrders.map(order => order.orderID).join(", "), // Show all order IDs
+          amount: totalAmount,
+          productName: title,
+          transactionId: trxId,
+        },
+      });
+      
+      // Reset form
+      setShowPayment(false);
+      setPaymentMethod(null);
+      setUserAccount("");
+      setTrxId("");
+      if (setSelectedItems) setSelectedItems([]);
+      
+    } catch (error) {
+      console.error("Error creating orders:", error);
+      setOrderModal({
+        isOpen: true,
+        status: "error",
+        title: "Order Failed",
+        message: "Failed to create orders. Please check your details and try again. If the problem persists, contact support.",
+      });
+    } finally {
+      setIsProcessingOrder(false);
+    }
   };
 
   // Payment methods configuration
@@ -147,6 +261,60 @@ const GameDetailsLayout: React.FC<
     },
   ];
 
+  // Helper functions for multiple selection
+  const isItemSelected = (categoryIdx: number, itemIdx: number) => {
+    return selectedItems.some(item => 
+      item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    );
+  };
+
+  const getSelectedItemQuantity = (categoryIdx: number, itemIdx: number) => {
+    const found = selectedItems.find(item => 
+      item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    );
+    return found ? found.quantity : 0;
+  };
+
+  const handleItemSelection = (categoryIdx: number, itemIdx: number) => {
+    if (!setSelectedItems) return;
+
+    const existingIndex = selectedItems.findIndex(item => 
+      item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    );
+
+    if (existingIndex >= 0) {
+      // Item already selected, increase quantity
+      const newSelectedItems = [...selectedItems];
+      newSelectedItems[existingIndex].quantity += 1;
+      setSelectedItems(newSelectedItems);
+    } else {
+      // New item, add to selection
+      setSelectedItems([...selectedItems, {
+        categoryIdx,
+        itemIdx,
+        quantity: 1
+      }]);
+    }
+  };
+
+  const updateItemQuantity = (categoryIdx: number, itemIdx: number, newQuantity: number) => {
+    if (!setSelectedItems) return;
+
+    if (newQuantity <= 0) {
+      // Remove item if quantity is 0 or less
+      setSelectedItems(selectedItems.filter(item => 
+        !(item.categoryIdx === categoryIdx && item.itemIdx === itemIdx)
+      ));
+    } else {
+      // Update quantity
+      setSelectedItems(selectedItems.map(item => 
+        item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+          ? { ...item, quantity: newQuantity }
+          : item
+      ));
+    }
+  };
+
   // Always scroll to top when this layout mounts
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -155,12 +323,10 @@ const GameDetailsLayout: React.FC<
   useEffect(() => {
     const saved = localStorage.getItem("gameOrderInputs");
     if (saved) {
-      const { selected, playerId, zoneId, quantity, pathname } =
-        JSON.parse(saved);
-      if (setSelected && selected) setSelected(selected);
+      const { selectedItems, playerId, zoneId, pathname } = JSON.parse(saved);
+      if (setSelectedItems && selectedItems) setSelectedItems(selectedItems);
       if (setPlayerId && playerId) setPlayerId(playerId);
       if (setZoneId && zoneId) setZoneId(zoneId);
-      if (setQuantity && quantity) setQuantity(quantity);
       localStorage.removeItem("gameOrderInputs");
     }
   }, []);
@@ -235,16 +401,13 @@ const GameDetailsLayout: React.FC<
                           key={itemIdx}
                           type="button"
                           variant={
-                            selected &&
-                            selected.categoryIdx === catIdx &&
-                            selected.itemIdx === itemIdx
+                            isItemSelected(catIdx, itemIdx)
                               ? "default"
                               : "outline"
                           }
                           className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
                           onClick={() =>
-                            setSelected &&
-                            setSelected({ categoryIdx: catIdx, itemIdx })
+                            handleItemSelection(catIdx, itemIdx)
                           }
                         >
                           <span className="flex items-center gap-2">
@@ -266,12 +429,16 @@ const GameDetailsLayout: React.FC<
                                 />
                               </span>
                             )}
+                            {/* Show quantity badge if selected */}
+                            {isItemSelected(catIdx, itemIdx) && (
+                              <span className="ml-2 bg-white/20 text-white px-2 py-1 rounded-full text-sm font-bold">
+                                {getSelectedItemQuantity(catIdx, itemIdx)}
+                              </span>
+                            )}
                           </span>
                           <span
                             className={`font-bold transition-colors duration-150 ${
-                              selected &&
-                              selected.categoryIdx === catIdx &&
-                              selected.itemIdx === itemIdx
+                              isItemSelected(catIdx, itemIdx)
                                 ? "text-white"
                                 : "text-primary"
                             } group-hover:text-white`}
@@ -387,60 +554,96 @@ const GameDetailsLayout: React.FC<
                   </div>
                 )}
 
-                <div className="flex items-center gap-4 mb-4">
-                  <label className="font-pixel text-base text-primary">
-                    Quantity
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      className="w-10 h-10 border-2 border-border rounded-lg flex items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
-                      onClick={() =>
-                        setQuantity &&
-                        setQuantity(Math.max(1, (quantity || 1) - 1))
-                      }
-                    >
-                      -
-                    </button>
-                    <input
-                      className="w-20 border-2 border-border rounded-lg px-3 py-2 text-base bg-white text-center focus:border-primary focus:outline-none transition-colors"
-                      type="number"
-                      min={1}
-                      value={quantity || 1}
-                      onChange={(e) =>
-                        setQuantity && setQuantity(Number(e.target.value))
-                      }
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="w-10 h-10 border-2 border-border rounded-lg flex items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
-                      onClick={() =>
-                        setQuantity && setQuantity((quantity || 1) + 1)
-                      }
-                    >
-                      +
-                    </button>
+                {/* Multiple Items Display - replaces old quantity selector */}
+                {selectedItems.length > 0 && (
+                  <div className="mb-4">
+                    <label className="font-pixel text-base text-primary mb-2 block">
+                      Selected Items
+                    </label>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {selectedItems.map((selectedItem, index) => {
+                        const item = priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
+                        if (!item) return null;
+                        
+                        return (
+                          <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                            <div className="flex-1 min-w-0">
+                              <span className="font-medium text-gray-900 truncate">
+                                {item.label}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 ml-4">
+                              <button
+                                type="button"
+                                className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                onClick={() =>
+                                  updateItemQuantity(selectedItem.categoryIdx, selectedItem.itemIdx, selectedItem.quantity - 1)
+                                }
+                              >
+                                -
+                              </button>
+                              <span className="w-12 text-center font-medium">
+                                {selectedItem.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                onClick={() =>
+                                  updateItemQuantity(selectedItem.categoryIdx, selectedItem.itemIdx, selectedItem.quantity + 1)
+                                }
+                              >
+                                +
+                              </button>
+                              <span className="ml-2 font-semibold text-primary">
+                                {typeof item.price === "number" ? item.price * selectedItem.quantity : item.price}৳
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Order Summary */}
-                {selected !== null && selectedItem && (
-                  <div className="rounded-xl border border-primary/30 px-4 py-3 mb-3 flex items-center justify-between gap-4 shadow-sm">
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <span className="font-pixel text-xl text-primary font-semibold mt-1">
-                        Total
+                {selectedItems.length > 0 && (
+                  <div className="rounded-xl border border-primary/30 px-4 py-3 mb-3 shadow-sm">
+                    <div className="flex flex-col gap-2">
+                      <span className="font-pixel text-xl text-primary font-semibold">
+                        Order Summary
                       </span>
+                      <div className="space-y-1">
+                        {selectedItems.map((selectedItem, index) => {
+                          const item = priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
+                          if (!item) return null;
+                          
+                          const itemPrice = typeof item.price === "number" ? item.price : 0;
+                          const itemTotal = itemPrice * selectedItem.quantity;
+                          
+                          return (
+                            <div key={index} className="flex justify-between text-sm">
+                              <span className="text-gray-600">
+                                {item.label} x{selectedItem.quantity}
+                              </span>
+                              <span className="font-medium text-primary">
+                                {itemTotal}৳
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="border-t pt-2 mt-2">
+                        <div className="flex justify-between items-center">
+                          <span className="font-pixel text-lg text-primary font-bold">
+                            Total
+                          </span>
+                          <span className="font-pixel text-2xl text-primary font-bold">
+                            {totalAmount}
+                            <span className="text-lg font-normal ml-1">৳</span>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <span className="font-pixel text-2xl text-primary font-bold whitespace-nowrap flex items-center gap-2">
-                      <span className="block text-base font-normal text-primary mr-2">
-                        {selectedItem.label} x{quantity || 1}
-                      </span>
-                      <span className="block text-xl font-bold text-primary">
-                        {totalAmount}
-                        <span className="text-lg font-normal ml-1">৳</span>
-                      </span>
-                    </span>
                   </div>
                 )}
 
@@ -449,21 +652,18 @@ const GameDetailsLayout: React.FC<
                   variant="default"
                   className="w-full font-pixel text-lg mt-2 flex items-center justify-center gap-2"
                   disabled={
-                    !isSignedIn ||
-                    !selected ||
+                    selectedItems.length === 0 ||
                     (typeof playerId !== "undefined" && !playerId) ||
-                    (typeof zoneId !== "undefined" && !zoneId) ||
-                    !quantity
+                    (typeof zoneId !== "undefined" && !zoneId)
                   }
                   onClick={() => {
                     if (!isSignedIn) {
                       localStorage.setItem(
                         "gameOrderInputs",
                         JSON.stringify({
-                          selected,
+                          selectedItems,
                           playerId,
                           zoneId,
-                          quantity,
                           pathname: location.pathname,
                         })
                       );
@@ -596,13 +796,14 @@ const GameDetailsLayout: React.FC<
 
                                   <Button
                                     className={`w-full font-pixel ${
-                                      userAccount && trxId
+                                      userAccount && trxId && !isProcessingOrder
                                         ? `bg-gradient-to-r ${method.color} text-white hover:shadow-lg`
                                         : "bg-gray-200 text-gray-500 cursor-not-allowed"
                                     }`}
-                                    disabled={!userAccount || !trxId}
+                                    disabled={!userAccount || !trxId || isProcessingOrder}
+                                    onClick={handleCompletePayment}
                                   >
-                                    Complete Payment
+                                    {isProcessingOrder ? "Processing..." : "Complete Payment"}
                                   </Button>
                                 </div>
                               </div>
@@ -748,6 +949,27 @@ const GameDetailsLayout: React.FC<
           </div>
         </div>
       </main>
+
+      {/* Order Status Modal */}
+      <OrderStatusModal
+        isOpen={orderModal.isOpen}
+        onClose={() => setOrderModal({ ...orderModal, isOpen: false })}
+        status={orderModal.status}
+        title={orderModal.title}
+        message={orderModal.message}
+        orderData={orderModal.orderData}
+        onViewOrders={() => {
+          setOrderModal({ ...orderModal, isOpen: false });
+          navigate("/my-orders");
+        }}
+        onRetry={() => {
+          setOrderModal({ ...orderModal, isOpen: false });
+          // Reset form to allow retry
+          setPaymentMethod(null);
+          setUserAccount("");
+          setTrxId("");
+        }}
+      />
     </div>
   );
 };

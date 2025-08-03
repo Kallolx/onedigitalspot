@@ -16,6 +16,18 @@ import {
   AlertTriangle,
   Upload,
   Link,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Grid3X3,
+  List,
+  MoreHorizontal,
+  Filter,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,6 +99,13 @@ const Products = () => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState([]);
   const [preview, setPreview] = useState({ src: null, x: 0, y: 0 });
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [sortBy, setSortBy] = useState("title");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [viewMode, setViewMode] = useState("table"); // table or grid
 
   // State for products by category
   const [productsByCategory, setProductsByCategory] = useState({
@@ -340,7 +359,7 @@ const Products = () => {
       const deletePromises = [];
 
       // Find products to delete
-      const productsToDelete = products.filter((p) =>
+      const productsToDelete = sortedProducts.filter((p) =>
         selected.includes(p.title)
       );
 
@@ -518,13 +537,101 @@ const Products = () => {
     resetNewProduct();
   };
 
-  // Filtered products for active category
-  const products = (productsByCategory[activeCategory] || []).filter(
+  // Filtered and sorted products for active category
+  const filteredProducts = (productsByCategory[activeCategory] || []).filter(
     (prod) =>
       prod.title?.toLowerCase().includes(search.toLowerCase()) ||
       (prod.category &&
         prod.category.toLowerCase().includes(search.toLowerCase()))
   );
+
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    let aValue = a[sortBy];
+    let bValue = b[sortBy];
+    
+    // Handle special cases for sorting
+    if (sortBy === "price") {
+      aValue = parseFloat(aValue?.replace(/[^\d.]/g, '') || "0");
+      bValue = parseFloat(bValue?.replace(/[^\d.]/g, '') || "0");
+    } else if (typeof aValue === "string") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue?.toLowerCase() || "";
+    }
+    
+    if (sortOrder === "asc") {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  // Pagination calculations
+  const totalProducts = sortedProducts.length;
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
+
+  // Reset pagination when filters change
+  const resetPagination = () => {
+    setCurrentPage(1);
+    setSelected([]);
+  };
+
+  // Handle category change
+  const handleCategoryChange = (category) => {
+    setActiveCategory(category);
+    resetPagination();
+  };
+
+  // Handle search change
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    resetPagination();
+  };
+
+  // Handle sort change
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+    resetPagination();
+  };
+
+  // Generate page numbers for pagination (responsive)
+  const getPageNumbers = (isMobile = false) => {
+    const pages = [];
+    const maxVisiblePages = isMobile ? 3 : 5; // Show fewer pages on mobile
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (startPage > 1) {
+        pages.push(1);
+        if (startPage > 2) pages.push("...");
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pages.push("...");
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
 
   // Bulk actions
   const BulkActions = () => (
@@ -606,7 +713,7 @@ const Products = () => {
                   ? "bg-primary text-white border-primary"
                   : "bg-background text-primary border-border hover:bg-primary/10 hover:text-primary"
               }`}
-              onClick={() => setActiveCategory(cat.key)}
+              onClick={() => handleCategoryChange(cat.key)}
               disabled={isLoading}
             >
               {IconComp && (
@@ -635,208 +742,626 @@ const Products = () => {
       {/* Product List for Selected Category */}
       {activeCategory && (
         <div className="space-y-6">
-          {/* Search & Actions */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="relative w-full sm:w-64">
-              <Input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={`Search in ${
-                  categories.find((c) => c.key === activeCategory)?.name
-                }...`}
-                className="font-pixel"
-                disabled={isLoading}
-              />
+          {/* Enhanced Search & Controls */}
+          <div className="space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              {/* Search and Filters */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-1">
+                <div className="relative w-full sm:w-80">
+                  <Input
+                    type="text"
+                    value={search}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    placeholder={`Search in ${
+                      categories.find((c) => c.key === activeCategory)?.name
+                    }...`}
+                    className="font-pixel pl-10"
+                    disabled={isLoading}
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+                
+                {/* Sort Controls */}
+                <div className="flex items-center gap-2">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="font-pixel text-sm border border-border rounded px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="title">Sort by Title</option>
+                    <option value="category">Sort by Category</option>
+                    <option value="price">Sort by Price</option>
+                    <option value="$createdAt">Sort by Date</option>
+                  </select>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                    className="font-pixel"
+                  >
+                    {sortOrder === "asc" ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+                  </Button>
+                </div>
+
+                {/* Items per page */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground font-pixel">Show:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="font-pixel text-sm border border-border rounded px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                {/* View Mode Toggle */}
+                <div className="flex border border-border rounded-md">
+                  <Button
+                    variant={viewMode === "table" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("table")}
+                    className="font-pixel rounded-r-none"
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="font-pixel rounded-l-none"
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <Button
+                  className="font-pixel"
+                  disabled={isLoading}
+                  onClick={resetToDefault}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Product
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                className="font-pixel"
-                disabled={isLoading}
-                onClick={resetToDefault}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Product
-              </Button>
-              <Button
-                variant="outline"
-                className="font-pixel"
-                disabled={isLoading}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
-              <Button
-                variant="outline"
-                className="font-pixel"
-                disabled={isLoading}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Import
-              </Button>
+
+            {/* Stats and Info Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground font-pixel">
+                <span>
+                  Total: <span className="font-bold text-primary">{totalProducts}</span> products
+                </span>
+                <span>
+                  Showing: <span className="font-bold text-primary">{startIndex + 1}</span> - <span className="font-bold text-primary">{Math.min(endIndex, totalProducts)}</span>
+                </span>
+                {search && (
+                  <span>
+                    Filter: "<span className="font-bold text-primary">{search}</span>"
+                  </span>
+                )}
+              </div>
+              {selected.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground font-pixel">
+                    {selected.length} selected
+                  </span>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="font-pixel"
+                    onClick={() => setShowBulkDeleteDialog(true)}
+                    disabled={isLoading}
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Table */}
-          <Card className="shadow-retro">
-            {/* Bulk Actions */}
-            {selected.length > 0 && (
-              <CardHeader className="border-b bg-muted/50">
-                <div className="flex items-center justify-between">
-                  <span className="font-pixel text-sm text-muted-foreground">
-                    {selected.length} selected
-                  </span>
-                  <BulkActions />
+          {/* Table/Grid View */}
+          {viewMode === "table" ? (
+            <Card className="shadow-retro">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="w-12">
+                          <input
+                            type="checkbox"
+                            checked={
+                              selected.length === paginatedProducts.length &&
+                              paginatedProducts.length > 0
+                            }
+                            onChange={(e) =>
+                              setSelected(
+                                e.target.checked
+                                  ? paginatedProducts.map((p) => p.title)
+                                  : []
+                              )
+                            }
+                            disabled={isLoading}
+                            className="rounded border-border"
+                          />
+                        </TableHead>
+                        <TableHead className="font-pixel">Image</TableHead>
+                        <TableHead 
+                          className="font-pixel cursor-pointer hover:bg-muted/50 select-none"
+                          onClick={() => handleSort("title")}
+                        >
+                          <div className="flex items-center gap-1">
+                            Title
+                            {sortBy === "title" ? (
+                              sortOrder === "asc" ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
+                            ) : (
+                              <ArrowUpDown className="w-4 h-4 opacity-50" />
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead 
+                          className="font-pixel cursor-pointer hover:bg-muted/50 select-none"
+                          onClick={() => handleSort("category")}
+                        >
+                          <div className="flex items-center gap-1">
+                            Category
+                            {sortBy === "category" ? (
+                              sortOrder === "asc" ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
+                            ) : (
+                              <ArrowUpDown className="w-4 h-4 opacity-50" />
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead 
+                          className="font-pixel cursor-pointer hover:bg-muted/50 select-none"
+                          onClick={() => handleSort("price")}
+                        >
+                          <div className="flex items-center gap-1">
+                            Price
+                            {sortBy === "price" ? (
+                              sortOrder === "asc" ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
+                            ) : (
+                              <ArrowUpDown className="w-4 h-4 opacity-50" />
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead className="font-pixel text-right">
+                          Actions
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedProducts.length === 0 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={6}
+                            className="h-24 text-center text-muted-foreground font-pixel"
+                          >
+                            {isLoading
+                              ? "Loading products..."
+                              : search 
+                              ? `No products found matching "${search}"`
+                              : "No products found."}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        paginatedProducts.map((prod) => (
+                          <TableRow
+                            key={prod.$id}
+                            className="hover:bg-muted/50 transition-colors"
+                          >
+                            <TableCell>
+                              <input
+                                type="checkbox"
+                                checked={selected.includes(prod.title)}
+                                onChange={(e) =>
+                                  setSelected(
+                                    e.target.checked
+                                      ? [...selected, prod.title]
+                                      : selected.filter((t) => t !== prod.title)
+                                  )
+                                }
+                                disabled={isLoading}
+                                className="rounded border-border"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <img
+                                src={prod.image}
+                                alt={prod.title}
+                                className="w-12 h-12 rounded-lg object-cover border border-border cursor-pointer transition-transform hover:scale-110"
+                                onMouseEnter={(e) =>
+                                  setPreview({
+                                    src: prod.image,
+                                    x: e.clientX,
+                                    y: e.clientY,
+                                  })
+                                }
+                                onMouseMove={(e) =>
+                                  setPreview((prev) => ({
+                                    ...prev,
+                                    x: e.clientX,
+                                    y: e.clientY,
+                                  }))
+                                }
+                                onMouseLeave={() =>
+                                  setPreview({ src: null, x: 0, y: 0 })
+                                }
+                              />
+                            </TableCell>
+                            <TableCell className="font-pixel font-medium text-primary">
+                              {prod.title}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {prod.category}
+                            </TableCell>
+                            <TableCell className="font-semibold text-primary">
+                              {prod.price}৳
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="font-pixel h-8 w-8 p-0"
+                                  onClick={() => {
+                                    setViewProduct(prod);
+                                    setShowViewModal(true);
+                                  }}
+                                  disabled={isLoading}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="font-pixel h-8 w-8 p-0"
+                                  onClick={() => {
+                                    setEditProduct(prod);
+                                    setShowEditModal(true);
+                                  }}
+                                  disabled={isLoading}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="font-pixel h-8 w-8 p-0 text-destructive hover:text-destructive"
+                                  onClick={() => {
+                                    setDeleteProduct(prod);
+                                    setShowDeleteDialog(true);
+                                  }}
+                                  disabled={isLoading}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
                 </div>
-              </CardHeader>
-            )}
-
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/50">
-                      <TableHead className="w-12">
+              </CardContent>
+            </Card>
+          ) : (
+            /* Grid View */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {paginatedProducts.length === 0 ? (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                    <Gift className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-pixel text-lg text-muted-foreground mb-2">
+                    {isLoading
+                      ? "Loading products..."
+                      : search 
+                      ? `No products found matching "${search}"`
+                      : "No products found"}
+                  </h3>
+                  {!isLoading && !search && (
+                    <Button
+                      onClick={resetToDefault}
+                      className="font-pixel mt-4"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add First Product
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                paginatedProducts.map((prod) => (
+                  <Card key={prod.$id} className="group hover:shadow-lg transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="relative">
                         <input
                           type="checkbox"
-                          checked={
-                            selected.length === products.length &&
-                            products.length > 0
-                          }
+                          checked={selected.includes(prod.title)}
                           onChange={(e) =>
                             setSelected(
                               e.target.checked
-                                ? products.map((p) => p.title)
-                                : []
+                                ? [...selected, prod.title]
+                                : selected.filter((t) => t !== prod.title)
                             )
                           }
-                          disabled={isLoading}
-                          className="rounded border-border"
+                          className="absolute top-2 left-2 z-10 rounded border-border"
                         />
-                      </TableHead>
-                      <TableHead className="font-pixel">Image</TableHead>
-                      <TableHead className="font-pixel">Title</TableHead>
-                      <TableHead className="font-pixel">Category</TableHead>
-                      <TableHead className="font-pixel">Price</TableHead>
-                      <TableHead className="font-pixel text-right">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {products.length === 0 ? (
-                      <TableRow>
-                        <TableCell
-                          colSpan={6}
-                          className="h-24 text-center text-muted-foreground font-pixel"
+                        <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
+                          <img
+                            src={prod.image}
+                            alt={prod.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                        </div>
+                        <h3 className="font-pixel font-bold text-primary mb-2 truncate">
+                          {prod.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {prod.category}
+                        </p>
+                        <p className="font-bold text-primary font-pixel mb-4">
+                          {prod.price}৳
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={() => {
+                                setViewProduct(prod);
+                                setShowViewModal(true);
+                              }}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={() => {
+                                setEditProduct(prod);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            onClick={() => {
+                              setDeleteProduct(prod);
+                              setShowDeleteDialog(true);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Card className="mt-6 overflow-hidden shadow-retro">
+              <CardContent className="p-3 sm:p-4">
+                {/* Mobile Pagination Layout */}
+                <div className="block sm:hidden">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-xs text-muted-foreground font-pixel">
+                      Page {currentPage} of {totalPages}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-pixel">
+                      {totalProducts} products
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-1">
+                    {/* First Page - Mobile */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1 || isLoading}
+                      className="font-pixel px-2 h-8"
+                    >
+                      <ChevronsLeft className="w-3 h-3" />
+                    </Button>
+
+                    {/* Previous Page - Mobile */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1 || isLoading}
+                      className="font-pixel px-2 h-8"
+                    >
+                      <ChevronLeft className="w-3 h-3" />
+                    </Button>
+
+                    {/* Page Numbers - Mobile (fewer) */}
+                    <div className="flex items-center gap-1">
+                      {getPageNumbers(true).map((page, index) => (
+                        <Button
+                          key={index}
+                          variant={page === currentPage ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => typeof page === "number" && setCurrentPage(page)}
+                          disabled={typeof page !== "number" || isLoading}
+                          className={`font-pixel w-8 h-8 p-0 text-xs ${typeof page !== "number" ? "cursor-default" : ""}`}
                         >
-                          {isLoading
-                            ? "Loading products..."
-                            : "No products found."}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      products.map((prod) => (
-                        <TableRow
-                          key={prod.$id}
-                          className="hover:bg-muted/50 transition-colors"
+                          {page}
+                        </Button>
+                      ))}
+                    </div>
+
+                    {/* Next Page - Mobile */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === totalPages || isLoading}
+                      className="font-pixel px-2 h-8"
+                    >
+                      <ChevronRight className="w-3 h-3" />
+                    </Button>
+
+                    {/* Last Page - Mobile */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages || isLoading}
+                      className="font-pixel px-2 h-8"
+                    >
+                      <ChevronsRight className="w-3 h-3" />
+                    </Button>
+                  </div>
+
+                  {/* Mobile Jump to Page */}
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    <span className="text-xs text-muted-foreground font-pixel">
+                      Jump to:
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={totalPages}
+                      value={currentPage}
+                      onChange={(e) => {
+                        const page = parseInt(e.target.value);
+                        if (page >= 1 && page <= totalPages) {
+                          setCurrentPage(page);
+                        }
+                      }}
+                      className="w-12 px-1 py-1 text-xs border border-border rounded font-pixel text-center focus:outline-none focus:ring-1 focus:ring-primary"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                {/* Desktop Pagination Layout */}
+                <div className="hidden sm:flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground font-pixel">
+                    <span>
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <span>•</span>
+                    <span>
+                      {totalProducts} total products
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* First Page - Desktop */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1 || isLoading}
+                      className="font-pixel"
+                    >
+                      <ChevronsLeft className="w-4 h-4" />
+                    </Button>
+
+                    {/* Previous Page - Desktop */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1 || isLoading}
+                      className="font-pixel"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+
+                    {/* Page Numbers - Desktop */}
+                    <div className="flex items-center gap-1">
+                      {getPageNumbers(false).map((page, index) => (
+                        <Button
+                          key={index}
+                          variant={page === currentPage ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => typeof page === "number" && setCurrentPage(page)}
+                          disabled={typeof page !== "number" || isLoading}
+                          className={`font-pixel min-w-[40px] ${typeof page !== "number" ? "cursor-default" : ""}`}
                         >
-                          <TableCell>
-                            <input
-                              type="checkbox"
-                              checked={selected.includes(prod.title)}
-                              onChange={(e) =>
-                                setSelected(
-                                  e.target.checked
-                                    ? [...selected, prod.title]
-                                    : selected.filter((t) => t !== prod.title)
-                                )
-                              }
-                              disabled={isLoading}
-                              className="rounded border-border"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <img
-                              src={prod.image}
-                              alt={prod.title}
-                              className="w-12 h-12 rounded-lg object-cover border border-border cursor-pointer transition-transform hover:scale-110"
-                              onMouseEnter={(e) =>
-                                setPreview({
-                                  src: prod.image,
-                                  x: e.clientX,
-                                  y: e.clientY,
-                                })
-                              }
-                              onMouseMove={(e) =>
-                                setPreview((prev) => ({
-                                  ...prev,
-                                  x: e.clientX,
-                                  y: e.clientY,
-                                }))
-                              }
-                              onMouseLeave={() =>
-                                setPreview({ src: null, x: 0, y: 0 })
-                              }
-                            />
-                          </TableCell>
-                          <TableCell className="font-pixel font-medium text-primary">
-                            {prod.title}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {prod.category}
-                          </TableCell>
-                          <TableCell className="font-semibold text-primary">
-                            {prod.price}৳
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="font-pixel h-8 w-8 p-0"
-                                onClick={() => {
-                                  setViewProduct(prod);
-                                  setShowViewModal(true);
-                                }}
-                                disabled={isLoading}
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="font-pixel h-8 w-8 p-0"
-                                onClick={() => {
-                                  setEditProduct(prod);
-                                  setShowEditModal(true);
-                                }}
-                                disabled={isLoading}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="font-pixel h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                onClick={() => {
-                                  setDeleteProduct(prod);
-                                  setShowDeleteDialog(true);
-                                }}
-                                disabled={isLoading}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                          {page}
+                        </Button>
+                      ))}
+                    </div>
+
+                    {/* Next Page - Desktop */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === totalPages || isLoading}
+                      className="font-pixel"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+
+                    {/* Last Page - Desktop */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages || isLoading}
+                      className="font-pixel"
+                    >
+                      <ChevronsRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Desktop Jump to Page */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground font-pixel">
+                      Go to:
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={totalPages}
+                      value={currentPage}
+                      onChange={(e) => {
+                        const page = parseInt(e.target.value);
+                        if (page >= 1 && page <= totalPages) {
+                          setCurrentPage(page);
+                        }
+                      }}
+                      className="w-16 px-2 py-1 text-sm border border-border rounded font-pixel text-center focus:outline-none focus:ring-2 focus:ring-primary"
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 

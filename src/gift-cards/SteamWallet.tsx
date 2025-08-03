@@ -3,6 +3,13 @@ import { databases, account } from "@/lib/appwrite";
 import { giftCards } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
 
+// Define the SelectedItem interface here since it's needed by the component
+interface SelectedItem {
+  categoryIdx: number;
+  itemIdx: number;
+  quantity: number;
+}
+
 const categoryIcons = {
   "Steam Wallet Codes (USD)": "/assets/icons/steam-card.svg",
 };
@@ -26,13 +33,9 @@ const infoSections = [
 ];
 
 export default function SteamWallet() {
-  const [selected, setSelected] = useState<{
-    categoryIdx: number;
-    itemIdx: number;
-  } | null>(null);
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [sw, setSw] = useState(null);
   const [priceList, setPriceList] = useState([]);
-  const [quantity, setQuantity] = useState(1);
   const [similar, setSimilar] = useState([]);
 
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -100,11 +103,9 @@ export default function SteamWallet() {
       image={sw?.image || ""}
       priceList={priceList}
       infoSections={infoSections}
-      quantity={quantity}
-      setQuantity={setQuantity}
       similarProducts={similar}
-      selected={selected}
-      setSelected={setSelected}
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
       playerId={undefined} // Hide Player ID
       setPlayerId={undefined} // Hide Player ID
       zoneId={undefined} // Hide Zone ID

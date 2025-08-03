@@ -16,6 +16,7 @@ import {
   MailValidation01Icon,
 } from "hugeicons-react";
 import { account } from "@/lib/appwrite";
+import { getUserOrders } from "@/lib/orders";
 
 import MobileMenu from "./MobileMenu";
 
@@ -24,6 +25,7 @@ const Header = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
 
   const location = { pathname: "/" };
 
@@ -31,6 +33,18 @@ const Header = () => {
   useEffect(() => {
     checkAuthStatus();
   }, []);
+
+  // Fetch pending orders count when user changes
+  useEffect(() => {
+    if (user) {
+      fetchPendingOrdersCount();
+      // Set up interval to refresh pending orders count every 30 seconds
+      const interval = setInterval(fetchPendingOrdersCount, 30000);
+      return () => clearInterval(interval);
+    } else {
+      setPendingOrdersCount(0);
+    }
+  }, [user]);
 
   const checkAuthStatus = async () => {
     try {
@@ -40,6 +54,21 @@ const Header = () => {
       setUser(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingOrdersCount = async () => {
+    if (!user) return;
+    
+    try {
+      const orders = await getUserOrders(user.$id);
+      const pendingCount = orders.filter(order => 
+        order.status && order.status.toLowerCase() === 'pending'
+      ).length;
+      setPendingOrdersCount(pendingCount);
+    } catch (error) {
+      console.error("Failed to fetch pending orders count:", error);
+      setPendingOrdersCount(0);
     }
   };
 
@@ -324,25 +353,16 @@ const Header = () => {
                             </a>
                           )}
                         <a
-                          href="/profile"
-                          className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                        >
-                          <UserIcon className="w-4 h-4" />
-                          Profile
-                        </a>
-                        <a
-                          href="/orders"
-                          className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+                          href="/my-orders"
+                          className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2 relative"
                         >
                           <ShoppingCart02Icon className="w-4 h-4" />
-                          Orders
-                        </a>
-                        <a
-                          href="/settings"
-                          className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                        >
-                          <Settings02Icon className="w-4 h-4" />
-                          Settings
+                          My Orders
+                          {pendingOrdersCount > 0 && (
+                            <span className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                              {pendingOrdersCount > 9 ? '9+' : pendingOrdersCount}
+                            </span>
+                          )}
                         </a>
                         <button
                           onClick={handleLogout}

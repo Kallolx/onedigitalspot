@@ -3,6 +3,13 @@ import { databases, account } from "@/lib/appwrite";
 import { mobileGames } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
 
+// Define the SelectedItem interface here since it's needed by the component
+interface SelectedItem {
+  categoryIdx: number;
+  itemIdx: number;
+  quantity: number;
+}
+
 const categoryIcons = {
   "Passes & Vouchers": "/assets/icons/voucher.svg",
   Diamonds: "/assets/icons/diamond.svg",
@@ -67,10 +74,9 @@ const infoSections = [
 ];
 
 export default function MobileLegends() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
   const [zoneId, setZoneId] = useState("");
-  const [quantity, setQuantity] = useState(1);
   const [ml, setMl] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
@@ -122,14 +128,12 @@ export default function MobileLegends() {
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selected={selected}
-      setSelected={setSelected as any}
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
       playerId={playerId}
       setPlayerId={setPlayerId}
       zoneId={zoneId}
       setZoneId={setZoneId}
-      quantity={quantity}
-      setQuantity={setQuantity}
       infoImage={infoImage}
     />
   );

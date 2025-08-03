@@ -11,6 +11,7 @@ import PCGames from "./pages/PcGames";
 import TopUpGames from "./pages/TopUpGames";
 import GiftCards from "./pages/GiftCards";
 import AiTools from "./pages/AiTools";
+import MyOrders from "./pages/MyOrders";
 import MobileLegends from "@/game-details/mobile-games/MobileLegends";
 import PUBGMobile from "@/game-details/mobile-games/PUBGMobile";
 import Valorant from "@/game-details/pc-games/Valorant";
@@ -44,6 +45,7 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/signup" element={<Signup />} />
+            <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/mobile-games" element={<MobileGames />} />
             <Route path="/pc-games" element={<PCGames />} />
             <Route path="/top-up-games" element={<TopUpGames />} />

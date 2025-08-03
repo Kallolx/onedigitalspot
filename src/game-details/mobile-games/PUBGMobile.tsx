@@ -2,6 +2,13 @@ import { useState } from "react";
 import { mobileGames } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
 
+// Define the SelectedItem interface here since it's needed by the component
+interface SelectedItem {
+  categoryIdx: number;
+  itemIdx: number;
+  quantity: number;
+}
+
 const priceList = [
   {
     title: "Passes & Vouchers",
@@ -58,9 +65,8 @@ const infoSections = [
 ];
 
 export default function PUBGMobile() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
-  const [quantity, setQuantity] = useState(1);
   const pubg = mobileGames.find((g) => g.title === "PUBG Mobile");
   const similar = mobileGames.filter((g) => g.title !== "PUBG Mobile").slice(0, 4);
   const infoImage = "/products/pubg-mobile.png";
@@ -72,12 +78,10 @@ export default function PUBGMobile() {
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selected={selected}
-      setSelected={setSelected as any}
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
       playerId={playerId}
       setPlayerId={setPlayerId}
-      quantity={quantity}
-      setQuantity={setQuantity}
       infoImage={infoImage}
     />
   );

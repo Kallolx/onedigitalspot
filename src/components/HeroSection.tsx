@@ -107,7 +107,7 @@ const HeroSection = () => {
                     Explore
                     <ArrowRight className="w-5 h-5 text-white" />
                   </Button>
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center mt-2 gap-2">
                     <AvatarCircles numPeople={99} avatarUrls={avatars} />
                     <h1 className="text-sm font-medium text-muted-foreground hover:underline cursor-pointer">
                       Join <br /> Community
