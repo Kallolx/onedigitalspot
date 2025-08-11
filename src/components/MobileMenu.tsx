@@ -6,7 +6,7 @@ import {
   GiftCardIcon,
   Tv01Icon,
   ArrowDown01Icon,
-  MoreHorizontalSquare01Icon
+  MoreHorizontalSquare01Icon,
 } from "hugeicons-react";
 
 import { useState } from "react";
@@ -37,7 +37,6 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
     >
       <div className="container px-4 py-4 max-h-[calc(100vh-73px)] overflow-y-auto">
         <nav className="flex flex-col gap-2 mb-4 tracking-tighter">
-
           {/* Home */}
           <Link
             to="/"
@@ -52,71 +51,26 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
           {/* Shop */}
           <div>
             <button
-              onClick={() => toggleSubmenu("shop")}
+              onClick={() => toggleSubmenu("Gaming")}
               className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
             >
               <div className="flex items-center gap-2">
                 <ShopSignIcon className="w-5 h-5" />
-                <span className="font-semibold">Shop</span>
+                <span className="font-semibold">Gaming</span>
               </div>
               <ArrowDown01Icon
                 className={`w-4 h-4 transition-transform ${
-                  activeSubmenu === "shop" ? "rotate-180" : ""
+                  activeSubmenu === "Gaming" ? "rotate-180" : ""
                 }`}
               />
             </button>
-            {activeSubmenu === "shop" && (
+            {activeSubmenu === "Gaming" && (
               <div className="mt-2 space-y-1">
                 {[
-                  { name: "Mobile Games", path: "/mobile-games" },
-                  { name: "PC Games", path: "/pc-games" },
-                ].map((dropItem) => {
-                  const productImages = {
-                    "Mobile Games": "/assets/icons/mobile-games.svg",
-                    "PC Games": "/assets/icons/pc-games.svg",
-                  };
-                  const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
-                  return (
-                    <Link
-                      key={dropItem.name}
-                      to={dropItem.path}
-                      className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                    >
-                      <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-                        <img
-                          src={imgSrc}
-                          alt={dropItem.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </span>
-                      {dropItem.name}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Top Up */}
-          <div>
-            <button
-              onClick={() => toggleSubmenu("topup")}
-              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <CoinsDollarIcon className="w-5 h-5" />
-                <span className="font-semibold">Top Up</span>
-              </div>
-              <ArrowDown01Icon
-                className={`w-4 h-4 transition-transform ${
-                  activeSubmenu === "topup" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {activeSubmenu === "topup" && (
-              <div className="mt-2 space-y-1">
-                {[
-                  { name: "Mobile Legends", path: "/mobile-games/mobile-legends" },
+                  {
+                    name: "Mobile Legends",
+                    path: "/mobile-games/mobile-legends",
+                  },
                   { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
                   { name: "Free Fire", path: "/mobile-games/free-fire" },
                   { name: "Roblox", path: "/mobile-games/roblox" },
@@ -126,9 +80,78 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                     "Mobile Legends": "/assets/icons/mobile-legends.svg",
                     "PUBG Mobile": "/assets/icons/pubg-mobile.svg",
                     "Free Fire": "/assets/icons/free-fire.svg",
+                    Roblox: "/assets/icons/roblox-banner.svg",
+                  };
+                  const imgSrc =
+                    productImages[dropItem.name] ||
+                    "/src/assets/icons/placeholder.svg";
+                  return (
+                    <a
+                      key={dropItem.name}
+                      href={dropItem.path}
+                      className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+                    >
+                      {dropItem.name !== "More" && (
+                        <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
+                          <img
+                            src={imgSrc}
+                            alt={dropItem.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </span>
+                      )}
+                      {dropItem.name}
+                      {dropItem.name === "More" && (
+                        <span className="inline-block">
+                          <MoreHorizontalSquare01Icon className="w-3 h-3" />
+                        </span>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Design Tools */}
+          <div>
+            <button
+              onClick={() => toggleSubmenu("Design Tools")}
+              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <CoinsDollarIcon className="w-5 h-5" />
+                <span className="font-semibold">Design Tools</span>
+              </div>
+              <ArrowDown01Icon
+                className={`w-4 h-4 transition-transform ${
+                  activeSubmenu === "Design Tools" ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {activeSubmenu === "Design Tools" && (
+              <div className="mt-2 space-y-1">
+                {[
+                  {
+                    name: "Canva Pro",
+                    path: "/design-tools/canva",
+                  },
+                  { name: "CapCut Pro", path: "/design-tools/capcut" },
+                  { name: "Tinder+", path: "/design-tools/tinder" },
+                  { name: "Discord Nitro", path: "/design-tools/discord-nitro" },
+                  { name: "More", path: "/design-tools" },
+                ].map((dropItem) => {
+                  const productImages = {
+                    "Canva Pro": "/assets/icons/canva.svg",
+                    "CapCut Pro": "/assets/icons/capcut.svg",
+                    "Tinder+": "/assets/icons/tinder.svg",
+                    "Discord Nitro": "/assets/icons/discord-nitro.svg",
+                    "Free Fire": "/assets/icons/free-fire.svg",
                     "Roblox": "/assets/icons/roblox-banner.svg",
                   };
-                  const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
+                  const imgSrc =
+                    productImages[dropItem.name] ||
+                    "/src/assets/icons/placeholder.svg";
                   return (
                     <a
                       key={dropItem.name}
@@ -188,7 +211,9 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                     "Midjourney Pro": "/assets/icons/midjourney.svg",
                     "Github Pro": "/assets/icons/github.svg",
                   };
-                  const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
+                  const imgSrc =
+                    productImages[dropItem.name] ||
+                    "/src/assets/icons/placeholder.svg";
                   return (
                     <a
                       key={dropItem.name}
@@ -243,12 +268,14 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   { name: "More", path: "/gift-cards" },
                 ].map((dropItem) => {
                   const productImages = {
-                    "Steam": "/assets/icons/steam-card.svg",
+                    Steam: "/assets/icons/steam-card.svg",
                     "Google Play": "/assets/icons/google-play.svg",
                     "Apple Store": "/assets/icons/apple-store.svg",
-                    "PlayStation": "/assets/icons/playstation.svg",
+                    PlayStation: "/assets/icons/playstation.svg",
                   };
-                  const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
+                  const imgSrc =
+                    productImages[dropItem.name] ||
+                    "/src/assets/icons/placeholder.svg";
                   return (
                     <a
                       key={dropItem.name}
@@ -303,12 +330,14 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   { name: "More", path: "/subscriptions" },
                 ].map((dropItem) => {
                   const productImages = {
-                    "Netflix": "/assets/icons/netflix.svg",
-                    "Crunchyroll": "/assets/icons/crunchyroll.svg",
-                    "Tinder": "/assets/icons/tinder.svg",
+                    Netflix: "/assets/icons/netflix.svg",
+                    Crunchyroll: "/assets/icons/crunchyroll.svg",
+                    Tinder: "/assets/icons/tinder.svg",
                     "Youtube Premium": "/assets/icons/youtube-premium.svg",
                   };
-                  const imgSrc = productImages[dropItem.name] || "/src/assets/icons/placeholder.svg";
+                  const imgSrc =
+                    productImages[dropItem.name] ||
+                    "/src/assets/icons/placeholder.svg";
                   return (
                     <a
                       key={dropItem.name}

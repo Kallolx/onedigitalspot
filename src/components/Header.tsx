@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ShopSignIcon,
-  CoinsDollarIcon,
   AiMagicIcon,
   GiftCardIcon,
   Tv01Icon,
@@ -14,6 +13,7 @@ import {
   Settings02Icon,
   UserIcon,
   MailValidation01Icon,
+  WebDesign01Icon,
 } from "hugeicons-react";
 import { account } from "@/lib/appwrite";
 import { getUserOrders } from "@/lib/orders";
@@ -59,11 +59,11 @@ const Header = () => {
 
   const fetchPendingOrdersCount = async () => {
     if (!user) return;
-    
+
     try {
       const orders = await getUserOrders(user.$id);
-      const pendingCount = orders.filter(order => 
-        order.status && order.status.toLowerCase() === 'pending'
+      const pendingCount = orders.filter(
+        (order) => order.status && order.status.toLowerCase() === "pending"
       ).length;
       setPendingOrdersCount(pendingCount);
     } catch (error) {
@@ -102,20 +102,23 @@ const Header = () => {
         location.pathname.startsWith(p)
       ),
       dropdown: [
-        { name: "Mobile Games", path: "/mobile-games" },
-        { name: "PC Games", path: "/pc-games" },
-      ],
-    },
-    {
-      name: "Top Up",
-      path: "/top-up-games",
-      icon: CoinsDollarIcon,
-      dropdown: [
         { name: "Mobile Legends", path: "/mobile-games/mobile-legends" },
         { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
         { name: "Free Fire", path: "/mobile-games/free-fire" },
         { name: "Roblox", path: "/mobile-games/roblox" },
         { name: "More", path: "/top-up-games" },
+      ],
+    },
+    {
+      name: "Design Tools",
+      path: "/design-tools",
+      icon: WebDesign01Icon,
+      dropdown: [
+        { name: "Canva Pro", path: "/design-tools/canva" },
+        { name: "CapCut Pro", path: "/design-tools/capcut" },
+        { name: "Tinder+", path: "/design-tools/tinder" },
+        { name: "Discord Nitro", path: "/design-tools/discord-nitro" },
+        { name: "More", path: "/design-tools" },
       ],
     },
     {
@@ -204,6 +207,11 @@ const Header = () => {
                           {item.dropdown.map((dropItem) => {
                             // Map product names to images (fallback to placeholder)
                             const productImages = {
+                              "Discord Nitro":
+                                "/assets/icons/discord-nitro.svg",
+                              "Canva Pro": "/assets/icons/canva.svg",
+                              "Tinder+": "/assets/icons/tinder.svg",
+                              "CapCut Pro": "/assets/icons/capcut.svg",
                               "Mobile Games": "/assets/icons/mobile-games.svg",
                               "PC Games": "/assets/icons/pc-games.svg",
                               "Mobile Legends":
@@ -360,7 +368,9 @@ const Header = () => {
                           My Orders
                           {pendingOrdersCount > 0 && (
                             <span className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                              {pendingOrdersCount > 9 ? '9+' : pendingOrdersCount}
+                              {pendingOrdersCount > 9
+                                ? "9+"
+                                : pendingOrdersCount}
                             </span>
                           )}
                         </a>

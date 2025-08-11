@@ -5,7 +5,6 @@ import { ChevronRight } from "lucide-react";
 import {
   mobileGames,
   pcGames,
-  topUpCards,
   giftCards,
   subscriptions,
   ProductivityCards,
@@ -16,7 +15,6 @@ import {
 const allProducts = [
   ...mobileGames,
   ...pcGames,
-  ...topUpCards,
   ...giftCards,
   ...subscriptions,
   ...ProductivityCards,
@@ -174,31 +172,6 @@ const GameCategories = () => (
           items={pcGames}
           navigationPrevClass=".swiper-pc-prev"
           navigationNextClass=".swiper-pc-next"
-        />
-      </div>
-
-      {/* Top Up Cards */}
-      <div>
-        <div className="flex items-center justify-between md:mb-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
-              Quick Top Up
-            </h2>
-          </div>
-          <a href="/top-up-games">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 lg:px-4 tracking-tighter"
-            >
-              See All <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </a>
-        </div>
-        <CategorySwiper
-          items={topUpCards}
-          navigationPrevClass=".swiper-topup-prev"
-          navigationNextClass=".swiper-topup-next"
         />
       </div>
     </div>
