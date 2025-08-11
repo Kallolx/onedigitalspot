@@ -74,7 +74,9 @@ export default function Gemini() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/gemini.png";
+  // Use image from subscriptions array
+  const geminiProduct = aiTools.find(p => p.title === "Gemini Premium");
+  const infoImage = geminiProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -136,7 +138,7 @@ export default function Gemini() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="Gemini Premium"
-      image={cg?.image || ""}
+      image={geminiProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

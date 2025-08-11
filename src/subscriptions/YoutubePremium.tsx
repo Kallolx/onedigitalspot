@@ -38,7 +38,9 @@ export default function YouTubePremiumSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/youtube.png";
+  // Use image from subscriptions array
+  const youtubePremiumProduct = subscriptions.find(p => p.title === "YouTube Premium");
+  const infoImage = youtubePremiumProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -93,7 +95,7 @@ export default function YouTubePremiumSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="YouTube Premium"
-      image={youtubePremium?.image || ""}
+      image={youtubePremiumProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

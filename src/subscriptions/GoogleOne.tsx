@@ -39,7 +39,9 @@ export default function GoogleOneSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/googleone.png";
+  // Use image from subscriptions array
+  const googleOneProduct = subscriptions.find(p => p.title === "Google One");
+  const infoImage = googleOneProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function GoogleOneSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Google One"
-      image={googleOne?.image || ""}
+      image={googleOneProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

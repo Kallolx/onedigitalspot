@@ -39,7 +39,9 @@ export default function HuluSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/hulu.png";
+  // Use image from subscriptions array
+  const huluProduct = subscriptions.find(p => p.title === "Hulu");
+  const infoImage = huluProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function HuluSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Hulu"
-      image={hulu?.image || ""}
+      image={huluProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

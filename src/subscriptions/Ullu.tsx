@@ -50,7 +50,9 @@ export default function UlluPremiumSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/ullu.png"; // Replace with actual image path
+  // Use image from subscriptions array
+  const ulluProduct = subscriptions.find(p => p.title === "Ullu Premium");
+  const infoImage = ulluProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -105,7 +107,7 @@ export default function UlluPremiumSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Ullu Premium"
-      image={ullu?.image || ""}
+      image={ulluProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

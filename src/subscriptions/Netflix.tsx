@@ -79,11 +79,13 @@ export default function NetflixSubscription() {
   const [playerId, setPlayerId] = useState("");
   const [zoneId, setZoneId] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [nf, setNf] = useState(null);
+
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/netflix.png";
+  // Use image from subscriptions array
+  const netflixProduct = subscriptions.find(p => p.title === "Netflix");
+  const infoImage = netflixProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -100,7 +102,7 @@ export default function NetflixSubscription() {
         const netflix = products.find(
           (g) => g.title && g.title.toLowerCase() === "netflix subscription"
         );
-        setNf(netflix);
+        
         // Group priceList if available - map to shared/personal format
         if (netflix && Array.isArray(netflix.priceList)) {
           const renewable = [];
@@ -132,7 +134,6 @@ export default function NetflixSubscription() {
           subscriptions.filter((g) => g.title !== "Netflix").slice(0, 4)
         );
       } catch (err) {
-        setNf(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -155,7 +156,7 @@ export default function NetflixSubscription() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="Netflix Subscription"
-      image={nf?.image || ""}
+      image={netflixProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

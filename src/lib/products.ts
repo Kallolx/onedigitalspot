@@ -14,7 +14,7 @@ export type Product = {
 export const mobileGames: Product[] = [
   {
     title: "Mobile Legends",
-    image: "/products/mobile-legends.png",
+    image: "/products/mobile-games/mobile-legends.avif",
     price: "299",
     rating: 5,
     category: "MOBA",
@@ -23,7 +23,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Call of Duty Mobile",
-    image: "/products/cod-mobile.png",
+    image: "/products/mobile-games/cod-mobile.avif",
     price: "399",
     rating: 5,
     category: "Action",
@@ -32,7 +32,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "PUBG Mobile",
-    image: "/products/pubg-mobile.png",
+    image: "/products/mobile-games/pubg-mobile.avif",
     price: "499",
     rating: 5,
     category: "Battle Royale",
@@ -42,7 +42,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Free Fire",
-    image: "/products/free-fire.png",
+    image: "/products/mobile-games/free-fire.avif",
     price: "199",
     rating: 5,
     category: "Battle Royale",
@@ -52,7 +52,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Delta Force",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/delta-force.avif",
     price: "599",
     rating: 5,
     category: "Action",
@@ -60,7 +60,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Blood Strike",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/blood-strike.avif",
     price: "349",
     rating: 5,
     category: "Action",
@@ -68,7 +68,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Clash of Clans",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/clash-of-clans.avif",
     price: "299",
     rating: 5,
     category: "Strategy",
@@ -76,7 +76,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Clash Royale",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/clash-royale.avif",
     price: "399",
     rating: 5,
     category: "Strategy",
@@ -84,7 +84,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Brawl Stars",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/brawl-stars.avif",
     price: "299",
     rating: 5,
     category: "Action",
@@ -92,7 +92,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Standoff 2",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/standoff-2.avif",
     price: "449",
     rating: 5,
     category: "Action",
@@ -100,7 +100,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Genshin Impact",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/genshin-impact.avif",
     price: "799",
     rating: 5,
     category: "RPG",
@@ -109,7 +109,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Wuthering Waves",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/wuthering-waves.avif",
     price: "699",
     rating: 5,
     category: "RPG",
@@ -117,7 +117,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "Roblox",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/roblox.avif",
     price: "399",
     rating: 5,
     category: "Sandbox",
@@ -125,7 +125,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "eFootball",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/efootball.avif",
     price: "599",
     rating: 5,
     category: "Sports",
@@ -133,7 +133,7 @@ export const mobileGames: Product[] = [
   },
   {
     title: "FIFA Mobile",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/fifa-mobile.avif",
     price: "699",
     rating: 5,
     category: "Sports",
@@ -227,16 +227,6 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/apple",
-  },
-  {
-    title: "Discord Nitro",
-    image: "/placeholder.svg",
-    price: "999",
-    rating: 5,
-    category: "Gift Cards",
-    buttonText: "Buy Now",
-    route: "/gift-cards/discord-nitro",
-    popular: true,
   },
   {
     title: "GameStop Gift Card",
@@ -362,11 +352,12 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Hulu",
-    image: "/products/hulu.png",
+    image: "/products/subscriptions/hulu.avif",
     price: "899",
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/hulu",
   },
   {
     title: "Amazon Prime",
@@ -398,7 +389,7 @@ export const subscriptions: Product[] = [
     route: "/subscriptions/zee5",
   },
   {
-    title: "Sony Live",
+    title: "Sony Liv",
     image: "/products/subscriptions/sony-liv.avif",
     price: "699",
     rating: 5,
@@ -508,7 +499,7 @@ export const subscriptions: Product[] = [
 export const ProductivityCards: Product[] = [
    {
     title: "Canva Pro",
-    image: "/placeholder.svg",
+    image: "/products/others/canva.avif",
     price: "1299",
     rating: 5,
     category: "Productivity",
@@ -518,7 +509,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Duolingo",
-    image: "/placeholder.svg",
+    image: "/products/others/duolingo.avif",
     price: "899",
     rating: 5,
     category: "Productivity",
@@ -527,7 +518,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "QuillBot",
-    image: "/placeholder.svg",
+    image: "/products/others/quillbot.avif",
     price: "599",
     rating: 5,
     category: "Productivity",
@@ -537,7 +528,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Grammarly",
-    image: "/placeholder.svg",
+    image: "/products/others/grammarly.avif",
     price: "1199",
     rating: 5,
     category: "Productivity",
@@ -547,7 +538,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Office 365",
-    image: "/placeholder.svg",
+    image: "/products/others/office365.avif",
     price: "1999",
     rating: 5,
     category: "Productivity",
@@ -557,7 +548,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Google One",
-    image: "/placeholder.svg",
+    image: "/products/others/google-one.avif",
     price: "699",
     rating: 5,
     category: "Productivity",
@@ -566,7 +557,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "CapCut Pro",
-    image: "/placeholder.svg",
+    image: "/products/others/capcut.avif",
     price: "799",
     rating: 5,
     category: "Productivity",
@@ -576,7 +567,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Figma Pro",
-    image: "/placeholder.svg",
+    image: "/products/others/figma.avif",
     price: "1499",
     rating: 5,
     category: "Productivity",
@@ -586,7 +577,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Notion Pro",
-    image: "/placeholder.svg",
+    image: "/products/others/notion.avif",
     price: "999",
     rating: 5,
     category: "Productivity",
@@ -596,7 +587,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Zoom Pro",
-    image: "/placeholder.svg",
+    image: "/products/others/zoom.avif",
     price: "1299",
     rating: 5,
     category: "Productivity",
@@ -604,17 +595,8 @@ export const ProductivityCards: Product[] = [
     route: "/subscriptions/zoom-pro",
   },
   {
-    title: "Microsoft Teams",
-    image: "/placeholder.svg",
-    price: "1199",
-    rating: 5,
-    category: "Productivity",
-    buttonText: "Subscribe",
-    route: "/subscriptions/microsoft-teams",
-  },
-  {
     title: "iCloud+",
-    image: "/placeholder.svg",
+    image: "/products/others/icloud.avif",
     price: "399",
     rating: 5,
     category: "Productivity",
@@ -623,7 +605,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "CodePen Pro",
-    image: "/placeholder.svg",
+    image: "/products/others/codepen.avif",
     price: "899",
     rating: 5,
     category: "Productivity",
@@ -634,7 +616,7 @@ export const ProductivityCards: Product[] = [
   // Security & VPN
   {
     title: "NordVPN",
-    image: "/placeholder.svg",
+    image: "/products/others/nordvpn.avif",
     price: "899",
     rating: 5,
     category: "Security",
@@ -644,7 +626,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "ExpressVPN",
-    image: "/placeholder.svg",
+    image: "/products/others/expressvpn.avif",
     price: "1299",
     rating: 5,
     category: "Security",
@@ -655,7 +637,7 @@ export const ProductivityCards: Product[] = [
   // Social
   {
     title: "Tinder Plus",
-    image: "/placeholder.svg",
+    image: "/products/others/tinder.avif",
     price: "799",
     rating: 5,
     category: "Social",
@@ -665,7 +647,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Bumble Plus",
-    image: "/placeholder.svg",
+    image: "/products/others/bumble.avif",
     price: "899",
     rating: 5,
     category: "Social",
@@ -675,7 +657,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Telegram Stars",
-    image: "/placeholder.svg",
+    image: "/products/others/telegram-stars.avif",
     price: "299",
     rating: 5,
     category: "Social",
@@ -685,7 +667,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "Discord Nitro",
-    image: "/placeholder.svg",
+    image: "/products/others/nitro.avif",
     price: "999",
     rating: 5,
     category: "Social",
@@ -695,7 +677,7 @@ export const ProductivityCards: Product[] = [
   },
   {
     title: "LinkedIn Premium",
-    image: "/placeholder.svg",
+    image: "/products/others/linkedin.avif",
     price: "1599",
     rating: 5,
     category: "Social",

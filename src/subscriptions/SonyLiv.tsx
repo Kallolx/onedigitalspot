@@ -50,7 +50,9 @@ export default function SonyLivSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/sonyliv.png"; // Replace with actual image path
+  // Use image from subscriptions array
+  const sonyLivProduct = subscriptions.find(p => p.title === "Sony Liv");
+  const infoImage = sonyLivProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -72,7 +74,7 @@ export default function SonyLivSubscription() {
           setPriceList([
             {
               title: "Sony Liv Subscription",
-              categoryIcon: "/assets/icons/sonyliv.svg", // Replace with actual icon path
+              categoryIcon: "/assets/icons/sonyliv.svg",
               items,
             },
           ]);
@@ -105,7 +107,7 @@ export default function SonyLivSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Sony Liv"
-      image={sonyLiv?.image || ""}
+      image={sonyLivProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

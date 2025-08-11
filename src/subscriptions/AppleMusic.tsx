@@ -59,7 +59,9 @@ export default function AppleMusicSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/applemusic.png"; // Adjust path or image accordingly
+  // Use image from subscriptions array
+  const appleMusicProduct = subscriptions.find(p => p.title === "Apple Music");
+  const infoImage = appleMusicProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -115,7 +117,7 @@ export default function AppleMusicSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Apple Music"
-      image={appleMusic?.image || ""}
+      image={appleMusicProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

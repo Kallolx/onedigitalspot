@@ -59,7 +59,9 @@ export default function WindsurfIDE() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/windsurf-ide.png";
+  // Use image from subscriptions array
+  const windsurfProduct = aiTools.find(p => p.title === "Windsurf IDE");
+  const infoImage = windsurfProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -113,7 +115,7 @@ export default function WindsurfIDE() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="Windsurf IDE"
-      image={windsurf?.image || ""}
+      image={windsurfProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

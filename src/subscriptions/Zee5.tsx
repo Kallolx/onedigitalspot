@@ -50,7 +50,9 @@ export default function Zee5Subscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/zee5.png"; // Replace with actual image path
+  // Use image from subscriptions array
+  const zee5Product = subscriptions.find(p => p.title === "ZEE5");
+  const infoImage = zee5Product?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -105,7 +107,7 @@ export default function Zee5Subscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="ZEE5"
-      image={zee5?.image || ""}
+      image={zee5Product?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

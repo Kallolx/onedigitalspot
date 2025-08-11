@@ -39,7 +39,9 @@ export default function Office365Subscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/office365.png";
+  // Use image from subscriptions array
+  const office365Product = subscriptions.find(p => p.title === "Office 365");
+  const infoImage = office365Product?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function Office365Subscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Office 365"
-      image={office365?.image || ""}
+      image={office365Product?.image || ""}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

@@ -39,7 +39,9 @@ export default function PhotoshopSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/photoshop.png";
+  // Use image from subscriptions array
+  const photoshopProduct = subscriptions.find(p => p.title === "Photoshop");
+  const infoImage = photoshopProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function PhotoshopSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Photoshop"
-      image={photoshop?.image || ""}
+      image={photoshopProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

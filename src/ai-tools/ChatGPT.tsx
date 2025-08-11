@@ -73,7 +73,9 @@ export default function ChatGPT() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/chatgpt.png";
+  // Use image from subscriptions array
+  const chatgptProduct = aiTools.find(p => p.title === "ChatGPT Premium");
+  const infoImage = chatgptProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -138,7 +140,7 @@ export default function ChatGPT() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="ChatGPT Pro"
-      image={cg?.image || ""}
+      image={chatgptProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

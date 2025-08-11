@@ -68,7 +68,9 @@ export default function Grok() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/grok.png";
+  // Use image from subscriptions array
+  const grokProduct = aiTools.find(p => p.title === "Super Grok Premium");
+  const infoImage = grokProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -132,7 +134,7 @@ export default function Grok() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="Grok Premium"
-      image={cg?.image || ""}
+      image={grokProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

@@ -60,7 +60,9 @@ export default function DisneyPlusSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/disney.png";
+  // Use image from subscriptions array
+  const disneyPlusProduct = subscriptions.find(p => p.title === "Disney Plus");
+  const infoImage = disneyPlusProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -118,7 +120,7 @@ export default function DisneyPlusSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Disney+"
-      image={disneyPlus?.image || ""}
+      image={disneyPlusProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

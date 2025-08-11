@@ -52,7 +52,9 @@ export default function CanvaProSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/canva.png"; // update with actual image path
+  // Use image from subscriptions array
+  const canvaProProduct = subscriptions.find(p => p.title === "Canva Pro");
+  const infoImage = canvaProProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -108,7 +110,7 @@ export default function CanvaProSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Canva Pro"
-      image={canvaPro?.image || ""}
+      image={canvaProProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

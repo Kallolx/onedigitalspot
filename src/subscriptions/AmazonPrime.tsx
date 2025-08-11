@@ -59,7 +59,9 @@ export default function AmazonPrimeSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/amazon-prime.png";
+  // Use image from subscriptions array
+  const amazonPrimeProduct = subscriptions.find(p => p.title === "Amazon Prime");
+  const infoImage = amazonPrimeProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -117,7 +119,7 @@ export default function AmazonPrimeSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Amazon Prime"
-      image={prime?.image}
+      image={amazonPrimeProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

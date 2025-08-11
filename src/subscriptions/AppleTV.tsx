@@ -59,7 +59,9 @@ export default function AppleTVSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/placeholder.svg";
+  // Use image from subscriptions array
+  const appleTVProduct = subscriptions.find(p => p.title === "Apple TV");
+  const infoImage = appleTVProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -111,7 +113,7 @@ export default function AppleTVSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Apple TV+"
-      image={appleTV?.image || ""}
+      image={appleTVProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

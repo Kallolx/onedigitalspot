@@ -39,7 +39,7 @@ const ServiceCard = ({
           alt={title}
           className="w-full h-full object-contain"
         />
-        <div className="absolute top-4 left-2 flex items-center gap-1 px-2 py-1 rounded-md">
+        <div className="absolute top-4 left-2 gap-1 px-2 py-1 rounded-md hidden sm:flex items-center">
           {[...Array(5)].map((_, i) => (
             <Star 
               key={i} 

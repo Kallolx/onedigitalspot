@@ -38,7 +38,9 @@ export default function GrammarlySubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/grammarly.png";
+  // Use image from subscriptions array
+  const grammarlyProduct = subscriptions.find(p => p.title === "Grammarly Premium");
+  const infoImage = grammarlyProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -93,7 +95,7 @@ export default function GrammarlySubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Grammarly"
-      image={grammarly?.image || ""}
+      image={grammarlyProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

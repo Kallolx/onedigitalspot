@@ -39,7 +39,9 @@ export default function LinkedInSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/linkedin.png";
+  // Use image from subscriptions array
+  const linkedinProduct = subscriptions.find(p => p.title === "LinkedIn Premium");
+  const infoImage = linkedinProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function LinkedInSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="LinkedIn Premium"
-      image={linkedin?.image || ""}
+      image={linkedinProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

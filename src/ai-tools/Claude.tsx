@@ -68,7 +68,9 @@ export default function Claude() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/claude.png";
+  // Use image from subscriptions array
+  const claudeProduct = aiTools.find(p => p.title === "Claude Premium");
+  const infoImage = claudeProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -132,7 +134,7 @@ export default function Claude() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="Claude"
-      image={cg?.image || ""}
+      image={claudeProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

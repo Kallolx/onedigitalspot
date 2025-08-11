@@ -39,7 +39,9 @@ export default function CapcutProSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/capcut.png"; // update image path
+  // Use image from subscriptions array
+  const capcutProduct = subscriptions.find(p => p.title === "Capcut Pro");
+  const infoImage = capcutProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function CapcutProSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Capcut Pro"
-      image={capcut?.image || ""}
+      image={capcutProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

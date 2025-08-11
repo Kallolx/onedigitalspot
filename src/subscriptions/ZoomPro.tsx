@@ -39,7 +39,9 @@ export default function ZoomProSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/zoompro.png";
+  // Use image from subscriptions array
+  const zoomProProduct = subscriptions.find(p => p.title === "Zoom Pro");
+  const infoImage = zoomProProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function ZoomProSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Zoom Pro"
-      image={zoomPro?.image || ""}
+      image={zoomProProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

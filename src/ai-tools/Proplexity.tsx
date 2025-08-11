@@ -68,7 +68,9 @@ export default function PerplexityAI() {
   const [priceList, setPriceList] = useState<any[]>([]);
   const [similar, setSimilar] = useState<any[]>([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/perplexity.png"; // Your Perplexity image path
+  // Use image from subscriptions array
+  const perplexityProduct = aiTools.find(p => p.title === "Perplexity Premium");
+  const infoImage = perplexityProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -133,7 +135,7 @@ export default function PerplexityAI() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="Perplexity AI Pro"
-      image={perplexity?.image || ""}
+      image={perplexityProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

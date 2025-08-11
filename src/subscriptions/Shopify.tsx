@@ -39,7 +39,9 @@ export default function ShopifySubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/shopify.png";
+  // Use image from subscriptions array
+  const shopifyProduct = subscriptions.find(p => p.title === "Shopify");
+  const infoImage = shopifyProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -94,7 +96,7 @@ export default function ShopifySubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Shopify"
-      image={shopify?.image || ""}
+      image={shopifyProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

@@ -64,7 +64,9 @@ export default function GitHubPro() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/github-pro.png";
+  // Use image from subscriptions array
+  const proProduct = aiTools.find(p => p.title === "GitHub Pro");
+  const infoImage = proProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -128,7 +130,7 @@ export default function GitHubPro() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="GitHub Pro"
-      image={pro?.image || ""}
+      image={proProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

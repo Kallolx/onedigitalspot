@@ -66,7 +66,9 @@ export default function CursorIDE() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/cursor-ide.png";
+  // Use image from subscriptions array
+  const cursorProduct = aiTools.find(p => p.title === "Cursor IDE");
+  const infoImage = cursorProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
@@ -120,7 +122,7 @@ export default function CursorIDE() {
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
       title="Cursor IDE"
-      image={cursor?.image || ""}
+      image={cursorProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

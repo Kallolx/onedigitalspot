@@ -53,7 +53,9 @@ export default function DuolingoSubscription() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/duolingo.png"; // replace with actual image path
+  // Use image from subscriptions array
+  const duolingoProduct = subscriptions.find(p => p.title === "Duolingo Plus");
+  const infoImage = duolingoProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -109,7 +111,7 @@ export default function DuolingoSubscription() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Duolingo Plus"
-      image={duolingo?.image || ""}
+      image={duolingoProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
