@@ -68,6 +68,7 @@ import Photoshop from "./subscriptions/Photoshop";
 import Shopify from "./subscriptions/Shopify";
 import YoutubePremium from "./subscriptions/YoutubePremium";
 import ZoomPro from "./subscriptions/ZoomPro";
+import Productivity from "./pages/Productivity";
 
 const queryClient = new QueryClient();
 
@@ -94,6 +95,9 @@ const App = () => {
             <Route path="/gift-cards" element={<GiftCards />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/ai-tools" element={<AiTools />} />
+            <Route path="/productivity" element={<Productivity />} />
+
+            {/* Game Details */}
 
             {/* Mobile Games Routes */}
             <Route

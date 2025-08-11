@@ -271,7 +271,7 @@ export const giftCards: Product[] = [
 export const aiTools: Product[] = [
   {
     title: "ChatGPT Premium",
-    image: "/products/chatgpt.png",
+    image: "/products/ai-tools/chatgpt.avif",
     price: "1999",
     rating: 5,
     category: "AI Assistant",
@@ -281,7 +281,7 @@ export const aiTools: Product[] = [
   },
   {
     title: "Perplexity Premium",
-    image: "/products/prop-ai.png",
+    image: "/products/ai-tools/prop-ai.avif",
     price: "1599",
     rating: 5,
     category: "AI Assistant",
@@ -290,7 +290,7 @@ export const aiTools: Product[] = [
   },
   {
     title: "Claude Premium",
-    image: "/products/claude-ai.png",
+    image: "/products/ai-tools/claude-ai.avif",
     price: "1799",
     rating: 5,
     category: "AI Assistant",
@@ -300,7 +300,7 @@ export const aiTools: Product[] = [
   },
   {
     title: "Super Grok Premium",
-    image: "/products/grok-ai.png",
+    image: "/products/ai-tools/grok-ai.avif",
     price: "1299",
     rating: 5,
     category: "AI Assistant",
@@ -309,7 +309,7 @@ export const aiTools: Product[] = [
   },
   {
     title: "Gemini Premium",
-    image: "/placeholder.svg",
+    image: "/products/ai-tools/gemini-ai.avif",
     price: "1899",
     rating: 5,
     category: "AI Assistant",
@@ -319,7 +319,7 @@ export const aiTools: Product[] = [
   },
   {
     title: "GitHub Pro",
-    image: "/placeholder.svg",
+    image: "/products/ai-tools/github-pro.avif",
     price: "999",
     rating: 5,
     category: "AI Coding",
@@ -329,7 +329,7 @@ export const aiTools: Product[] = [
   },
   {
     title: "Cursor IDE",
-    image: "/placeholder.svg",
+    image: "/products/ai-tools/cursor-ide.avif",
     price: "1499",
     rating: 5,
     category: "AI Coding",
@@ -339,7 +339,7 @@ export const aiTools: Product[] = [
   },
   {
     title: "Windsurf IDE",
-    image: "/placeholder.svg",
+    image: "/products/ai-tools/windsurf.avif",
     price: "1299",
     rating: 5,
     category: "AI Coding",
@@ -352,7 +352,7 @@ export const subscriptions: Product[] = [
   // Entertainment
   {
     title: "Netflix",
-    image: "/products/netflix.png",
+    image: "/products/subscriptions/netflix.avif",
     price: "1499",
     rating: 5,
     category: "Entertainment",
@@ -370,7 +370,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Amazon Prime",
-    image: "/products/amazon-prime.png",
+    image: "/products/subscriptions/amazon-prime.avif",
     price: "1299",
     rating: 5,
     category: "Entertainment",
@@ -379,7 +379,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Disney Plus",
-    image: "/products/disney.png",
+    image: "/products/subscriptions/disney.avif",
     price: "999",
     rating: 5,
     category: "Entertainment",
@@ -389,7 +389,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "ZEE5",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/zee5.avif",
     price: "599",
     rating: 5,
     category: "Entertainment",
@@ -399,7 +399,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Sony Live",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/sony-liv.avif",
     price: "699",
     rating: 5,
     category: "Entertainment",
@@ -409,7 +409,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Ullu Premium",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/ullu.avif",
     price: "399",
     rating: 5,
     category: "Entertainment",
@@ -419,7 +419,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Alt Balaji",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/alt-balaji.avif",
     price: "499",
     rating: 5,
     category: "Entertainment",
@@ -429,7 +429,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "HBO Max",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/hbo.avif",
     price: "1199",
     rating: 5,
     category: "Entertainment",
@@ -438,7 +438,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Apple TV",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/apple-tv.avif",
     price: "799",
     rating: 5,
     category: "Entertainment",
@@ -447,7 +447,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "YouTube Premium",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/yt-premium.avif",
     price: "399",
     rating: 5,
     category: "Entertainment",
@@ -456,7 +456,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Apple Music",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/apple-music.avif",
     price: "399",
     rating: 5,
     category: "Entertainment",
@@ -464,26 +464,8 @@ export const subscriptions: Product[] = [
     route: "/subscriptions/apple-music",
   },
   {
-    title: "SoundCloud Pro",
-    image: "/placeholder.svg",
-    price: "599",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/soundcloud-pro",
-  },
-  {
-    title: "Twitch Turbo",
-    image: "/placeholder.svg",
-    price: "899",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/twitch-turbo",
-  },
-  {
     title: "Crunchyroll",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/crunchy.avif",
     price: "799",
     rating: 5,
     category: "Entertainment",
@@ -493,7 +475,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Spotify",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/spotify.avif",
     price: "299",
     rating: 5,
     category: "Entertainment",
@@ -503,7 +485,7 @@ export const subscriptions: Product[] = [
   // Gaming
   {
     title: "Xbox Game Pass",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/x-box.avif",
     price: "1299",
     rating: 5,
     category: "Gaming",
@@ -512,7 +494,7 @@ export const subscriptions: Product[] = [
   },
   {
     title: "Ubisoft+",
-    image: "/placeholder.svg",
+    image: "/products/subscriptions/ubisoft.avif",
     price: "1599",
     rating: 5,
     category: "Gaming",
@@ -520,7 +502,11 @@ export const subscriptions: Product[] = [
     route: "/subscriptions/ubisoft-plus",
   },
   // Productivity
-  {
+ 
+];
+
+export const ProductivityCards: Product[] = [
+   {
     title: "Canva Pro",
     image: "/placeholder.svg",
     price: "1299",

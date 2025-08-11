@@ -173,7 +173,7 @@ const Header = () => {
           <div className="flex items-center justify-between">
             <a href="/" className="flex items-center h-full">
               <img
-                src="/assets/logo.svg"
+                src="/assets/logo-av.avif"
                 alt="LootBox Logo"
                 className="h-full object-contain"
                 style={{ width: "auto", maxHeight: "48px" }}
