@@ -165,7 +165,7 @@ export const pcGames : Product[] = [
 export const giftCards: Product[] = [
   {
     title: "Google Play",
-    image: "/products/google-play.png",
+    image: "/products/gift-cards/google-play.avif",
     price: "500",
     rating: 5,
     category: "Gift Cards",
@@ -174,8 +174,8 @@ export const giftCards: Product[] = [
     popular: true,
   },
   {
-    title: "iTunes",
-    image: "/products/itunes.png",
+    title: "Apple Gift Card",
+    image: "/products/gift-cards/apple-music.avif",
     price: "1000",
     rating: 5,
     category: "Gift Cards",
@@ -184,7 +184,7 @@ export const giftCards: Product[] = [
   },
   {
     title: "Steam Wallet",
-    image: "/products/steam-wallet.png",
+    image: "/products/gift-cards/steam.avif",
     price: "1500",
     rating: 5,
     category: "Gift Cards",
@@ -193,7 +193,7 @@ export const giftCards: Product[] = [
   },
   {
     title: "PlayStation",
-    image: "/products/playstation.png",
+    image: "/products/gift-cards/playstation.avif",
     price: "2000",
     rating: 5,
     category: "Gift Cards",
@@ -202,7 +202,7 @@ export const giftCards: Product[] = [
   },
   {
     title: "Valorant Gift Cards",
-    image: "/products/valorant.png",
+    image: "/products/gift-cards/valorant.avif",
     price: "1200",
     rating: 5,
     category: "Gift Cards",
@@ -211,7 +211,7 @@ export const giftCards: Product[] = [
   },
   {
     title: "Amazon Gift Cards",
-    image: "/placeholder.svg",
+    image: "/products/gift-cards/amazon.avif",
     price: "1500",
     rating: 5,
     category: "Gift Cards",
@@ -220,17 +220,8 @@ export const giftCards: Product[] = [
     popular: true,
   },
   {
-    title: "Apple Gift Card",
-    image: "/placeholder.svg",
-    price: "1200",
-    rating: 5,
-    category: "Gift Cards",
-    buttonText: "Buy Now",
-    route: "/gift-cards/apple",
-  },
-  {
     title: "GameStop Gift Card",
-    image: "/placeholder.svg",
+    image: "/products/gift-cards/game-stop.avif",
     price: "1800",
     rating: 5,
     category: "Gift Cards",
@@ -238,8 +229,17 @@ export const giftCards: Product[] = [
     route: "/gift-cards/gamestop",
   },
   {
+    title: "Discord Nitro Code",
+    image: "/products/gift-cards/discord-nitro.avif",
+    price: "1200",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now",
+    route: "/gift-cards/discord-nitro",
+  },
+  {
     title: "Roblox Gift Cards",
-    image: "/placeholder.svg",
+    image: "/products/gift-cards/roblox.avif",
     price: "800",
     rating: 5,
     category: "Gift Cards",
@@ -248,7 +248,7 @@ export const giftCards: Product[] = [
   },
   {
     title: "Spotify Gift Card",
-    image: "/placeholder.svg",
+    image: "/products/gift-cards/spotify.avif",
     price: "600",
     rating: 5,
     category: "Gift Cards",
@@ -690,7 +690,7 @@ export const ProductivityCards: Product[] = [
 export const topUpCards: Product[] = [
   {
     title: "Mobile Legends",
-    image: "/products/mobile-legends.png",
+    image: "/products/mobile-games/mobile-legends.avif",
     price: "399",
     rating: 5,
     category: "Mobile Games",
@@ -700,7 +700,7 @@ export const topUpCards: Product[] = [
   },
   {
     title: "PUBG Mobile UC/Passes",
-    image: "/products/pubg-mobile.png",
+    image: "/products/mobile-games/pubg-mobile.avif",
     price: "999",
     rating: 5,
     category: "Mobile Games",
@@ -729,7 +729,7 @@ export const topUpCards: Product[] = [
   },
   {
     title: "Free Fire",
-    image: "/products/free-fire.png",
+    image: "/products/mobile-games/free-fire.avif",
     price: "299",
     rating: 5,
     category: "Mobile Games",
@@ -738,7 +738,7 @@ export const topUpCards: Product[] = [
   },
   {
     title: "Genshin Impact",
-    image: "/placeholder.svg",
+    image: "/products/mobile-games/genshin-impact.avif",
     price: "1299",
     rating: 5,
     category: "Mobile Games",
