@@ -105,6 +105,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "RPG",
     buttonText: "Buy Primogems",
+    route: "/mobile-games/genshin-impact",
   },
   {
     title: "Wuthering Waves",
@@ -169,6 +170,7 @@ export const giftCards: Product[] = [
     rating: 5,
     category: "Gift Cards",
     buttonText: "Buy Now",
+    route: "/gift-cards/google-play",
     popular: true,
   },
   {
@@ -178,6 +180,7 @@ export const giftCards: Product[] = [
     rating: 5,
     category: "Gift Cards",
     buttonText: "Buy Now",
+    route: "/gift-cards/itunes",
   },
   {
     title: "Steam Wallet",
@@ -195,6 +198,7 @@ export const giftCards: Product[] = [
     rating: 5,
     category: "Gift Cards",
     buttonText: "Buy Now",
+    route: "/gift-cards/playstation",
   },
   {
     title: "Valorant Gift Cards",
@@ -203,6 +207,45 @@ export const giftCards: Product[] = [
     rating: 5,
     category: "Gift Cards",
     buttonText: "Buy Now",
+    route: "/gift-cards/valorant",
+  },
+  {
+    title: "Amazon Gift Cards",
+    image: "/placeholder.svg",
+    price: "1500",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now",
+    route: "/gift-cards/amazon",
+    popular: true,
+  },
+  {
+    title: "Apple Gift Card",
+    image: "/placeholder.svg",
+    price: "1200",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now",
+    route: "/gift-cards/apple",
+  },
+  {
+    title: "Discord Nitro",
+    image: "/placeholder.svg",
+    price: "999",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now",
+    route: "/gift-cards/discord-nitro",
+    popular: true,
+  },
+  {
+    title: "GameStop Gift Card",
+    image: "/placeholder.svg",
+    price: "1800",
+    rating: 5,
+    category: "Gift Cards",
+    buttonText: "Buy Now",
+    route: "/gift-cards/gamestop",
   },
   {
     title: "Roblox Gift Cards",
@@ -211,30 +254,17 @@ export const giftCards: Product[] = [
     rating: 5,
     category: "Gift Cards",
     buttonText: "Buy Now",
+    route: "/gift-cards/roblox",
   },
   {
-    title: "Minecraft Minecoins",
+    title: "Spotify Gift Card",
     image: "/placeholder.svg",
-    price: "699",
+    price: "600",
     rating: 5,
     category: "Gift Cards",
     buttonText: "Buy Now",
-  },
-  {
-    title: "Fortnite V-Bucks",
-    image: "/placeholder.svg",
-    price: "999",
-    rating: 5,
-    category: "Gift Cards",
-    buttonText: "Buy Now",
-  },
-  {
-    title: "AWS Credits",
-    image: "/placeholder.svg",
-    price: "2999",
-    rating: 5,
-    category: "Gift Cards",
-    buttonText: "Buy Now",
+    route: "/gift-cards/spotify",
+    popular: true,
   },
 ];
 
@@ -256,6 +286,7 @@ export const aiTools: Product[] = [
     rating: 5,
     category: "AI Assistant",
     buttonText: "Subscribe",
+    route: "/ai-tools/proplexity",
   },
   {
     title: "Claude Premium",
@@ -265,6 +296,7 @@ export const aiTools: Product[] = [
     category: "AI Assistant",
     buttonText: "Subscribe",
     popular: true,
+    route: "/ai-tools/claude",
   },
   {
     title: "Super Grok Premium",
@@ -273,6 +305,7 @@ export const aiTools: Product[] = [
     rating: 5,
     category: "AI Assistant",
     buttonText: "Subscribe",
+    route: "/ai-tools/grok",
   },
   {
     title: "Gemini Premium",
@@ -282,15 +315,17 @@ export const aiTools: Product[] = [
     category: "AI Assistant",
     buttonText: "Subscribe",
     popular: true,
+    route: "/ai-tools/gemini",
   },
   {
-    title: "GitHub Copilot",
+    title: "GitHub Pro",
     image: "/placeholder.svg",
     price: "999",
     rating: 5,
     category: "AI Coding",
     buttonText: "Subscribe",
     popular: true,
+    route: "/ai-tools/github",
   },
   {
     title: "Cursor IDE",
@@ -300,6 +335,7 @@ export const aiTools: Product[] = [
     category: "AI Coding",
     buttonText: "Subscribe",
     popular: true,
+    route: "/ai-tools/cursor",
   },
   {
     title: "Windsurf IDE",
@@ -308,6 +344,7 @@ export const aiTools: Product[] = [
     rating: 5,
     category: "AI Coding",
     buttonText: "Subscribe",
+    route: "/ai-tools/windsurf",
   },
 ];
 
@@ -338,6 +375,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/amazon-prime",
   },
   {
     title: "Disney Plus",
@@ -346,6 +384,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/disney-plus",
     popular: true,
   },
   {
@@ -356,14 +395,7 @@ export const subscriptions: Product[] = [
     category: "Entertainment",
     buttonText: "Subscribe",
     popular: true,
-  },
-  {
-    title: "Hotstar",
-    image: "/placeholder.svg",
-    price: "1499",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
+    route: "/subscriptions/zee5",
   },
   {
     title: "Sony Live",
@@ -373,15 +405,17 @@ export const subscriptions: Product[] = [
     category: "Entertainment",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/SonyLiv",
   },
   {
-    title: "Ullu",
+    title: "Ullu Premium",
     image: "/placeholder.svg",
     price: "399",
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/ullu",
   },
   {
     title: "Alt Balaji",
@@ -391,6 +425,7 @@ export const subscriptions: Product[] = [
     category: "Entertainment",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/alt-balaji",
   },
   {
     title: "HBO Max",
@@ -399,6 +434,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/hbo-max",
   },
   {
     title: "Apple TV",
@@ -407,6 +443,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/apple-tv",
   },
   {
     title: "YouTube Premium",
@@ -415,6 +452,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/youtube-premium",
   },
   {
     title: "Apple Music",
@@ -423,6 +461,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/apple-music",
   },
   {
     title: "SoundCloud Pro",
@@ -431,6 +470,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/soundcloud-pro",
   },
   {
     title: "Twitch Turbo",
@@ -439,6 +479,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/twitch-turbo",
   },
   {
     title: "Crunchyroll",
@@ -448,23 +489,7 @@ export const subscriptions: Product[] = [
     category: "Entertainment",
     buttonText: "Subscribe",
     popular: true,
-  },
-  {
-    title: "Voot",
-    image: "/placeholder.svg",
-    price: "699",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-  },
-  {
-    title: "Hoichoi",
-    image: "/placeholder.svg",
-    price: "599",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    popular: true,
+    route: "/subscriptions/crunchyroll",
   },
   {
     title: "Spotify",
@@ -473,6 +498,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
+    route: "/subscriptions/spotify",
   },
   // Gaming
   {
@@ -482,6 +508,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Gaming",
     buttonText: "Subscribe",
+    route: "/subscriptions/xbox-game-pass",
   },
   {
     title: "Ubisoft+",
@@ -490,6 +517,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Gaming",
     buttonText: "Subscribe",
+    route: "/subscriptions/ubisoft-plus",
   },
   // Productivity
   {
@@ -499,6 +527,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
+    route: "/subscriptions/canva-pro",
     popular: true,
   },
   {
@@ -508,6 +537,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
+    route: "/subscriptions/duolingo",
   },
   {
     title: "QuillBot",
@@ -517,6 +547,7 @@ export const subscriptions: Product[] = [
     category: "Productivity",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/quillbot",
   },
   {
     title: "Grammarly",
@@ -526,6 +557,7 @@ export const subscriptions: Product[] = [
     category: "Productivity",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/grammarly",
   },
   {
     title: "Office 365",
@@ -535,6 +567,7 @@ export const subscriptions: Product[] = [
     category: "Productivity",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/office-365",
   },
   {
     title: "Google One",
@@ -543,6 +576,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
+    route: "/subscriptions/google-one",
   },
   {
     title: "CapCut Pro",
@@ -552,15 +586,17 @@ export const subscriptions: Product[] = [
     category: "Productivity",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/capcut-pro",
   },
   {
-    title: "Figma Professional",
+    title: "Figma Pro",
     image: "/placeholder.svg",
     price: "1499",
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/figma-pro",
   },
   {
     title: "Notion Pro",
@@ -569,6 +605,8 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
+    popular: true,
+    route: "/subscriptions/notion-pro",
   },
   {
     title: "Zoom Pro",
@@ -577,6 +615,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
+    route: "/subscriptions/zoom-pro",
   },
   {
     title: "Microsoft Teams",
@@ -585,6 +624,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
+    route: "/subscriptions/microsoft-teams",
   },
   {
     title: "iCloud+",
@@ -593,15 +633,7 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-  },
-  {
-    title: "GitHub Pro",
-    image: "/placeholder.svg",
-    price: "999",
-    rating: 5,
-    category: "Productivity",
-    buttonText: "Subscribe",
-    popular: true,
+    route: "/subscriptions/icloud-plus",
   },
   {
     title: "CodePen Pro",
@@ -610,23 +642,9 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
+    route: "/subscriptions/codepen-pro",
   },
-  {
-    title: "Visual Studio Professional",
-    image: "/placeholder.svg",
-    price: "2999",
-    rating: 5,
-    category: "Productivity",
-    buttonText: "Subscribe",
-  },
-  {
-    title: "Vercel Pro",
-    image: "/placeholder.svg",
-    price: "1999",
-    rating: 5,
-    category: "Productivity",
-    buttonText: "Subscribe",
-  },
+
   // Security & VPN
   {
     title: "NordVPN",
@@ -636,6 +654,7 @@ export const subscriptions: Product[] = [
     category: "Security",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/nordvpn",
   },
   {
     title: "ExpressVPN",
@@ -644,6 +663,8 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Security",
     buttonText: "Subscribe",
+    popular: true,
+    route: "/subscriptions/expressvpn",
   },
   // Social
   {
@@ -654,6 +675,7 @@ export const subscriptions: Product[] = [
     category: "Social",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/tinder-plus",
   },
   {
     title: "Bumble Plus",
@@ -663,6 +685,7 @@ export const subscriptions: Product[] = [
     category: "Social",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/bumble-plus",
   },
   {
     title: "Telegram Stars",
@@ -672,6 +695,7 @@ export const subscriptions: Product[] = [
     category: "Social",
     buttonText: "Buy Stars",
     popular: true,
+    route: "/subscriptions/telegram-stars",
   },
   {
     title: "Discord Nitro",
@@ -681,15 +705,17 @@ export const subscriptions: Product[] = [
     category: "Social",
     buttonText: "Subscribe",
     popular: true,
+    route: "/gift-cards/discord-nitro",
   },
   {
-    title: "LinkedIn Pro",
+    title: "LinkedIn Premium",
     image: "/placeholder.svg",
     price: "1599",
     rating: 5,
     category: "Social",
     buttonText: "Subscribe",
     popular: true,
+    route: "/subscriptions/linkedin",
   },
 ];
 

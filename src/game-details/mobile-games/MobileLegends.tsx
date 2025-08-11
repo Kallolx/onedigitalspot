@@ -12,7 +12,7 @@ interface SelectedItem {
 
 const categoryIcons = {
   "Passes & Vouchers": "/assets/icons/voucher.svg",
-  Diamonds: "/assets/icons/diamond.svg",
+  "Diamonds": "/assets/icons/diamond.svg",
 };
 
 function groupPriceList(priceList) {
@@ -21,7 +21,7 @@ function groupPriceList(priceList) {
   priceList.forEach((item) => {
     const [label, price, hot, type] = item.split("|");
     const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "pass" || type === "voucher") {
+    if (type === "voucher") {
       passes.push(obj);
     } else if (type === "diamond") {
       diamonds.push(obj);

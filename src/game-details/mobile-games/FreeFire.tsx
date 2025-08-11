@@ -3,7 +3,6 @@ import { databases, account } from "@/lib/appwrite";
 import { mobileGames } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
 
-// Define the SelectedItem interface here since it's needed by the component
 interface SelectedItem {
   categoryIdx: number;
   itemIdx: number;
@@ -11,42 +10,42 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Passes & Vouchers": "/assets/icons/battle-pass.svg",
-  "UC Packages": "/assets/icons/uc.svg",
+  "Passes & Vouchers": "/assets/icons/voucher.svg",
+  "Diamonds": "/assets/icons/diamond.svg",
 };
 
-function groupPriceList(priceList) {
-  const passes = [];
-  const uc = [];
+function groupPriceList(priceList: any[]) {
+  const passes: any[] = [];
+  const diamonds: any[] = [];
+
   priceList.forEach((item) => {
-    // Support both string and object formats
     if (typeof item === "string") {
       const [label, price, hot, type] = item.split("|");
       const obj = { label, price: Number(price), hot: hot === "true" };
-      if (type === "pass") {
+      if (type === "pass" || type === "voucher") {
         passes.push(obj);
-      } else if (type === "uc") {
-        uc.push(obj);
+      } else if (type === "diamond") {
+        diamonds.push(obj);
       }
     } else if (typeof item === "object" && item.label && item.price) {
-      // fallback for object format
-      if (item.label.toLowerCase().includes("pass")) {
+      if (item.label.toLowerCase().includes("pass") || item.label.toLowerCase().includes("voucher")) {
         passes.push(item);
       } else {
-        uc.push(item);
+        diamonds.push(item);
       }
     }
   });
+
   return [
     {
-      title: "Battle Passes",
+      title: "Passes & Vouchers",
       categoryIcon: categoryIcons["Passes & Vouchers"],
       items: passes,
     },
     {
-      title: "UC Packages",
-      categoryIcon: categoryIcons["UC Packages"],
-      items: uc,
+      title: "Diamond Packages",
+      categoryIcon: categoryIcons["Diamonds"],
+      items: diamonds,
     },
   ];
 }
@@ -56,32 +55,32 @@ const infoSections = [
     title: "How to Buy",
     content: (
       <ul className="list-disc pl-5 text-base mb-4">
-        <li>Select your desired UC or pass package above.</li>
-        <li>Enter your Player ID.</li>
+        <li>Select your desired Diamond package or pass above.</li>
+        <li>Enter your Free Fire Player ID.</li>
         <li>Choose quantity and proceed to payment.</li>
       </ul>
     ),
   },
   {
-    title: "How to Find Player ID",
+    title: "How to Find Your Player ID",
     content: (
       <div className="mb-2">
         <p className="mb-2">
-          Open PUBG Mobile, tap your avatar in the top-right corner. Your Player ID is displayed below your avatar name.
+          Open Garena Free Fire and tap your avatar in the top-left corner. Your Player ID will be displayed below your username.
         </p>
       </div>
     ),
   },
 ];
 
-export default function PUBGMobile() {
+export default function FreeFire() {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
-  const [pubg, setPubg] = useState(null);
-  const [priceList, setPriceList] = useState([]);
-  const [similar, setSimilar] = useState([]);
+  const [freefire, setFreefire] = useState<any>(null);
+  const [priceList, setPriceList] = useState<any[]>([]);
+  const [similar, setSimilar] = useState<any[]>([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/pubg-mobile.png";
+  const infoImage = "/products/freefire.png";
 
   useEffect(() => {
     async function fetchProduct() {
@@ -90,17 +89,16 @@ export default function PUBGMobile() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_MOBILE_GAMES_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        // Find PUBG Mobile (case-insensitive)
-        const pubgProduct = products.find((g) => g.title && g.title.toLowerCase() === "pubg mobile");
-        setPubg(pubgProduct);
-        // Group priceList
-        if (pubgProduct && Array.isArray(pubgProduct.priceList)) {
-          setPriceList(groupPriceList(pubgProduct.priceList));
+        const ffProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "free fire"
+        );
+        setFreefire(ffProduct);
+        if (ffProduct && Array.isArray(ffProduct.priceList)) {
+          setPriceList(groupPriceList(ffProduct.priceList));
         }
-        // Get similar products
-        setSimilar(mobileGames.filter((g) => g.title !== "PUBG Mobile").slice(0, 4));
+        setSimilar(mobileGames.filter((g) => g.title !== "Free Fire").slice(0, 4));
       } catch (err) {
-        setPubg(null);
+        setFreefire(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -122,8 +120,8 @@ export default function PUBGMobile() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="PUBG Mobile"
-      image={pubg?.image || ""}
+      title="Free Fire"
+      image={freefire?.image || ""}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

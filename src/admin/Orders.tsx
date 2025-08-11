@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Download, Plus, Filter, Trash2, Edit, Eye, RefreshCw, CheckCircle, XCircle, Clock, Package } from "lucide-react";
+import { Search, Download, Plus, Filter, Trash2, Edit, Eye, RefreshCw, CheckCircle, XCircle, Clock, Package, ShieldCheck } from "lucide-react";
 import { getAllOrders, updateOrderStatus, OrderData } from "../lib/orders";
 import { RotateLoader } from "react-spinners";
 
@@ -331,6 +331,15 @@ const Orders = () => {
               onClick={onClose}
             >
               Close
+            </button>
+            <button 
+              className="px-4 py-2 rounded-lg bg-green-500 text-white font-pixel hover:bg-green-600 flex items-center gap-2" 
+              onClick={() => { 
+                window.open('/admin/receipt-verifier', '_blank');
+              }}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Verify Receipt
             </button>
             <button 
               className="px-4 py-2 rounded-lg bg-blue-500 text-white font-pixel hover:bg-blue-600" 

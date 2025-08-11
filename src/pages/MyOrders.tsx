@@ -6,6 +6,7 @@ import { Card } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
 import { getUserOrders, getCurrentUser, OrderData } from "../lib/orders";
+import ReceiptGenerator from "../components/ReceiptGenerator";
 import { 
   ClockIcon, 
   CheckCircleIcon, 
@@ -18,13 +19,14 @@ import {
   CalendarIcon,
   CreditCardIcon,
   PackageIcon,
+  PhoneIcon,
 } from "lucide-react";
 import { RotateLoader } from "react-spinners";
 
 // Timer component for pending orders
 const DeliveryTimer = ({ createdAt, status }: { createdAt: string; status: string }) => {
   const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 0 });
-  const [phase, setPhase] = useState<'initial' | 'extended' | 'overdue'>('initial');
+  const [showTimer, setShowTimer] = useState(false);
 
   useEffect(() => {
     if (status.toLowerCase() !== 'pending') return;
@@ -34,34 +36,20 @@ const DeliveryTimer = ({ createdAt, status }: { createdAt: string; status: strin
       const now = new Date().getTime();
       const elapsed = now - orderTime;
       
-      // 30 minutes = 1800000ms, 2 hours = 7200000ms
+      // 30 minutes = 1800000ms
       const thirtyMinutes = 30 * 60 * 1000;
-      const twoHours = 2 * 60 * 60 * 1000;
       
       if (elapsed < thirtyMinutes) {
-        // First 30 minutes - show countdown to 30 minutes
+        // Within 30 minutes - show countdown timer
         const remaining = thirtyMinutes - elapsed;
-        setPhase('initial');
-        setTimeLeft({
-          minutes: Math.floor(remaining / 60000),
-          seconds: Math.floor((remaining % 60000) / 1000)
-        });
-      } else if (elapsed < twoHours) {
-        // 30 minutes to 2 hours - show countdown to 2 hours
-        const remaining = twoHours - elapsed;
-        setPhase('extended');
+        setShowTimer(true);
         setTimeLeft({
           minutes: Math.floor(remaining / 60000),
           seconds: Math.floor((remaining % 60000) / 1000)
         });
       } else {
-        // Over 2 hours - show overdue
-        setPhase('overdue');
-        const overdue = elapsed - twoHours;
-        setTimeLeft({
-          minutes: Math.floor(overdue / 60000),
-          seconds: Math.floor((overdue % 60000) / 1000)
-        });
+        // Over 30 minutes - don't show timer
+        setShowTimer(false);
       }
     };
 
@@ -71,35 +59,10 @@ const DeliveryTimer = ({ createdAt, status }: { createdAt: string; status: strin
     return () => clearInterval(interval);
   }, [createdAt, status]);
 
-  if (status.toLowerCase() !== 'pending') {
+  // If not pending or over 30 minutes, don't show timer
+  if (status.toLowerCase() !== 'pending' || !showTimer) {
     return null;
   }
-
-  const getTimerColor = () => {
-    switch (phase) {
-      case 'initial':
-        return 'text-green-600';
-      case 'extended':
-        return 'text-orange-600';
-      case 'overdue':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
-
-  const getTimerText = () => {
-    switch (phase) {
-      case 'initial':
-        return 'Delivery';
-      case 'extended':
-        return 'Processing';
-      case 'overdue':
-        return 'Delayed';
-      default:
-        return 'Processing';
-    }
-  };
 
   const formatTime = (minutes: number, seconds: number) => {
     const mins = minutes.toString().padStart(2, '0');
@@ -108,9 +71,9 @@ const DeliveryTimer = ({ createdAt, status }: { createdAt: string; status: strin
   };
 
   return (
-    <div className={`flex items-center gap-2 text-sm font-bold ${getTimerColor()}`}>
+    <div className="flex items-center gap-2 text-sm font-bold text-green-600">
       <ClockIcon className="w-4 h-4" />
-      <span className="text-xs">{getTimerText()}</span>
+      <span className="text-xs">Delivery</span>
       <span className="font-mono text-lg font-black">{formatTime(timeLeft.minutes, timeLeft.seconds)}</span>
     </div>
   );
@@ -129,8 +92,8 @@ const MyOrders = () => {
 
   // Enhanced timer component for order details modal
   const DetailedDeliveryTimer = ({ createdAt, status }: { createdAt: string; status: string }) => {
-    const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
-    const [phase, setPhase] = useState<'initial' | 'extended' | 'overdue'>('initial');
+    const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 0 });
+    const [showTimer, setShowTimer] = useState(false);
 
     useEffect(() => {
       if (status.toLowerCase() !== 'pending') return;
@@ -140,33 +103,20 @@ const MyOrders = () => {
         const now = new Date().getTime();
         const elapsed = now - orderTime;
         
+        // 30 minutes = 1800000ms
         const thirtyMinutes = 30 * 60 * 1000;
-        const twoHours = 2 * 60 * 60 * 1000;
         
         if (elapsed < thirtyMinutes) {
+          // Within 30 minutes - show countdown timer
           const remaining = thirtyMinutes - elapsed;
-          setPhase('initial');
+          setShowTimer(true);
           setTimeLeft({
-            hours: 0,
             minutes: Math.floor(remaining / 60000),
             seconds: Math.floor((remaining % 60000) / 1000)
           });
-        } else if (elapsed < twoHours) {
-          const remaining = twoHours - elapsed;
-          setPhase('extended');
-          setTimeLeft({
-            hours: Math.floor(remaining / 3600000),
-            minutes: Math.floor((remaining % 3600000) / 60000),
-            seconds: Math.floor((remaining % 60000) / 1000)
-          });
         } else {
-          setPhase('overdue');
-          const overdue = elapsed - twoHours;
-          setTimeLeft({
-            hours: Math.floor(overdue / 3600000),
-            minutes: Math.floor((overdue % 3600000) / 60000),
-            seconds: Math.floor((overdue % 60000) / 1000)
-          });
+          // Over 30 minutes - don't show timer
+          setShowTimer(false);
         }
       };
 
@@ -176,6 +126,7 @@ const MyOrders = () => {
       return () => clearInterval(interval);
     }, [createdAt, status]);
 
+    // If not pending, show normal status badge
     if (status.toLowerCase() !== 'pending') {
       return (
         <Badge className={`${getStatusColor(status)} flex items-center gap-1 w-fit mt-2`}>
@@ -185,54 +136,25 @@ const MyOrders = () => {
       );
     }
 
-    const getPhaseInfo = () => {
-      switch (phase) {
-        case 'initial':
-          return {
-            color: 'bg-green-100 text-green-800 border-green-200',
-            text: 'Delivery',
-            description: 'Processing within 30 minutes'
-          };
-        case 'extended':
-          return {
-            color: 'bg-orange-100 text-orange-800 border-orange-200',
-            text: 'Processing',
-            description: 'Delivery within 2 hours'
-          };
-        case 'overdue':
-          return {
-            color: 'bg-red-100 text-red-800 border-red-200',
-            text: 'Delayed',
-            description: 'Taking longer than expected'
-          };
-        default:
-          return {
-            color: 'bg-gray-100 text-gray-800 border-gray-200',
-            text: 'Processing',
-            description: 'Order being processed'
-          };
-      }
-    };
+    // If pending but over 30 minutes, show processing badge
+    if (!showTimer) {
+      return (
+        <Badge className="bg-blue-100 text-blue-800 border-blue-200 flex items-center gap-1 w-fit mt-2">
+          <TruckIcon className="w-4 h-4" />
+          <span>Processing</span>
+        </Badge>
+      );
+    }
 
-    const phaseInfo = getPhaseInfo();
-    const formatTime = (hours: number, minutes: number, seconds: number) => {
-      if (hours > 0) {
-        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }
+    // Show timer only (no icon, no label, no bg, no padding)
+    const formatTime = (minutes: number, seconds: number) => {
       return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     };
 
     return (
-      <div className="mt-3">
-        <Badge className={`${phaseInfo.color} flex items-center gap-2 w-fit border px-4 py-2`}>
-          <ClockIcon className="w-4 h-4" />
-          <span className="font-medium text-sm">{phaseInfo.text}</span>
-          <span className="font-mono font-black text-xl ml-1">
-            {formatTime(timeLeft.hours, timeLeft.minutes, timeLeft.seconds)}
-          </span>
-        </Badge>
-        <p className="text-xs text-gray-500 mt-2">{phaseInfo.description}</p>
-      </div>
+      <span className="font-mono font-black text-xl text-green-700">
+        {formatTime(timeLeft.minutes, timeLeft.seconds)}
+      </span>
     );
   };
 
@@ -317,10 +239,28 @@ const MyOrders = () => {
   };
 
   const getStatusDisplay = (order: OrderData) => {
+    // Check if it's pending and within 30 minutes
     if (order.status.toLowerCase() === 'pending') {
-      return <DeliveryTimer createdAt={order.createdAt} status={order.status} />;
+      const orderTime = new Date(order.createdAt).getTime();
+      const now = new Date().getTime();
+      const elapsed = now - orderTime;
+      const thirtyMinutes = 30 * 60 * 1000;
+      
+      if (elapsed < thirtyMinutes) {
+        // Show timer for pending orders within 30 minutes
+        return <DeliveryTimer createdAt={order.createdAt} status={order.status} />;
+      } else {
+        // Show processing badge for pending orders over 30 minutes
+        return (
+          <Badge className="bg-blue-100 text-blue-800 border-blue-200 flex items-center gap-1 w-fit">
+            <TruckIcon className="w-4 h-4" />
+            <span>Processing</span>
+          </Badge>
+        );
+      }
     }
     
+    // Show normal status badge for non-pending orders
     return (
       <Badge className={`${getStatusColor(order.status)} flex items-center gap-1 w-fit`}>
         {getStatusIcon(order.status)}
@@ -356,75 +296,26 @@ const MyOrders = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="flex flex-col">
-              <div>
-                <h1 className="text-3xl md:text-4xl tracking-tighter font-bold text-gray-900 font-pixel">
-                  My Orders
-                </h1>
-                <p className="text-gray-600 mt-2">
-                  Track and manage all your orders in one place
-                </p>
-              </div>
+          {/* Header + Search/Filter Section */}
+          <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-3xl md:text-4xl tracking-tighter font-bold text-gray-900 font-pixel">
+                My Orders
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Track and manage all your orders in one place
+              </p>
             </div>
-          </div>
-
-          {/* Summary Cards */}
-          {!loading && !error && orders.length > 0 && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-              <Card className="p-6 bg-primary text-white shadow-retro border-2 border-primary-dark">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-primary-foreground text-sm font-medium">Total Orders</p>
-                    <p className="text-3xl font-bold font-pixel">{summary.total}</p>
-                  </div>
-                  <PackageIcon className="w-10 h-10 text-primary-foreground/80" />
-                </div>
-              </Card>
-
-              <Card className="p-6 bg-secondary text-secondary-foreground shadow-retro border-2 border-secondary-dark">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-secondary-foreground/90 text-sm font-medium">Pending</p>
-                    <p className="text-3xl font-bold font-pixel">{summary.pending}</p>
-                  </div>
-                  <ClockIcon className="w-10 h-10 text-secondary-foreground/80" />
-                </div>
-              </Card>
-
-              <Card className="p-6 bg-primary text-white shadow-retro border-2 border-primary-dark">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-primary-foreground text-sm font-medium">Completed</p>
-                    <p className="text-3xl font-bold font-pixel">{summary.completed}</p>
-                  </div>
-                  <CheckCircleIcon className="w-10 h-10 text-primary-foreground/80" />
-                </div>
-              </Card>
-
-              <Card className="p-6 bg-secondary text-secondary-foreground shadow-retro border-2 border-secondary-dark">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-secondary-foreground/90 text-sm font-medium">Total Spent</p>
-                    <p className="text-3xl font-bold font-pixel">{summary.totalAmount}৳</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          )}
-
-          {/* Search and Filter Bar */}
-          {!loading && !error && orders.length > 0 && (
-            <Card className="p-6 mb-8">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
+            {/* Search and Filter Bar */}
+            {!loading && !error && orders.length > 0 && (
+              <div className="flex flex-row gap-2 items-end w-full md:w-auto md:max-w-xl">
+                <div className="relative flex-1 max-w-[220px]">
                   <SearchIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
-                    placeholder="Search by product name, transaction ID, or order ID..."
+                    placeholder="search here..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 pr-2 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -432,7 +323,7 @@ const MyOrders = () => {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white"
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white"
                   >
                     <option value="all">All Status</option>
                     <option value="pending">Pending</option>
@@ -442,8 +333,53 @@ const MyOrders = () => {
                   </select>
                 </div>
               </div>
-            </Card>
+            )}
+          </div>
+
+          {/* Summary Cards */}
+          {!loading && !error && orders.length > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+              <Card className="p-6 bg-primary text-white shadow-retro">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-primary-foreground text-sm font-medium">Total Orders</p>
+                    <p className="text-3xl font-bold font-pixel">{summary.total}</p>
+                  </div>
+                  <PackageIcon className="w-10 h-10 text-primary-foreground/80" />
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-primary text-white shadow-retro">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-primary-foreground text-sm font-medium">Pending</p>
+                    <p className="text-3xl font-bold font-pixel">{summary.pending}</p>
+                  </div>
+                  <ClockIcon className="w-10 h-10 text-primary-foreground/80" />
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-primary text-white shadow-retro">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-primary-foreground text-sm font-medium">Completed</p>
+                    <p className="text-3xl font-bold font-pixel">{summary.completed}</p>
+                  </div>
+                  <CheckCircleIcon className="w-10 h-10 text-primary-foreground/80" />
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-primary text-white shadow-retro">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-primary-foreground text-sm font-medium">Total Spent</p>
+                    <p className="text-3xl font-bold font-pixel">{summary.totalAmount}৳</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
           )}
+
 
           {/* Loading State */}
           {loading && (
@@ -587,7 +523,7 @@ const MyOrders = () => {
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <Button
-                                variant="outline"
+                                variant="default"
                                 size="sm"
                                 onClick={() => setSelectedOrder(order)}
                                 className="flex items-center gap-1"
@@ -744,24 +680,25 @@ const MyOrders = () => {
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 font-pixel">Order Details</h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedOrder(null)}
-                >
-                  <XCircleIcon className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-6">
-                {/* Product Info */}
-                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-0 sm:p-4">
+          <Card className="w-full max-w-2xl h-[70dvh] sm:h-auto max-h-[90dvh] sm:max-h-[90vh] flex flex-col mx-0 sm:mx-0">
+            {/* Sticky Header */}
+            <div className="sticky rounded-lg top-0 z-10 bg-white p-4 sm:p-6 border-b flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900 font-pixel">Order Details</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedOrder(null)}
+              >
+                <XCircleIcon className="w-4 h-4" />
+              </Button>
+            </div>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-6">
+              {/* Product Info */}
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 bg-gray-50 rounded-lg p-4">
+                <div className="flex flex-row items-center w-full gap-3">
+                  <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                     <img
                       src={selectedOrder.productImage}
                       alt={selectedOrder.productName}
@@ -772,130 +709,147 @@ const MyOrders = () => {
                       }}
                     />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 font-pixel">
-                      {selectedOrder.productName}
-                    </h3>
-                    <p className="text-gray-600">
+                  <div className="flex-1 min-w-0 text-left flex flex-col gap-1">
+                    <div className="flex items-center gap-2 flex-wrap w-full">
+                      <h3 className="text-base font-semibold text-gray-900 font-pixel truncate">
+                        {selectedOrder.productName}
+                      </h3>
+                      {/* Status badge/timer - beside name on all screens, right-aligned on mobile */}
+                      <span className="sm:hidden flex-1 flex justify-end">
+                        <DetailedDeliveryTimer createdAt={selectedOrder.createdAt} status={selectedOrder.status} />
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm truncate">
                       {selectedOrder.itemLabel} × {selectedOrder.quantity}
                     </p>
+                  </div>
+                  {/* Status badge/timer - right on desktop */}
+                  <div className="hidden sm:block sm:ml-auto">
                     <DetailedDeliveryTimer createdAt={selectedOrder.createdAt} status={selectedOrder.status} />
                   </div>
                 </div>
-
-                {/* Order Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Order Information</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Order ID:</span>
-                          <span className="font-mono">{selectedOrder.orderID || "N/A"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Date:</span>
-                          <span>{formatDate(selectedOrder.createdAt)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Product Type:</span>
-                          <span>{selectedOrder.productType}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {(selectedOrder.playerId || selectedOrder.zoneId) && (
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Game Details</h4>
-                        <div className="space-y-2 text-sm">
-                          {selectedOrder.playerId && (
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Player ID:</span>
-                              <span className="font-mono">{selectedOrder.playerId}</span>
-                            </div>
-                          )}
-                          {selectedOrder.zoneId && (
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Zone ID:</span>
-                              <span className="font-mono">{selectedOrder.zoneId}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Payment Details</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Method:</span>
-                          <span>{selectedOrder.paymentMethod}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Account:</span>
-                          <span className="font-mono">{selectedOrder.paymentAccountNumber}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Transaction ID:</span>
-                          <span className="font-mono">{selectedOrder.transactionId}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Amount Breakdown</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Unit Price:</span>
-                          <span>{selectedOrder.unitPrice}৳</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Quantity:</span>
-                          <span>{selectedOrder.quantity}</span>
-                        </div>
-                        <div className="flex justify-between border-t pt-2 font-semibold">
-                          <span>Total Amount:</span>
-                          <span className="text-primary font-pixel">{selectedOrder.totalAmount}৳</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t">
-                  {selectedOrder.status.toLowerCase() === "pending" && (
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => {
-                        alert("Contact support to cancel this order.");
-                      }}
-                    >
-                      Contact Support
-                    </Button>
-                  )}
-                  {selectedOrder.status.toLowerCase() === "completed" && (
-                    <Button
-                      className="flex-1 font-pixel"
-                      onClick={() => {
-                        navigate(`/${selectedOrder.productType.toLowerCase().replace(' ', '-')}/${selectedOrder.productName.toLowerCase().replace(' ', '-')}`);
-                        setSelectedOrder(null);
-                      }}
-                    >
-                      Order Again
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    onClick={() => setSelectedOrder(null)}
-                  >
-                    Close
-                  </Button>
+                {/* Receipt Generator - Full width on mobile */}
+                <div className="w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0">
+                  <ReceiptGenerator 
+                    order={selectedOrder} 
+                    userName={user?.name || "Guest User"}
+                    userEmail={user?.email || "guest@example.com"}
+                  />
                 </div>
               </div>
+
+              {/* Order Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Order Information</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Order ID:</span>
+                        <span className="font-mono">{selectedOrder.orderID || "N/A"}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Date:</span>
+                        <span>{formatDate(selectedOrder.createdAt)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Product Type:</span>
+                        <span>{selectedOrder.productType}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {(selectedOrder.playerId || selectedOrder.zoneId) && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-2">Game Details</h4>
+                      <div className="space-y-2 text-sm">
+                        {selectedOrder.playerId && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Player ID:</span>
+                            <span className="font-mono">{selectedOrder.playerId}</span>
+                          </div>
+                        )}
+                        {selectedOrder.zoneId && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Zone ID:</span>
+                            <span className="font-mono">{selectedOrder.zoneId}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Payment Details</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Method:</span>
+                        <span>{selectedOrder.paymentMethod}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Account:</span>
+                        <span className="font-mono">{selectedOrder.paymentAccountNumber}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Transaction ID:</span>
+                        <span className="font-mono">{selectedOrder.transactionId}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Amount Breakdown</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Unit Price:</span>
+                        <span>{selectedOrder.unitPrice}৳</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Quantity:</span>
+                        <span>{selectedOrder.quantity}</span>
+                      </div>
+                      <div className="flex justify-between border-t pt-2 font-semibold">
+                        <span>Total Amount:</span>
+                        <span className="text-primary text-2xl font-pixel">={selectedOrder.totalAmount}৳</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Sticky Actions Footer */}
+            <div className="sticky bottom-0 rounded-lg z-10 bg-white p-4 border-t flex gap-3">
+              {selectedOrder.status.toLowerCase() === "pending" && (
+                <Button
+                  variant="default"
+                  className="flex-1"
+                  onClick={() => {
+                    alert("Contact support to cancel this order.");
+                  }}
+                >
+                  <PhoneIcon className="w-4 h-4 mr-2" />
+                  Contact Support
+                </Button>
+              )}
+              {selectedOrder.status.toLowerCase() === "completed" && (
+                <Button
+                  className="flex-1 font-pixel"
+                  onClick={() => {
+                    navigate(`/${selectedOrder.productType.toLowerCase().replace(' ', '-')}/${selectedOrder.productName.toLowerCase().replace(' ', '-')}`);
+                    setSelectedOrder(null);
+                  }}
+                >
+                  Order Again
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => setSelectedOrder(null)}
+              >
+                Close
+              </Button>
             </div>
           </Card>
         </div>

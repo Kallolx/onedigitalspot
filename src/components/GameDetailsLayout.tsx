@@ -45,7 +45,8 @@ interface GameDetailsLayoutProps {
   setPlayerId?: (v: string) => void;
   zoneId?: string;
   setZoneId?: (v: string) => void;
-  // Remove the legacy single selection props - now using multiple selection
+  uuid?: string;
+  setUuid?: (v: string) => void;
   selectedItems?: SelectedItem[];
   setSelectedItems?: (v: SelectedItem[]) => void;
   onSubmit?: (e: React.FormEvent) => void;
@@ -65,16 +66,20 @@ const GameDetailsLayout: React.FC<
   setPlayerId,
   zoneId,
   setZoneId,
+  uuid,
+  setUuid,
   selectedItems = [],
   setSelectedItems,
   onSubmit,
   infoImage,
   isSignedIn = false, // default to false if not provided
 }) => {
-  const [showInfo, setShowInfo] = useState<null | "player" | "zone">(null);
+  const [showInfo, setShowInfo] = useState<null | "player" | "zone" | "uuid">(
+    null
+  );
   const [showPayment, setShowPayment] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<
-    "bkash" | "nagad" | "pathaopay" | null
+    "bkash" | "nagad" | "Rocket" | null
   >(null);
   const [userAccount, setUserAccount] = useState("");
   const [trxId, setTrxId] = useState("");
@@ -100,9 +105,10 @@ const GameDetailsLayout: React.FC<
   const totalAmount = selectedItems.reduce((total, item) => {
     const selectedItem = priceList[item.categoryIdx]?.items[item.itemIdx];
     if (!selectedItem) return total;
-    
-    const itemPrice = typeof selectedItem.price === "number" ? selectedItem.price : 0;
-    return total + (itemPrice * item.quantity);
+
+    const itemPrice =
+      typeof selectedItem.price === "number" ? selectedItem.price : 0;
+    return total + itemPrice * item.quantity;
   }, 0);
 
   // Copy to clipboard function
@@ -114,12 +120,18 @@ const GameDetailsLayout: React.FC<
 
   // Handle order creation
   const handleCompletePayment = async () => {
-    if (!paymentMethod || !userAccount || !trxId || selectedItems.length === 0) {
+    if (
+      !paymentMethod ||
+      !userAccount ||
+      !trxId ||
+      selectedItems.length === 0
+    ) {
       setOrderModal({
         isOpen: true,
         status: "error",
         title: "Missing Information",
-        message: "Please fill in all payment details and select at least one item before proceeding.",
+        message:
+          "Please fill in all payment details and select at least one item before proceeding.",
       });
       return;
     }
@@ -129,30 +141,34 @@ const GameDetailsLayout: React.FC<
     try {
       // Get current user details
       const user = await getCurrentUser();
-      
+
       // Determine product type from URL
       let productType = "Unknown";
-      if (location.pathname.includes('/mobile-games/')) {
+      if (location.pathname.includes("/mobile-games/")) {
         productType = "Mobile Games";
-      } else if (location.pathname.includes('/pc-games/')) {
+      } else if (location.pathname.includes("/pc-games/")) {
         productType = "PC Games";
-      } else if (location.pathname.includes('/gift-cards/')) {
+      } else if (location.pathname.includes("/gift-cards/")) {
         productType = "Gift Cards";
-      } else if (location.pathname.includes('/ai-tools/')) {
+      } else if (location.pathname.includes("/ai-tools/")) {
         productType = "AI Tools";
-      } else if (location.pathname.includes('/subscriptions/')) {
+      } else if (location.pathname.includes("/subscriptions/")) {
         productType = "Subscriptions";
       }
 
       // Create orders for each selected item
       const orderPromises = selectedItems.map(async (selectedItem) => {
-        const item = priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
+        const item =
+          priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
         if (!item) throw new Error("Invalid item selection");
 
         const itemPrice = typeof item.price === "number" ? item.price : 0;
         const itemTotal = itemPrice * selectedItem.quantity;
 
-        const orderData: Omit<OrderData, 'id' | 'orderID' | 'createdAt' | 'updatedAt'> = {
+        const orderData: Omit<
+          OrderData,
+          "id" | "orderID" | "createdAt" | "updatedAt"
+        > = {
           userId: user.$id,
           userName: user.name || "Guest User",
           userEmail: user.email || "",
@@ -176,7 +192,7 @@ const GameDetailsLayout: React.FC<
 
       // Wait for all orders to be created
       const newOrders = await Promise.all(orderPromises);
-      
+
       // Show success modal
       setOrderModal({
         isOpen: true,
@@ -184,27 +200,27 @@ const GameDetailsLayout: React.FC<
         title: "Orders Placed Successfully!",
         message: `${newOrders.length} order(s) have been successfully placed and are being processed. You will receive updates via email.`,
         orderData: {
-          orderId: newOrders.map(order => order.orderID).join(", "), // Show all order IDs
+          orderId: newOrders.map((order) => order.orderID).join(", "), // Show all order IDs
           amount: totalAmount,
           productName: title,
           transactionId: trxId,
         },
       });
-      
+
       // Reset form
       setShowPayment(false);
       setPaymentMethod(null);
       setUserAccount("");
       setTrxId("");
       if (setSelectedItems) setSelectedItems([]);
-      
     } catch (error) {
       console.error("Error creating orders:", error);
       setOrderModal({
         isOpen: true,
         status: "error",
         title: "Order Failed",
-        message: "Failed to create orders. Please check your details and try again. If the problem persists, contact support.",
+        message:
+          "Failed to create orders. Please check your details and try again. If the problem persists, contact support.",
       });
     } finally {
       setIsProcessingOrder(false);
@@ -223,7 +239,7 @@ const GameDetailsLayout: React.FC<
       qr: "/assets/qr/bkash.png",
       instructions: [
         'Open up the bKash app & Choose "Send Money" Its a Personal Account',
-        "Enter the bKash Account Number: <span class=\"font-bold text-primary\">01831624571</span>",
+        'Enter the bKash Account Number: <span class="font-bold text-primary">01831624571</span>',
         `Enter the exact amount: <span class=\"font-bold text-primary\">${totalAmount}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a bKash Transaction ID (TRX ID)",
@@ -236,41 +252,41 @@ const GameDetailsLayout: React.FC<
       color: "from-orange-500 to-red-500",
       account: "01831624571",
       type: "Send Money",
-      qr: "/assets/qr/nagad.png",
       instructions: [
         'Open up the Nagad app & Choose "Send Money"',
-        "Enter the Nagad Account Number: 017XXXXXXXX",
-        `Enter the exact amount: ${totalAmount}৳`,
+        'Enter the Nagad Account Number: <span class="font-bold text-primary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold text-primary\">${totalAmount}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Nagad Transaction ID",
       ],
     },
     {
-      id: "pathaopay" as const,
-      name: "Pathao Pay",
-      icon: "/assets/icons/visa.svg",
+      id: "Rocket" as const,
+      name: "Rocket",
+      icon: "/assets/icons/rocket.png",
       color: "from-blue-500 to-purple-600",
-      account: "pathaopay.me/@yourtag",
+      account: "01831624571",
       type: "Send Money",
-      qr: "/assets/qr/pathaopay.png",
       instructions: [
-        "Open Pathao Pay and send to pathaopay.me/@yourtag",
-        `Enter the exact amount: ${totalAmount}৳`,
+        'Open up the Rocket app & Choose "Send Money"',
+        'Enter the Rocket Account Number:  <span class="font-bold text-primary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold text-primary\">${totalAmount}৳</span>`,
         "Confirm the Transaction",
+        "After sending money, you'll receive a Rocket Transaction ID",
       ],
     },
   ];
 
   // Helper functions for multiple selection
   const isItemSelected = (categoryIdx: number, itemIdx: number) => {
-    return selectedItems.some(item => 
-      item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    return selectedItems.some(
+      (item) => item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
     );
   };
 
   const getSelectedItemQuantity = (categoryIdx: number, itemIdx: number) => {
-    const found = selectedItems.find(item => 
-      item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    const found = selectedItems.find(
+      (item) => item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
     );
     return found ? found.quantity : 0;
   };
@@ -278,40 +294,54 @@ const GameDetailsLayout: React.FC<
   const handleItemSelection = (categoryIdx: number, itemIdx: number) => {
     if (!setSelectedItems) return;
 
-    const existingIndex = selectedItems.findIndex(item => 
-      item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    const existingIndex = selectedItems.findIndex(
+      (item) => item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
     );
 
     if (existingIndex >= 0) {
-      // Item already selected, increase quantity
-      const newSelectedItems = [...selectedItems];
-      newSelectedItems[existingIndex].quantity += 1;
+      // Item already selected, remove it (unselect)
+      const newSelectedItems = selectedItems.filter(
+        (item) =>
+          !(item.categoryIdx === categoryIdx && item.itemIdx === itemIdx)
+      );
       setSelectedItems(newSelectedItems);
     } else {
-      // New item, add to selection
-      setSelectedItems([...selectedItems, {
-        categoryIdx,
-        itemIdx,
-        quantity: 1
-      }]);
+      // New item, add to selection with quantity 1
+      setSelectedItems([
+        ...selectedItems,
+        {
+          categoryIdx,
+          itemIdx,
+          quantity: 1,
+        },
+      ]);
     }
   };
 
-  const updateItemQuantity = (categoryIdx: number, itemIdx: number, newQuantity: number) => {
+  const updateItemQuantity = (
+    categoryIdx: number,
+    itemIdx: number,
+    newQuantity: number
+  ) => {
     if (!setSelectedItems) return;
 
     if (newQuantity <= 0) {
       // Remove item if quantity is 0 or less
-      setSelectedItems(selectedItems.filter(item => 
-        !(item.categoryIdx === categoryIdx && item.itemIdx === itemIdx)
-      ));
+      setSelectedItems(
+        selectedItems.filter(
+          (item) =>
+            !(item.categoryIdx === categoryIdx && item.itemIdx === itemIdx)
+        )
+      );
     } else {
       // Update quantity
-      setSelectedItems(selectedItems.map(item => 
-        item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
-          ? { ...item, quantity: newQuantity }
-          : item
-      ));
+      setSelectedItems(
+        selectedItems.map((item) =>
+          item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
     }
   };
 
@@ -327,6 +357,7 @@ const GameDetailsLayout: React.FC<
       if (setSelectedItems && selectedItems) setSelectedItems(selectedItems);
       if (setPlayerId && playerId) setPlayerId(playerId);
       if (setZoneId && zoneId) setZoneId(zoneId);
+      if (setUuid && uuid) setUuid(uuid);
       localStorage.removeItem("gameOrderInputs");
     }
   }, []);
@@ -351,15 +382,13 @@ const GameDetailsLayout: React.FC<
       <Header />
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl md:text-4xl font-semibold tracking-tighter text-center mb-6 font-pixel text-primary">
-          {title} Top Up
+          Purchase {title}
         </h1>
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Game Image Section - Compact */}
           <div className="lg:col-span-4">
             <div className="bg-white rounded-2xl shadow-card p-6 sticky top-8">
-              <div
-                className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto"
-              >
+              <div className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto">
                 {/* Loader while loading or error */}
                 {(!imgLoaded || imgError) && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
@@ -406,9 +435,7 @@ const GameDetailsLayout: React.FC<
                               : "outline"
                           }
                           className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
-                          onClick={() =>
-                            handleItemSelection(catIdx, itemIdx)
-                          }
+                          onClick={() => handleItemSelection(catIdx, itemIdx)}
                         >
                           <span className="flex items-center gap-2">
                             {category.categoryIcon && (
@@ -492,6 +519,40 @@ const GameDetailsLayout: React.FC<
                         </div>
                       )}
 
+                    {/* UUID Field */}
+                    {typeof uuid !== "undefined" &&
+                      typeof setUuid !== "undefined" && (
+                        <div className="flex-1">
+                          <label
+                            className="block font-pixel text-base text-primary mb-1"
+                            htmlFor="uuid"
+                          >
+                            UUID <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative flex items-center">
+                            <input
+                              id="uuid"
+                              className="input w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-white/90 focus:border-primary focus:ring-2 focus:ring-primary transition"
+                              placeholder="Enter your UUID"
+                              value={uuid || ""}
+                              onChange={(e) =>
+                                setUuid && setUuid(e.target.value)
+                              }
+                              required
+                            />
+                            <button
+                              type="button"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-blue-600 focus:outline-none"
+                              tabIndex={-1}
+                              aria-label="Where to find UUID"
+                              onClick={() => setShowInfo("uuid")}
+                            >
+                              <Info className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                     {/* Zone ID Field */}
                     {typeof zoneId !== "undefined" &&
                       typeof setZoneId !== "undefined" && (
@@ -557,45 +618,62 @@ const GameDetailsLayout: React.FC<
                 {/* Multiple Items Display - replaces old quantity selector */}
                 {selectedItems.length > 0 && (
                   <div className="mb-4">
-                    <label className="font-pixel text-base text-primary mb-2 block">
-                      Selected Items
-                    </label>
+                    <span className="font-pixel text-xl text-primary font-semibold">
+                      Order Summary
+                    </span>
                     <div className="space-y-2 max-h-40 overflow-y-auto">
                       {selectedItems.map((selectedItem, index) => {
-                        const item = priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
+                        const item =
+                          priceList[selectedItem.categoryIdx]?.items[
+                            selectedItem.itemIdx
+                          ];
                         if (!item) return null;
-                        
+
                         return (
-                          <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                          <div
+                            key={index}
+                            className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
+                          >
                             <div className="flex-1 min-w-0">
                               <span className="font-medium text-gray-900 truncate">
                                 {item.label}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 ml-4">
+                            <div className="flex items-center gap-1 ml-2">
                               <button
                                 type="button"
-                                className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                className="w-6 h-6 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100 transition-colors text-sm"
                                 onClick={() =>
-                                  updateItemQuantity(selectedItem.categoryIdx, selectedItem.itemIdx, selectedItem.quantity - 1)
+                                  updateItemQuantity(
+                                    selectedItem.categoryIdx,
+                                    selectedItem.itemIdx,
+                                    selectedItem.quantity - 1
+                                  )
                                 }
                               >
                                 -
                               </button>
-                              <span className="w-12 text-center font-medium">
+                              <span className="w-8 text-center font-medium text-sm">
                                 {selectedItem.quantity}
                               </span>
                               <button
                                 type="button"
-                                className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                className="w-6 h-6 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100 transition-colors text-sm"
                                 onClick={() =>
-                                  updateItemQuantity(selectedItem.categoryIdx, selectedItem.itemIdx, selectedItem.quantity + 1)
+                                  updateItemQuantity(
+                                    selectedItem.categoryIdx,
+                                    selectedItem.itemIdx,
+                                    selectedItem.quantity + 1
+                                  )
                                 }
                               >
                                 +
                               </button>
-                              <span className="ml-2 font-semibold text-primary">
-                                {typeof item.price === "number" ? item.price * selectedItem.quantity : item.price}৳
+                              <span className="ml-1 font-semibold text-primary text-sm">
+                                {typeof item.price === "number"
+                                  ? item.price * selectedItem.quantity
+                                  : item.price}
+                                ৳
                               </span>
                             </div>
                           </div>
@@ -609,39 +687,14 @@ const GameDetailsLayout: React.FC<
                 {selectedItems.length > 0 && (
                   <div className="rounded-xl border border-primary/30 px-4 py-3 mb-3 shadow-sm">
                     <div className="flex flex-col gap-2">
-                      <span className="font-pixel text-xl text-primary font-semibold">
-                        Order Summary
-                      </span>
-                      <div className="space-y-1">
-                        {selectedItems.map((selectedItem, index) => {
-                          const item = priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
-                          if (!item) return null;
-                          
-                          const itemPrice = typeof item.price === "number" ? item.price : 0;
-                          const itemTotal = itemPrice * selectedItem.quantity;
-                          
-                          return (
-                            <div key={index} className="flex justify-between text-sm">
-                              <span className="text-gray-600">
-                                {item.label} x{selectedItem.quantity}
-                              </span>
-                              <span className="font-medium text-primary">
-                                {itemTotal}৳
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="border-t pt-2 mt-2">
-                        <div className="flex justify-between items-center">
-                          <span className="font-pixel text-lg text-primary font-bold">
-                            Total
-                          </span>
-                          <span className="font-pixel text-2xl text-primary font-bold">
-                            {totalAmount}
-                            <span className="text-lg font-normal ml-1">৳</span>
-                          </span>
-                        </div>
+                      <div className="flex justify-between items-center">
+                        <span className="font-pixel text-lg text-primary font-bold">
+                          Total
+                        </span>
+                        <span className="font-pixel text-2xl text-primary font-bold">
+                          {totalAmount}
+                          <span className="text-lg font-normal ml-1">৳</span>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -730,7 +783,7 @@ const GameDetailsLayout: React.FC<
 
                   {/* Payment Details */}
                   {paymentMethod && (
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200">
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 ">
                       {paymentMethods.map((method) => {
                         if (method.id !== paymentMethod) return null;
 
@@ -800,42 +853,24 @@ const GameDetailsLayout: React.FC<
                                         ? `bg-gradient-to-r ${method.color} text-white hover:shadow-lg`
                                         : "bg-gray-200 text-gray-500 cursor-not-allowed"
                                     }`}
-                                    disabled={!userAccount || !trxId || isProcessingOrder}
+                                    disabled={
+                                      !userAccount ||
+                                      !trxId ||
+                                      isProcessingOrder
+                                    }
                                     onClick={handleCompletePayment}
                                   >
-                                    {isProcessingOrder ? "Processing..." : "Complete Payment"}
+                                    {isProcessingOrder
+                                      ? "Processing..."
+                                      : "Complete Payment"}
                                   </Button>
                                 </div>
                               </div>
 
                               {/* QR Code and Form */}
                               <div className="">
-                                {/* QR Code */}
-                                <div className="text-center mb-6">
-                                  <img
-                                    src={method.qr}
-                                    alt={`${method.name} QR`}
-                                    className="w-64 h-64 mx-auto rounded-xl"
-                                    onError={(e) => {
-                                      const target =
-                                        e.target as HTMLImageElement;
-                                      target.style.display = "none";
-                                      const fallback =
-                                        target.nextSibling as HTMLElement;
-                                      if (fallback)
-                                        fallback.style.display = "flex";
-                                    }}
-                                  />
-                                  <div className="w-56 h-56 bg-gray-100 rounded-lg items-center justify-center text-gray-400 text-sm hidden">
-                                    <img
-                                      src={method.qr}
-                                      alt={`${method.name} QR`}
-                                    />
-                                  </div>
-                                </div>
-
                                 {/* Account Details */}
-                                <div className="bg-white rounded-xl p-4 border border-gray-200 mt-6">
+                                <div className="bg-white rounded-xl p-4 border border-gray-200 mb-8">
                                   <h6 className="font-pixel text-sm text-primary mb-3">
                                     Account Details
                                   </h6>
@@ -913,6 +948,31 @@ const GameDetailsLayout: React.FC<
                                     Coupon is optional
                                   </span>
                                 </div>
+                                {/* QR Code */}
+                                {method.qr && (
+                                  <div className="text-center mb-6">
+                                    <img
+                                      src={method.qr}
+                                      alt={`${method.name} QR`}
+                                      className="w-64 h-64 mx-auto rounded-xl"
+                                      onError={(e) => {
+                                        const target =
+                                          e.target as HTMLImageElement;
+                                        target.style.display = "none";
+                                        const fallback =
+                                          target.nextSibling as HTMLElement;
+                                        if (fallback)
+                                          fallback.style.display = "flex";
+                                      }}
+                                    />
+                                    <div className="w-56 h-56 bg-gray-100 rounded-lg items-center justify-center text-gray-400 text-sm hidden">
+                                      <img
+                                        src={method.qr}
+                                        alt={`${method.name} QR`}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>

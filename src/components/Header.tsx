@@ -126,7 +126,7 @@ const Header = () => {
         { name: "ChatGPT Pro", path: "/ai-tools/chatgpt" },
         { name: "Claude Pro", path: "/ai-tools/claude" },
         { name: "Midjourney Pro", path: "/ai-tools/midjourney" },
-        { name: "Github Pro", path: "/ai-tools/dalle" },
+        { name: "Github Pro", path: "/ai-tools/github" },
         { name: "More", path: "/ai-tools" },
       ],
     },

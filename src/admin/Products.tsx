@@ -1012,7 +1012,9 @@ const Products = () => {
                               {prod.category}
                             </TableCell>
                             <TableCell className="font-semibold text-primary">
-                              {prod.price}৳
+                              {Array.isArray(prod.priceList) && prod.priceList.length > 0
+                                ? (typeof prod.priceList[0] === 'string' ? prod.priceList[0].split('|')[0] : prod.priceList[0]) + '৳'
+                                : (prod.price ? (typeof prod.price === 'string' ? prod.price.split('|')[0] : prod.price) + '৳' : '-')}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-1">
@@ -1203,21 +1205,7 @@ const Products = () => {
                       <ChevronLeft className="w-3 h-3" />
                     </Button>
 
-                    {/* Page Numbers - Mobile (fewer) */}
-                    <div className="flex items-center gap-1">
-                      {getPageNumbers(true).map((page, index) => (
-                        <Button
-                          key={index}
-                          variant={page === currentPage ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => typeof page === "number" && setCurrentPage(page)}
-                          disabled={typeof page !== "number" || isLoading}
-                          className={`font-pixel w-8 h-8 p-0 text-xs ${typeof page !== "number" ? "cursor-default" : ""}`}
-                        >
-                          {page}
-                        </Button>
-                      ))}
-                    </div>
+                    {/* Removed page numbers for mobile pagination */}
 
                     {/* Next Page - Mobile */}
                     <Button
@@ -1242,26 +1230,7 @@ const Products = () => {
                     </Button>
                   </div>
 
-                  {/* Mobile Jump to Page */}
-                  <div className="flex items-center justify-center gap-2 mt-3">
-                    <span className="text-xs text-muted-foreground font-pixel">
-                      Jump to:
-                    </span>
-                    <input
-                      type="number"
-                      min="1"
-                      max={totalPages}
-                      value={currentPage}
-                      onChange={(e) => {
-                        const page = parseInt(e.target.value);
-                        if (page >= 1 && page <= totalPages) {
-                          setCurrentPage(page);
-                        }
-                      }}
-                      className="w-12 px-1 py-1 text-xs border border-border rounded font-pixel text-center focus:outline-none focus:ring-1 focus:ring-primary"
-                      disabled={isLoading}
-                    />
-                  </div>
+                  {/* Removed jump to page for mobile */}
                 </div>
 
                 {/* Desktop Pagination Layout */}
@@ -1299,21 +1268,7 @@ const Products = () => {
                       <ChevronLeft className="w-4 h-4" />
                     </Button>
 
-                    {/* Page Numbers - Desktop */}
-                    <div className="flex items-center gap-1">
-                      {getPageNumbers(false).map((page, index) => (
-                        <Button
-                          key={index}
-                          variant={page === currentPage ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => typeof page === "number" && setCurrentPage(page)}
-                          disabled={typeof page !== "number" || isLoading}
-                          className={`font-pixel min-w-[40px] ${typeof page !== "number" ? "cursor-default" : ""}`}
-                        >
-                          {page}
-                        </Button>
-                      ))}
-                    </div>
+                    {/* Removed page numbers for desktop pagination */}
 
                     {/* Next Page - Desktop */}
                     <Button
@@ -1338,26 +1293,7 @@ const Products = () => {
                     </Button>
                   </div>
 
-                  {/* Desktop Jump to Page */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground font-pixel">
-                      Go to:
-                    </span>
-                    <input
-                      type="number"
-                      min="1"
-                      max={totalPages}
-                      value={currentPage}
-                      onChange={(e) => {
-                        const page = parseInt(e.target.value);
-                        if (page >= 1 && page <= totalPages) {
-                          setCurrentPage(page);
-                        }
-                      }}
-                      className="w-16 px-2 py-1 text-sm border border-border rounded font-pixel text-center focus:outline-none focus:ring-2 focus:ring-primary"
-                      disabled={isLoading}
-                    />
-                  </div>
+                  {/* Removed jump to page for desktop */}
                 </div>
               </CardContent>
             </Card>
@@ -1642,12 +1578,15 @@ const Products = () => {
                               }}
                               className="font-pixel text-xs border border-muted rounded px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
                             >
-                              <option value="">Type</option>
+                              <option value="">None</option>
+                              <option value="Pass">Pass</option>
                               <option value="diamond">Diamond</option>
                               <option value="voucher">Voucher</option>
                               <option value="other">Shared</option>
                               <option value="subscription">Personal</option>
                               <option value="codes">Codes</option>
+                              <option value="uc">Uc</option>
+                              <option value="team">Team</option>
                             </select>
                             <Button
                               type="button"
@@ -1858,12 +1797,15 @@ const Products = () => {
                           }}
                           className="font-pixel text-xs border border-muted rounded px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
                         >
-                          <option value="">Type</option>
+                          <option value="">None</option>
+                          <option value="pass">Pass</option>
                           <option value="diamond">Diamond</option>
                           <option value="voucher">Voucher</option>
                           <option value="shared">Shared</option>
                           <option value="personal">Personal</option>
                           <option value="codes">Codes</option>
+                          <option value="uc">Uc</option>
+                          <option value="team">Team</option>
                         </select>
                         <Button
                           type="button"

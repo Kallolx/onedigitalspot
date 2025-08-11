@@ -4,11 +4,12 @@ import { Card } from "@/components/ui/card";
 import React, { useEffect, useState, useRef } from "react";
 import ServiceCard from "@/components/ServiceCard";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Info, X, Lock, Send } from "lucide-react";
+import { Info, X, Lock, Send, Check, Copy } from "lucide-react";
 import { RotateLoader } from "react-spinners";
 import { account } from "@/lib/appwrite";
 import { createOrder, OrderData } from "@/lib/orders";
 import OrderStatusModal from "@/components/OrderStatusModal";
+import { Input } from "./ui/input";
 
 interface PriceItem {
   label: string;
@@ -54,13 +55,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   similarProducts,
   selected,
   setSelected,
-  playerId,
-  setPlayerId,
-  zoneId,
-  setZoneId,
   quantity,
   setQuantity,
-  infoImage,
   children,
   isSignedIn = false,
 }) => {
@@ -76,7 +72,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   // Payment and order states
   const [showPayment, setShowPayment] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<
-    "bkash" | "nagad" | "pathaopay" | null
+    "bkash" | "nagad" | "Rocket" | null
   >(null);
   const [userAccount, setUserAccount] = useState("");
   const [trxId, setTrxId] = useState("");
@@ -103,11 +99,17 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   const isSubscription = location.pathname.includes('/subscriptions/');
   
   // Calculate selected item and total amount
-  const filteredList = priceList.filter(category =>
-    purchaseType === "shared"
-      ? category.title.toLowerCase().includes("shared")
-      : category.title.toLowerCase().includes("personal")
-  );
+  const filteredList = priceList.length === 1 
+    ? priceList // For single category products like Cursor, use all categories
+    : priceList.filter(category =>
+        purchaseType === "shared"
+          ? (title === "GitHub Pro" 
+              ? category.title.toLowerCase().includes("personal")
+              : category.title.toLowerCase().includes("shared"))
+          : (title === "GitHub Pro" 
+              ? category.title.toLowerCase().includes("team")
+              : category.title.toLowerCase().includes("personal"))
+      );
   
   const selectedItem = selected && filteredList[selected.categoryIdx]?.items[selected.itemIdx];
   
@@ -243,27 +245,27 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
       color: "from-orange-500 to-red-500",
       account: "01831624571",
       type: "Send Money",
-      qr: "/assets/qr/nagad.png",
       instructions: [
         'Open up the Nagad app & Choose "Send Money"',
-        "Enter the Nagad Account Number: 017XXXXXXXX",
+        "Enter the Nagad Account Number: 01831624571",
         `Enter the exact amount: ${totalAmount}৳`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Nagad Transaction ID",
       ],
     },
     {
-      id: "pathaopay" as const,
-      name: "Pathao Pay",
-      icon: "/assets/icons/visa.svg",
+      id: "Rocket" as const,
+      name: "Rocket",
+      icon: "/assets/icons/rocket.png",
       color: "from-blue-500 to-purple-600",
-      account: "pathaopay.me/@yourtag",
+      account: "01831624571",
       type: "Send Money",
-      qr: "/assets/qr/pathaopay.png",
       instructions: [
-        "Open Pathao Pay and send to pathaopay.me/@yourtag",
+        'Open up the Rocket app & Choose "Send Money"',
+        "Enter the Rocket Account Number: 01831624571",
         `Enter the exact amount: ${totalAmount}৳`,
         "Confirm the Transaction",
+        "After sending money, you'll receive a Rocket Transaction ID",
       ],
     },
   ];
@@ -343,7 +345,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
           </div>
           {/* Main Content */}
           <div className="flex-1">
-            {/* Purchase Type Switcher */}
+            {/* Purchase Type Switcher - Only show if there are multiple categories */}
+            {priceList.length > 1 && (
             <Card className="mb-6 p-4">
               <div className="flex gap-2 mb-4 flex-wrap">
                 <Button
@@ -352,7 +355,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                   onClick={() => setPurchaseType("shared")}
                   className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[110px]"
                 >
-                  {isSubscription ? "Non-Renewable" : "Shared Account"}
+                  {title === "GitHub Pro" ? "Personal" : (isSubscription ? "Non-Renewable" : "Shared Account")}
                 </Button>
                 <Button
                   type="button"
@@ -360,7 +363,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                   onClick={() => setPurchaseType("personal")}
                   className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[110px]"
                 >
-                  {isSubscription ? "Renewable" : "Personal Account"}
+                  {title === "GitHub Pro" ? "Team" : (isSubscription ? "Renewable" : "Personal Account")}
                 </Button>
               </div>
               {/* Price List for Shared Account */}
@@ -368,7 +371,9 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                 <div className="flex flex-col gap-6">
                   {priceList
                     .filter((category) =>
-                      category.title.toLowerCase().includes("shared")
+                      title === "GitHub Pro" 
+                        ? category.title.toLowerCase().includes("personal")
+                        : category.title.toLowerCase().includes("shared")
                     )
                     .map((category, catIdx) => (
                       <div key={catIdx}>
@@ -435,7 +440,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                 <>
                   <div className="flex flex-col gap-4 mb-4">
                     {/* Sub-tabs only for AI tools */}
-                    {!isSubscription && (
+                    {!isSubscription && title !== "GitHub Pro" && (
                       <div className="flex gap-4 mb-2">
                         <Button
                           type="button"
@@ -459,7 +464,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                           }}
                           className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[120px]"
                         >
-                          Use Existing Account
+                          {title === "GitHub" ? "use existing one" : "Use Existing Account"}
                         </Button>
                       </div>
                     )}
@@ -467,7 +472,9 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                     <div className="flex flex-col gap-6">
                       {priceList
                         .filter((category) =>
-                          category.title.toLowerCase().includes("personal")
+                          title === "GitHub Pro" 
+                            ? category.title.toLowerCase().includes("team")
+                            : category.title.toLowerCase().includes("personal")
                         )
                         .map((category, catIdx) => (
                           <div key={catIdx}>
@@ -558,6 +565,73 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                 </>
               )}
             </Card>
+            )}
+
+            {/* Show all price lists when there's only one category */}
+            {priceList.length === 1 && (
+            <Card className="mb-6 p-4">
+              <div className="flex flex-col gap-6">
+                {priceList.map((category, catIdx) => (
+                  <div key={catIdx}>
+                    <h3 className="font-pixel text-base text-primary mb-2 pl-1 opacity-80 flex items-center gap-2">
+                      {category.title}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {category.items.map((item, itemIdx) => (
+                        <Button
+                          key={itemIdx}
+                          type="button"
+                          variant={
+                            selected &&
+                            selected.categoryIdx === catIdx &&
+                            selected.itemIdx === itemIdx
+                              ? "default"
+                              : "outline"
+                          }
+                          className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
+                          onClick={() =>
+                            setSelected({ categoryIdx: catIdx, itemIdx })
+                          }
+                        >
+                          <span className="flex items-center gap-2">
+                            {category.categoryIcon && (
+                              <img
+                                src={category.categoryIcon}
+                                alt="icon"
+                                className="w-5 h-5 text-primary"
+                              />
+                            )}
+                            {item.label}
+                            {item.hot && (
+                              <span className="ml-1">
+                                <img
+                                  src="/assets/icons/fire.svg"
+                                  alt="Popular"
+                                  className="inline-block mr-1 w-4 h-4"
+                                />
+                              </span>
+                            )}
+                          </span>
+                          <span
+                            className={`font-bold transition-colors duration-150 ${
+                              selected &&
+                              selected.categoryIdx === catIdx &&
+                              selected.itemIdx === itemIdx
+                                ? "text-white"
+                                : "text-primary"
+                            } group-hover:text-white`}
+                          >
+                            {item.price}৳
+                          </span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            )}
+
             {/* Quantity, Order Summary, and Proceed Button */}
             <Card className="mb-8 p-4">
               <div className="flex items-center gap-4 mb-4">
@@ -668,7 +742,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                 </div>
 
                 {/* Payment Methods Grid */}
-                <div className="p-4">
+                <div className=" p-4">
                   <div className="flex gap-4 mb-8 items-start justify-start">
                     {paymentMethods.map((method) => (
                       <Button
@@ -695,7 +769,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
 
                   {/* Payment Details */}
                   {paymentMethod && (
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200">
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 ">
                       {paymentMethods.map((method) => {
                         if (method.id !== paymentMethod) return null;
 
@@ -706,151 +780,185 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                               {/* Instructions */}
                               <div className="space-y-4">
                                 <h5 className="font-pixel text-base text-primary mb-4">
-                                  Payment Instructions
+                                  {method.name} Payment Instructions
                                 </h5>
 
                                 <ol className="space-y-3 text-sm">
-                                  {method.instructions.map((instruction, idx) => (
-                                    <li key={idx} className="flex gap-3">
-                                      <span className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold">
-                                        {idx + 1}
-                                      </span>
-                                      <span
-                                        className="text-gray-700 leading-relaxed"
-                                        dangerouslySetInnerHTML={{
-                                          __html: instruction,
-                                        }}
-                                      />
-                                    </li>
-                                  ))}
+                                  {method.instructions.map(
+                                    (instruction, idx) => (
+                                      <li key={idx} className="flex gap-3">
+                                        <span
+                                          className={`flex-shrink-0 w-6 h-6 bg-gradient-to-br ${method.color} text-white rounded-full flex items-center justify-center text-xs font-bold`}
+                                        >
+                                          {idx + 1}
+                                        </span>
+                                        <span
+                                          className="text-base text-gray-500 font-pixel tracking-tight"
+                                          dangerouslySetInnerHTML={{
+                                            __html: instruction,
+                                          }}
+                                        />
+                                      </li>
+                                    )
+                                  )}
                                 </ol>
 
+                                {/* Form */}
                                 <div className="space-y-4">
-                                  <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-pixel text-sm text-primary">
-                                        {method.name} Number
-                                      </span>
-                                      <button
-                                        onClick={() =>
-                                          copyToClipboard(method.account, "Account")
-                                        }
-                                        className="text-primary hover:text-primary/80 font-pixel text-xs px-2 py-1 rounded border border-primary/20 hover:bg-primary/10 transition-colors"
-                                      >
-                                        {copiedText === "Account" ? "Copied!" : "Copy"}
-                                      </button>
-                                    </div>
-                                    <div className="font-mono text-lg font-bold text-primary mt-1">
-                                      {method.account}
-                                    </div>
+                                  <h6 className="font-pixel text-sm text-primary">
+                                    Transaction Details
+                                  </h6>
+
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-2">
+                                      Your {method.name} Account
+                                    </label>
+                                    <Input
+                                      placeholder={`Enter your ${method.name} number`}
+                                      value={userAccount}
+                                      onChange={(e) =>
+                                        setUserAccount(e.target.value)
+                                      }
+                                    />
                                   </div>
 
-                                  <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-pixel text-sm text-green-700">
-                                        Amount to Send
-                                      </span>
-                                      <button
-                                        onClick={() =>
-                                          copyToClipboard(String(totalAmount), "Amount")
-                                        }
-                                        className="text-green-700 hover:text-green-600 font-pixel text-xs px-2 py-1 rounded border border-green-300 hover:bg-green-100 transition-colors"
-                                      >
-                                        {copiedText === "Amount" ? "Copied!" : "Copy"}
-                                      </button>
-                                    </div>
-                                    <div className="font-mono text-xl font-bold text-green-700 mt-1">
-                                      {totalAmount}৳
-                                    </div>
+                                  <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-2">
+                                      Transaction ID (TRX ID)
+                                    </label>
+                                    <Input
+                                      placeholder="Enter transaction ID"
+                                      value={trxId}
+                                      onChange={(e) => setTrxId(e.target.value)}
+                                    />
                                   </div>
 
-                                  <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-                                    <p className="font-medium mb-1">Important:</p>
-                                    <p>
-                                      Send the exact amount shown above. Any
-                                      difference may delay your order processing.
-                                    </p>
-                                  </div>
+                                  <Button
+                                    className={`w-full font-pixel ${
+                                      userAccount && trxId && !isProcessingOrder
+                                        ? `bg-gradient-to-r ${method.color} text-white hover:shadow-lg`
+                                        : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                    }`}
+                                    disabled={
+                                      !userAccount ||
+                                      !trxId ||
+                                      isProcessingOrder
+                                    }
+                                    onClick={handleCompletePayment}
+                                  >
+                                    {isProcessingOrder
+                                      ? "Placing..."
+                                      : "Place Order"}
+                                  </Button>
                                 </div>
                               </div>
 
                               {/* QR Code and Form */}
                               <div className="">
-                                <h5 className="font-pixel text-base text-primary mb-4">
-                                  Payment Details
-                                </h5>
-                                <div className="text-center mb-6">
-                                  <img
-                                    src={method.qr}
-                                    alt={`${method.name} QR`}
-                                    className="w-64 h-64 mx-auto rounded-xl"
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.style.display = "none";
-                                    }}
-                                  />
-                                  <p className="text-xs text-gray-500 mt-2">
-                                    Scan QR code to pay with {method.name}
-                                  </p>
-                                </div>
-
-                                <div className="space-y-4">
-                                  <div>
-                                    <label className="font-pixel text-sm text-primary mb-2 block">
-                                      Your {method.name} Account Number
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={userAccount}
-                                      onChange={(e) => setUserAccount(e.target.value)}
-                                      placeholder={`Enter your ${method.name} account number`}
-                                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                      required
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label className="font-pixel text-sm text-primary mb-2 block">
-                                      Transaction ID (TRX ID)
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={trxId}
-                                      onChange={(e) => setTrxId(e.target.value)}
-                                      placeholder="Enter transaction ID from SMS"
-                                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                      required
-                                    />
-                                  </div>
-
-                                  <Button
-                                    onClick={handleCompletePayment}
-                                    disabled={
-                                      !paymentMethod ||
-                                      !userAccount ||
-                                      !trxId ||
-                                      isProcessingOrder
-                                    }
-                                    className="w-full font-pixel text-lg py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                                  >
-                                    {isProcessingOrder ? (
-                                      <div className="flex items-center justify-center gap-2">
-                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                        Processing...
+                                {/* Account Details */}
+                                <div className="bg-white rounded-xl p-4 border border-gray-200 mb-8">
+                                  <h6 className="font-pixel text-sm text-primary mb-3">
+                                    Account Details
+                                  </h6>
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-gray-600 text-sm">
+                                        {method.name} Number:
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-mono font-semibold text-md">
+                                          {method.account}
+                                        </span>
+                                        <button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              method.account,
+                                              "account"
+                                            )
+                                          }
+                                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                        >
+                                          {copiedText === "account" ? (
+                                            <Check className="w-3 h-3 text-green-500" />
+                                          ) : (
+                                            <Copy className="w-3 h-3 text-gray-500" />
+                                          )}
+                                        </button>
                                       </div>
-                                    ) : (
-                                      "Complete Payment"
-                                    )}
-                                  </Button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowPayment(false)}
-                                    className="w-full py-2 text-gray-600 hover:text-gray-800 font-pixel text-sm transition-colors"
-                                  >
-                                    Cancel Payment
-                                  </button>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-gray-600 text-sm">
+                                        Total:
+                                      </span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-sans text-xl font-bold">
+                                          = {totalAmount} BDT
+                                        </span>
+                                        <button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              totalAmount?.toString() || "",
+                                              "amount"
+                                            )
+                                          }
+                                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                        >
+                                          {copiedText === "amount" ? (
+                                            <Check className="w-3 h-3 text-green-500" />
+                                          ) : (
+                                            <Copy className="w-3 h-3 text-gray-500" />
+                                          )}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {/* Apply Coupon Field (Mock) */}
+                                  <div className="mt-4 flex gap-2 items-center">
+                                    <Input
+                                      type="text"
+                                      placeholder="Enter coupon code"
+                                      className="font-pixel"
+                                      // You can add value/onChange if you want to handle state
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      className="font-pixel"
+                                      size="sm"
+                                      // onClick={() => {/* mock apply logic */}}
+                                    >
+                                      Apply
+                                    </Button>
+                                  </div>
+                                  <span className="text-xs text-gray-400 mt-1 block">
+                                    Coupon is optional
+                                  </span>
                                 </div>
+                                {/* QR Code */}
+                                {method.qr && (
+                                  <div className="text-center mb-6">
+                                    <img
+                                      src={method.qr}
+                                      alt={`${method.name} QR`}
+                                      className="w-64 h-64 mx-auto rounded-xl"
+                                      onError={(e) => {
+                                        const target =
+                                          e.target as HTMLImageElement;
+                                        target.style.display = "none";
+                                        const fallback =
+                                          target.nextSibling as HTMLElement;
+                                        if (fallback)
+                                          fallback.style.display = "flex";
+                                      }}
+                                    />
+                                    <div className="w-56 h-56 bg-gray-100 rounded-lg items-center justify-center text-gray-400 text-sm hidden">
+                                      <img
+                                        src={method.qr}
+                                        alt={`${method.name} QR`}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
