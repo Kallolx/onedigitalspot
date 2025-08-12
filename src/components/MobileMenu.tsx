@@ -67,14 +67,11 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
             {activeSubmenu === "Gaming" && (
               <div className="mt-2 space-y-1">
                 {[
-                  {
-                    name: "Mobile Legends",
-                    path: "/mobile-games/mobile-legends",
-                  },
                   { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
                   { name: "Free Fire", path: "/mobile-games/free-fire" },
-                  { name: "Roblox", path: "/mobile-games/roblox" },
-                  { name: "More", path: "/top-up-games" },
+                  { name: "Valorant", path: "/pc-games/valorant" },
+                  { name: "Apex Legends", path: "/pc-games/apex-legends" },
+                  { name: "More", path: "/all-games" },
                 ].map((dropItem) => {
                   const productImages = {
                     "Mobile Legends": "/assets/icons/mobile-legends.svg",
@@ -138,7 +135,10 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                   },
                   { name: "CapCut Pro", path: "/design-tools/capcut" },
                   { name: "Tinder+", path: "/design-tools/tinder" },
-                  { name: "Discord Nitro", path: "/design-tools/discord-nitro" },
+                  {
+                    name: "Discord Nitro",
+                    path: "/design-tools/discord-nitro",
+                  },
                   { name: "More", path: "/design-tools" },
                 ].map((dropItem) => {
                   const productImages = {
@@ -147,7 +147,7 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                     "Tinder+": "/assets/icons/tinder.svg",
                     "Discord Nitro": "/assets/icons/discord-nitro.svg",
                     "Free Fire": "/assets/icons/free-fire.svg",
-                    "Roblox": "/assets/icons/roblox-banner.svg",
+                    Roblox: "/assets/icons/roblox-banner.svg",
                   };
                   const imgSrc =
                     productImages[dropItem.name] ||

@@ -7,7 +7,7 @@ import {
   pcGames,
   giftCards,
   subscriptions,
-  ProductivityCards,
+  productivity,
   aiTools,
 } from "@/lib/products";
 
@@ -17,7 +17,7 @@ const allProducts = [
   ...pcGames,
   ...giftCards,
   ...subscriptions,
-  ...ProductivityCards,
+  ...productivity,
   ...aiTools,
 ];
 
@@ -104,7 +104,7 @@ const GameCategories = () => (
           </a>
         </div>
         <CategorySwiper
-          items={ProductivityCards}
+          items={productivity}
           isSubscription={true}
           navigationPrevClass=".swiper-sub-prev"
           navigationNextClass=".swiper-sub-next"

@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
-    title: "About LinkedIn Premium Subscription",
+    title: "About Google One Subscription",
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Boost your professional profile with LinkedIn Premium.
-          Get insights, InMail messages, and access to exclusive learning content.
+          Get expanded cloud storage across Google Drive, Gmail, and Photos with Google One.
+          Enjoy extra benefits including family sharing and expert support.
         </p>
         <ul className="list-disc pl-5">
-          <li><b>InMail Messages:</b> Contact recruiters and prospects directly.</li>
-          <li><b>Profile Insights:</b> See who viewed your profile.</li>
-          <li><b>Learning Courses:</b> Access LinkedIn Learning content.</li>
+          <li><b>Expanded Storage:</b> Choose plans from 100GB to 2TB or more.</li>
+          <li><b>Family Sharing:</b> Share your plan with up to 5 family members.</li>
+          <li><b>Extra Benefits:</b> Access Google experts and get special offers.</li>
         </ul>
       </div>
     ),
@@ -24,24 +24,24 @@ const infoSections = [
     title: "How to Use",
     content: (
       <ol className="list-decimal pl-5 text-base mb-4">
-        <li>Select your LinkedIn Premium plan.</li>
-        <li>Login with your LinkedIn account.</li>
+        <li>Select your Google One plan.</li>
+        <li>Login with your Google account.</li>
         <li>Complete payment securely.</li>
-        <li>Start growing your professional network.</li>
+        <li>Access your expanded storage and benefits immediately.</li>
       </ol>
     ),
   },
 ];
 
-export default function LinkedInSubscription() {
+export default function GoogleOneSubscription() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [linkedin, setLinkedin] = useState(null);
+  const [googleOne, setGoogleOne] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const linkedinProduct = subscriptions.find(p => p.title === "LinkedIn Premium");
-  const infoImage = linkedinProduct?.image;
+  const googleOneProduct = productivity.find(p => p.title === "Google One");
+  const infoImage = googleOneProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -50,30 +50,30 @@ export default function LinkedInSubscription() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        const linkedinProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "linkedin premium"
+        const googleProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "google one"
         );
-        setLinkedin(linkedinProduct);
+        setGoogleOne(googleProduct);
 
-        if (linkedinProduct && Array.isArray(linkedinProduct.priceList)) {
-          const items = linkedinProduct.priceList.map((item) => {
+        if (googleProduct && Array.isArray(googleProduct.priceList)) {
+          const items = googleProduct.priceList.map((item) => {
             const [label, price, hot] = item.split("|");
             return { label, price: Number(price), hot: hot === "true" };
           });
           setPriceList([
             {
-              title: "LinkedIn Premium Subscription",
-              categoryIcon: "/assets/icons/linkedin.svg",
+              title: "Google One Subscription",
+              categoryIcon: "/assets/icons/googleone.svg",
               items,
             },
           ]);
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "linkedin").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "google one").slice(0, 4)
         );
       } catch {
-        setLinkedin(null);
+        setGoogleOne(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -95,8 +95,8 @@ export default function LinkedInSubscription() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="LinkedIn Premium"
-      image={linkedinProduct?.image}
+      title="Google One"
+      image={googleOneProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

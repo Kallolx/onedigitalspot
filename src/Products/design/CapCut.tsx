@@ -1,20 +1,21 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
-    title: "About Grammarly Subscription",
+    title: "About Capcut Pro Subscription",
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Improve your writing with Grammarly Premium. Get advanced grammar, style, and plagiarism checks.
+          Unlock advanced video editing features and premium effects with Capcut Pro.
+          Create stunning videos with no watermarks and export in HD quality.
         </p>
         <ul className="list-disc pl-5">
-          <li><b>Grammar & Spelling:</b> Catch complex mistakes and errors.</li>
-          <li><b>Style & Clarity:</b> Suggestions to improve tone and clarity.</li>
-          <li><b>Plagiarism Checker:</b> Ensure your writing is original.</li>
+          <li><b>Premium Effects & Filters:</b> Access exclusive editing tools.</li>
+          <li><b>No Watermarks:</b> Export videos without branding.</li>
+          <li><b>High Quality Export:</b> Export videos in Full HD or higher.</li>
         </ul>
       </div>
     ),
@@ -23,24 +24,24 @@ const infoSections = [
     title: "How to Use",
     content: (
       <ol className="list-decimal pl-5 text-base mb-4">
-        <li>Choose your Grammarly Premium plan.</li>
-        <li>Login with your Grammarly account.</li>
-        <li>Complete the payment securely.</li>
-        <li>Start improving your writing instantly.</li>
+        <li>Choose your Capcut Pro subscription plan.</li>
+        <li>Log in with your Capcut account details.</li>
+        <li>Complete payment securely.</li>
+        <li>Enjoy full access to premium video editing features.</li>
       </ol>
     ),
   },
 ];
 
-export default function GrammarlySubscription() {
+export default function CapcutProSubscription() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [grammarly, setGrammarly] = useState(null);
+  const [capcut, setCapcut] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const grammarlyProduct = subscriptions.find(p => p.title === "Grammarly Premium");
-  const infoImage = grammarlyProduct?.image;
+  const capcutProduct = productivity.find(p => p.title === "Capcut Pro");
+  const infoImage = capcutProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -49,30 +50,30 @@ export default function GrammarlySubscription() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        const grammarlyProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "grammarly"
+        const capcutProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "capcut pro"
         );
-        setGrammarly(grammarlyProduct);
+        setCapcut(capcutProduct);
 
-        if (grammarlyProduct && Array.isArray(grammarlyProduct.priceList)) {
-          const items = grammarlyProduct.priceList.map((item) => {
+        if (capcutProduct && Array.isArray(capcutProduct.priceList)) {
+          const items = capcutProduct.priceList.map((item) => {
             const [label, price, hot] = item.split("|");
             return { label, price: Number(price), hot: hot === "true" };
           });
           setPriceList([
             {
-              title: "Grammarly Premium Subscription",
-              categoryIcon: "/assets/icons/grammarly.svg",
+              title: "Capcut Pro Subscription",
+              categoryIcon: "/assets/icons/capcut.svg",
               items,
             },
           ]);
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "grammarly").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "capcut pro").slice(0, 4)
         );
       } catch {
-        setGrammarly(null);
+        setCapcut(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -94,8 +95,8 @@ export default function GrammarlySubscription() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="Grammarly"
-      image={grammarlyProduct?.image}
+      title="Capcut Pro"
+      image={capcutProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

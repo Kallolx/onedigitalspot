@@ -82,14 +82,12 @@ const Products = () => {
   const [editProduct, setEditProduct] = useState(null);
   const [deleteProduct, setDeleteProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   // Add product states
   const [newProduct, setNewProduct] = useState({
     title: "",
     category: "",
     description: "",
-    image: "",
     priceList: [],
   });
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -98,7 +96,6 @@ const Products = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState([]);
-  const [preview, setPreview] = useState({ src: null, x: 0, y: 0 });
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -294,7 +291,6 @@ const Products = () => {
         category: editProduct.category,
         price: editProduct.price,
         description: editProduct.description,
-        image: editProduct.image,
         priceList: editProduct.priceList || [],
         status: true,
       };
@@ -386,77 +382,6 @@ const Products = () => {
     }
   };
 
-  // Cloudinary upload function
-  const uploadToCloudinary = async (file) => {
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset =
-      import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "ml_default";
-
-    if (!cloudName) {
-      throw new Error("Cloudinary cloud name not configured");
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-
-    // Only add folder if it's specified
-    const folder = import.meta.env.VITE_CLOUDINARY_FOLDER_MODE;
-    if (folder) {
-      formData.append("folder", folder);
-    }
-
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Upload failed");
-      }
-
-      const data = await response.json();
-      return data.secure_url;
-    } catch (error) {
-      console.error("Cloudinary upload error:", error);
-      throw error;
-    }
-  };
-
-  // Handle image upload
-  const handleImageUpload = async (file, isEdit = false) => {
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      const imageUrl = await uploadToCloudinary(file);
-
-      if (isEdit) {
-        setEditProduct((prev) => ({
-          ...prev,
-          image: imageUrl,
-        }));
-      } else {
-        setNewProduct((prev) => ({
-          ...prev,
-          image: imageUrl,
-        }));
-      }
-
-      toast.success("Image uploaded successfully");
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      toast.error("Failed to upload image");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   // Add new product to database
   const handleAddProduct = async () => {
     if (!selectedCategory || !newProduct.title) {
@@ -494,7 +419,6 @@ const Products = () => {
         title: newProduct.title,
         category: categoryNames[selectedCategory],
         description: newProduct.description,
-        image: newProduct.image,
         priceList: newProduct.priceList,
         status: true,
       };
@@ -524,7 +448,6 @@ const Products = () => {
       title: "",
       category: "",
       description: "",
-      image: "",
       priceList: [],
     });
     setSelectedCategory("");
@@ -658,32 +581,8 @@ const Products = () => {
     </div>
   );
 
-  // Image preview portal
-  const ImagePreview = preview.src
-    ? ReactDOM.createPortal(
-        <div
-          style={{
-            position: "fixed",
-            left: preview.x + 20,
-            top: preview.y - 20,
-            zIndex: 9999,
-            pointerEvents: "none",
-          }}
-          className="bg-white border border-border rounded-lg shadow-lg p-2"
-        >
-          <img
-            src={preview.src}
-            alt="Preview"
-            className="w-48 h-48 object-contain rounded-lg"
-          />
-        </div>,
-        document.body
-      )
-    : null;
-
   return (
     <div className="space-y-8">
-      {ImagePreview}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -901,13 +800,12 @@ const Products = () => {
                             className="rounded border-border"
                           />
                         </TableHead>
-                        <TableHead className="font-pixel">Image</TableHead>
                         <TableHead 
                           className="font-pixel cursor-pointer hover:bg-muted/50 select-none"
                           onClick={() => handleSort("title")}
                         >
                           <div className="flex items-center gap-1">
-                            Title
+                            Product Name
                             {sortBy === "title" ? (
                               sortOrder === "asc" ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
                             ) : (
@@ -928,13 +826,19 @@ const Products = () => {
                             )}
                           </div>
                         </TableHead>
+                        <TableHead className="font-pixel">
+                          Description
+                        </TableHead>
+                        <TableHead className="font-pixel">
+                          Price Options
+                        </TableHead>
                         <TableHead 
                           className="font-pixel cursor-pointer hover:bg-muted/50 select-none"
-                          onClick={() => handleSort("price")}
+                          onClick={() => handleSort("$createdAt")}
                         >
                           <div className="flex items-center gap-1">
-                            Price
-                            {sortBy === "price" ? (
+                            Created
+                            {sortBy === "$createdAt" ? (
                               sortOrder === "asc" ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
                             ) : (
                               <ArrowUpDown className="w-4 h-4 opacity-50" />
@@ -950,7 +854,7 @@ const Products = () => {
                       {paginatedProducts.length === 0 ? (
                         <TableRow>
                           <TableCell
-                            colSpan={6}
+                            colSpan={7}
                             className="h-24 text-center text-muted-foreground font-pixel"
                           >
                             {isLoading
@@ -981,40 +885,43 @@ const Products = () => {
                                 className="rounded border-border"
                               />
                             </TableCell>
-                            <TableCell>
-                              <img
-                                src={prod.image}
-                                alt={prod.title}
-                                className="w-12 h-12 rounded-lg object-cover border border-border cursor-pointer transition-transform hover:scale-110"
-                                onMouseEnter={(e) =>
-                                  setPreview({
-                                    src: prod.image,
-                                    x: e.clientX,
-                                    y: e.clientY,
-                                  })
-                                }
-                                onMouseMove={(e) =>
-                                  setPreview((prev) => ({
-                                    ...prev,
-                                    x: e.clientX,
-                                    y: e.clientY,
-                                  }))
-                                }
-                                onMouseLeave={() =>
-                                  setPreview({ src: null, x: 0, y: 0 })
-                                }
-                              />
-                            </TableCell>
-                            <TableCell className="font-pixel font-medium text-primary">
-                              {prod.title}
+                            <TableCell className="font-pixel font-bold text-primary text-lg max-w-xs">
+                              <div className="truncate" title={prod.title}>
+                                {prod.title}
+                              </div>
                             </TableCell>
                             <TableCell className="text-muted-foreground">
-                              {prod.category}
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                                {prod.category}
+                              </span>
                             </TableCell>
-                            <TableCell className="font-semibold text-primary">
-                              {Array.isArray(prod.priceList) && prod.priceList.length > 0
-                                ? (typeof prod.priceList[0] === 'string' ? prod.priceList[0].split('|')[0] : prod.priceList[0]) + '৳'
-                                : (prod.price ? (typeof prod.price === 'string' ? prod.price.split('|')[0] : prod.price) + '৳' : '-')}
+                            <TableCell className="text-sm text-muted-foreground max-w-xs">
+                              <div className="truncate" title={prod.description || 'No description'}>
+                                {prod.description || 'No description available'}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {Array.isArray(prod.priceList) && prod.priceList.length > 0 ? (
+                                <div className="space-y-1">
+                                  <div className="font-semibold text-primary">
+                                    {prod.priceList.length} option{prod.priceList.length > 1 ? 's' : ''}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    From: {typeof prod.priceList[0] === 'string' 
+                                      ? prod.priceList[0].split('|')[1] || prod.priceList[0].split('|')[0] 
+                                      : prod.priceList[0]}৳
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">No prices set</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {prod.$createdAt ? new Date(prod.$createdAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              }) : 'Unknown'}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-1">
@@ -1459,51 +1366,6 @@ const Products = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="font-pixel text-sm font-medium mb-2 block">
-                    Image
-                  </label>
-                  <div className="space-y-2">
-                    <Input
-                      value={newProduct.image}
-                      onChange={(e) =>
-                        handleNewProductChange("image", e.target.value)
-                      }
-                      className="font-pixel border-2 border-border"
-                      placeholder="Paste image URL or upload below"
-                    />
-                    <div>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            handleImageUpload(file, false);
-                          }
-                        }}
-                        className="font-pixel text-xs border-2 border-border"
-                        disabled={isUploading}
-                      />
-                      {isUploading && (
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
-                          Uploading to Cloudinary...
-                        </div>
-                      )}
-                    </div>
-                    {newProduct.image && (
-                      <div className="mt-2">
-                        <img
-                          src={newProduct.image}
-                          alt="Preview"
-                          className="w-20 h-20 object-cover rounded border"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 {/* Price List Editor */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -1691,43 +1553,6 @@ const Products = () => {
                     }
                     className="font-pixel"
                   />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-pixel text-sm font-medium mb-2 block">
-                  Image URL
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    value={editProduct.image || ""}
-                    onChange={(e) => handleEditChange("image", e.target.value)}
-                    className="font-pixel flex-1"
-                    placeholder="Paste image URL or upload below"
-                  />
-                </div>
-                <div className="mt-2">
-                  <label className="font-pixel text-xs text-muted-foreground mb-1 block">
-                    Or upload image:
-                  </label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleImageUpload(file, true);
-                      }
-                    }}
-                    className="font-pixel text-xs"
-                    disabled={isUploading}
-                  />
-                  {isUploading && (
-                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
-                      Uploading to Cloudinary...
-                    </div>
-                  )}
                 </div>
               </div>
 

@@ -102,11 +102,11 @@ const Header = () => {
         location.pathname.startsWith(p)
       ),
       dropdown: [
-        { name: "Mobile Legends", path: "/mobile-games/mobile-legends" },
         { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
         { name: "Free Fire", path: "/mobile-games/free-fire" },
-        { name: "Roblox", path: "/mobile-games/roblox" },
-        { name: "More", path: "/top-up-games" },
+        { name: "Valorant", path: "/pc-games/valorant" },
+        { name: "Apex Legends", path: "/pc-games/apex-legends" },
+        { name: "More", path: "/all-games" },
       ],
     },
     {
@@ -118,7 +118,7 @@ const Header = () => {
         { name: "CapCut Pro", path: "/design-tools/capcut" },
         { name: "Tinder+", path: "/design-tools/tinder" },
         { name: "Discord Nitro", path: "/design-tools/discord-nitro" },
-        { name: "More", path: "/design-tools" },
+        { name: "More", path: "/productivity" },
       ],
     },
     {

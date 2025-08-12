@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
@@ -53,7 +53,7 @@ export default function CanvaProSubscription() {
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const canvaProProduct = subscriptions.find(p => p.title === "Canva Pro");
+  const canvaProProduct = productivity.find(p => p.title === "Canva Pro");
   const infoImage = canvaProProduct?.image;
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function CanvaProSubscription() {
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "canva pro").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "canva pro").slice(0, 4)
         );
       } catch (err) {
         setCanvaPro(null);

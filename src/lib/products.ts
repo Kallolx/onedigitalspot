@@ -496,7 +496,7 @@ export const subscriptions: Product[] = [
  
 ];
 
-export const ProductivityCards: Product[] = [
+export const productivity: Product[] = [
    {
     title: "Canva Pro",
     image: "/products/others/canva.avif",
@@ -508,7 +508,7 @@ export const ProductivityCards: Product[] = [
     popular: true,
   },
   {
-    title: "Duolingo",
+    title: "Duolingo Plus",
     image: "/products/others/duolingo.avif",
     price: "899",
     rating: 5,
@@ -556,7 +556,7 @@ export const ProductivityCards: Product[] = [
     route: "/subscriptions/google-one",
   },
   {
-    title: "CapCut Pro",
+    title: "Capcut Pro",
     image: "/products/others/capcut.avif",
     price: "799",
     rating: 5,

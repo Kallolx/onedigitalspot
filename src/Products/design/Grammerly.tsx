@@ -1,21 +1,20 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
-    title: "About Photoshop Subscription",
+    title: "About Grammarly Subscription",
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Unlock the full power of Adobe Photoshop with subscription plans.
-          Edit photos professionally with industry-leading tools.
+          Improve your writing with Grammarly Premium. Get advanced grammar, style, and plagiarism checks.
         </p>
         <ul className="list-disc pl-5">
-          <li><b>Advanced Photo Editing:</b> Layers, masks, retouching.</li>
-          <li><b>Creative Cloud:</b> Sync files and access assets.</li>
-          <li><b>Latest Updates:</b> Get all feature updates automatically.</li>
+          <li><b>Grammar & Spelling:</b> Catch complex mistakes and errors.</li>
+          <li><b>Style & Clarity:</b> Suggestions to improve tone and clarity.</li>
+          <li><b>Plagiarism Checker:</b> Ensure your writing is original.</li>
         </ul>
       </div>
     ),
@@ -24,24 +23,24 @@ const infoSections = [
     title: "How to Use",
     content: (
       <ol className="list-decimal pl-5 text-base mb-4">
-        <li>Select your Photoshop plan.</li>
-        <li>Login with your Adobe account.</li>
-        <li>Complete payment securely.</li>
-        <li>Download and use Photoshop on your device.</li>
+        <li>Choose your Grammarly Premium plan.</li>
+        <li>Login with your Grammarly account.</li>
+        <li>Complete the payment securely.</li>
+        <li>Start improving your writing instantly.</li>
       </ol>
     ),
   },
 ];
 
-export default function PhotoshopSubscription() {
+export default function GrammarlySubscription() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [photoshop, setPhotoshop] = useState(null);
+  const [grammarly, setGrammarly] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const photoshopProduct = subscriptions.find(p => p.title === "Photoshop");
-  const infoImage = photoshopProduct?.image;
+  const grammarlyProduct = productivity.find(p => p.title === "Grammarly");
+  const infoImage = grammarlyProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -50,30 +49,30 @@ export default function PhotoshopSubscription() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        const photoshopProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "photoshop"
+        const grammarlyProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "grammarly"
         );
-        setPhotoshop(photoshopProduct);
+        setGrammarly(grammarlyProduct);
 
-        if (photoshopProduct && Array.isArray(photoshopProduct.priceList)) {
-          const items = photoshopProduct.priceList.map((item) => {
+        if (grammarlyProduct && Array.isArray(grammarlyProduct.priceList)) {
+          const items = grammarlyProduct.priceList.map((item) => {
             const [label, price, hot] = item.split("|");
             return { label, price: Number(price), hot: hot === "true" };
           });
           setPriceList([
             {
-              title: "Photoshop Subscription",
-              categoryIcon: "/assets/icons/photoshop.svg",
+              title: "Grammarly Premium Subscription",
+              categoryIcon: "/assets/icons/grammarly.svg",
               items,
             },
           ]);
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "photoshop").slice(0, 4)
+         productivity.filter((g) => g.title.toLowerCase() !== "grammarly").slice(0, 4)
         );
       } catch {
-        setPhotoshop(null);
+        setGrammarly(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -95,8 +94,8 @@ export default function PhotoshopSubscription() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="Photoshop"
-      image={photoshopProduct?.image}
+      title="Grammarly"
+      image={grammarlyProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

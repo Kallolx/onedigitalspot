@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
-    title: "About Google One Subscription",
+    title: "About Photoshop Subscription",
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Get expanded cloud storage across Google Drive, Gmail, and Photos with Google One.
-          Enjoy extra benefits including family sharing and expert support.
+          Unlock the full power of Adobe Photoshop with subscription plans.
+          Edit photos professionally with industry-leading tools.
         </p>
         <ul className="list-disc pl-5">
-          <li><b>Expanded Storage:</b> Choose plans from 100GB to 2TB or more.</li>
-          <li><b>Family Sharing:</b> Share your plan with up to 5 family members.</li>
-          <li><b>Extra Benefits:</b> Access Google experts and get special offers.</li>
+          <li><b>Advanced Photo Editing:</b> Layers, masks, retouching.</li>
+          <li><b>Creative Cloud:</b> Sync files and access assets.</li>
+          <li><b>Latest Updates:</b> Get all feature updates automatically.</li>
         </ul>
       </div>
     ),
@@ -24,24 +24,24 @@ const infoSections = [
     title: "How to Use",
     content: (
       <ol className="list-decimal pl-5 text-base mb-4">
-        <li>Select your Google One plan.</li>
-        <li>Login with your Google account.</li>
+        <li>Select your Photoshop plan.</li>
+        <li>Login with your Adobe account.</li>
         <li>Complete payment securely.</li>
-        <li>Access your expanded storage and benefits immediately.</li>
+        <li>Download and use Photoshop on your device.</li>
       </ol>
     ),
   },
 ];
 
-export default function GoogleOneSubscription() {
+export default function PhotoshopSubscription() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [googleOne, setGoogleOne] = useState(null);
+  const [photoshop, setPhotoshop] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const googleOneProduct = subscriptions.find(p => p.title === "Google One");
-  const infoImage = googleOneProduct?.image;
+  const photoshopProduct = productivity.find(p => p.title === "Photoshop");
+  const infoImage = photoshopProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -50,30 +50,30 @@ export default function GoogleOneSubscription() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        const googleProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "google one"
+        const photoshopProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "photoshop"
         );
-        setGoogleOne(googleProduct);
+        setPhotoshop(photoshopProduct);
 
-        if (googleProduct && Array.isArray(googleProduct.priceList)) {
-          const items = googleProduct.priceList.map((item) => {
+        if (photoshopProduct && Array.isArray(photoshopProduct.priceList)) {
+          const items = photoshopProduct.priceList.map((item) => {
             const [label, price, hot] = item.split("|");
             return { label, price: Number(price), hot: hot === "true" };
           });
           setPriceList([
             {
-              title: "Google One Subscription",
-              categoryIcon: "/assets/icons/googleone.svg",
+              title: "Photoshop Subscription",
+              categoryIcon: "/assets/icons/photoshop.svg",
               items,
             },
           ]);
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "google one").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "photoshop").slice(0, 4)
         );
       } catch {
-        setGoogleOne(null);
+        setPhotoshop(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -95,8 +95,8 @@ export default function GoogleOneSubscription() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="Google One"
-      image={googleOneProduct?.image}
+      title="Photoshop"
+      image={photoshopProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

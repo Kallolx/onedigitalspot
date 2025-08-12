@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
-    title: "About Office 365 Subscription",
+    title: "About LinkedIn Premium Subscription",
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Access Microsoft Office apps and cloud services with Office 365.
-          Includes Word, Excel, PowerPoint, Outlook, and OneDrive storage.
+          Boost your professional profile with LinkedIn Premium.
+          Get insights, InMail messages, and access to exclusive learning content.
         </p>
         <ul className="list-disc pl-5">
-          <li><b>Office Apps:</b> Word, Excel, PowerPoint, Outlook, and more.</li>
-          <li><b>Cloud Storage:</b> OneDrive with 1TB storage.</li>
-          <li><b>Multi-device Use:</b> Install on PC, Mac, tablets, and phones.</li>
+          <li><b>InMail Messages:</b> Contact recruiters and prospects directly.</li>
+          <li><b>Profile Insights:</b> See who viewed your profile.</li>
+          <li><b>Learning Courses:</b> Access LinkedIn Learning content.</li>
         </ul>
       </div>
     ),
@@ -24,24 +24,24 @@ const infoSections = [
     title: "How to Use",
     content: (
       <ol className="list-decimal pl-5 text-base mb-4">
-        <li>Choose your Office 365 plan.</li>
-        <li>Login with your Microsoft account.</li>
+        <li>Select your LinkedIn Premium plan.</li>
+        <li>Login with your LinkedIn account.</li>
         <li>Complete payment securely.</li>
-        <li>Start using Microsoft Office apps and services.</li>
+        <li>Start growing your professional network.</li>
       </ol>
     ),
   },
 ];
 
-export default function Office365Subscription() {
+export default function LinkedInSubscription() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [office365, setOffice365] = useState(null);
+  const [linkedin, setLinkedin] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const office365Product = subscriptions.find(p => p.title === "Office 365");
-  const infoImage = office365Product?.image;
+  const linkedinProduct = productivity.find(p => p.title === "LinkedIn Premium");
+  const infoImage = linkedinProduct?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -50,30 +50,30 @@ export default function Office365Subscription() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        const officeProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "office 365"
+        const linkedinProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "linkedin premium"
         );
-        setOffice365(officeProduct);
+        setLinkedin(linkedinProduct);
 
-        if (officeProduct && Array.isArray(officeProduct.priceList)) {
-          const items = officeProduct.priceList.map((item) => {
+        if (linkedinProduct && Array.isArray(linkedinProduct.priceList)) {
+          const items = linkedinProduct.priceList.map((item) => {
             const [label, price, hot] = item.split("|");
             return { label, price: Number(price), hot: hot === "true" };
           });
           setPriceList([
             {
-              title: "Office 365 Subscription",
-              categoryIcon: "/assets/icons/office365.svg",
+              title: "LinkedIn Premium Subscription",
+              categoryIcon: "/assets/icons/linkedin.svg",
               items,
             },
           ]);
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "office 365").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "linkedin").slice(0, 4)
         );
       } catch {
-        setOffice365(null);
+        setLinkedin(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -95,8 +95,8 @@ export default function Office365Subscription() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="Office 365"
-      image={office365Product?.image || ""}
+      title="LinkedIn Premium"
+      image={linkedinProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

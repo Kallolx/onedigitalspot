@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
@@ -40,7 +40,7 @@ export default function ZoomProSubscription() {
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const zoomProProduct = subscriptions.find(p => p.title === "Zoom Pro");
+  const zoomProProduct = productivity.find(p => p.title === "Zoom Pro");
   const infoImage = zoomProProduct?.image;
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function ZoomProSubscription() {
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "zoom pro").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "zoom pro").slice(0, 4)
         );
       } catch {
         setZoomPro(null);

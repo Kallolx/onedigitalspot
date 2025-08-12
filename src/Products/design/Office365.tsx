@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
-    title: "About Capcut Pro Subscription",
+    title: "About Office 365 Subscription",
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Unlock advanced video editing features and premium effects with Capcut Pro.
-          Create stunning videos with no watermarks and export in HD quality.
+          Access Microsoft Office apps and cloud services with Office 365.
+          Includes Word, Excel, PowerPoint, Outlook, and OneDrive storage.
         </p>
         <ul className="list-disc pl-5">
-          <li><b>Premium Effects & Filters:</b> Access exclusive editing tools.</li>
-          <li><b>No Watermarks:</b> Export videos without branding.</li>
-          <li><b>High Quality Export:</b> Export videos in Full HD or higher.</li>
+          <li><b>Office Apps:</b> Word, Excel, PowerPoint, Outlook, and more.</li>
+          <li><b>Cloud Storage:</b> OneDrive with 1TB storage.</li>
+          <li><b>Multi-device Use:</b> Install on PC, Mac, tablets, and phones.</li>
         </ul>
       </div>
     ),
@@ -24,24 +24,24 @@ const infoSections = [
     title: "How to Use",
     content: (
       <ol className="list-decimal pl-5 text-base mb-4">
-        <li>Choose your Capcut Pro subscription plan.</li>
-        <li>Log in with your Capcut account details.</li>
+        <li>Choose your Office 365 plan.</li>
+        <li>Login with your Microsoft account.</li>
         <li>Complete payment securely.</li>
-        <li>Enjoy full access to premium video editing features.</li>
+        <li>Start using Microsoft Office apps and services.</li>
       </ol>
     ),
   },
 ];
 
-export default function CapcutProSubscription() {
+export default function Office365Subscription() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [capcut, setCapcut] = useState(null);
+  const [office365, setOffice365] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const capcutProduct = subscriptions.find(p => p.title === "Capcut Pro");
-  const infoImage = capcutProduct?.image;
+  const office365Product = productivity.find(p => p.title === "Office 365");
+  const infoImage = office365Product?.image;
 
   useEffect(() => {
     async function fetchSubscriptions() {
@@ -50,30 +50,30 @@ export default function CapcutProSubscription() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        const capcutProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "capcut pro"
+        const officeProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "office 365"
         );
-        setCapcut(capcutProduct);
+        setOffice365(officeProduct);
 
-        if (capcutProduct && Array.isArray(capcutProduct.priceList)) {
-          const items = capcutProduct.priceList.map((item) => {
+        if (officeProduct && Array.isArray(officeProduct.priceList)) {
+          const items = officeProduct.priceList.map((item) => {
             const [label, price, hot] = item.split("|");
             return { label, price: Number(price), hot: hot === "true" };
           });
           setPriceList([
             {
-              title: "Capcut Pro Subscription",
-              categoryIcon: "/assets/icons/capcut.svg",
+              title: "Office 365 Subscription",
+              categoryIcon: "/assets/icons/office365.svg",
               items,
             },
           ]);
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "capcut pro").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "office 365").slice(0, 4)
         );
       } catch {
-        setCapcut(null);
+        setOffice365(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -95,8 +95,8 @@ export default function CapcutProSubscription() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="Capcut Pro"
-      image={capcutProduct?.image}
+      title="Office 365"
+      image={office365Product?.image || ""}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

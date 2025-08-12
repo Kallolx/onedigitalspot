@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
-import { subscriptions } from "@/lib/products";
+import { productivity } from "@/lib/products";
 
 const infoSections = [
   {
@@ -54,7 +54,7 @@ export default function DuolingoSubscription() {
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const duolingoProduct = subscriptions.find(p => p.title === "Duolingo Plus");
+  const duolingoProduct = productivity.find(p => p.title === "Duolingo Plus");
   const infoImage = duolingoProduct?.image;
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function DuolingoSubscription() {
         }
 
         setSimilar(
-          subscriptions.filter((g) => g.title.toLowerCase() !== "duolingo plus").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "duolingo plus").slice(0, 4)
         );
       } catch (err) {
         setDuolingo(null);

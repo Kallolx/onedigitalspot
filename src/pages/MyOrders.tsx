@@ -6,6 +6,7 @@ import { Card } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
 import { getUserOrders, getCurrentUser, OrderData } from "../lib/orders";
+import { mobileGames, pcGames, giftCards, aiTools, subscriptions, productivity } from "../lib/products";
 import ReceiptGenerator from "../components/ReceiptGenerator";
 import { 
   ClockIcon, 
@@ -22,6 +23,27 @@ import {
   PhoneIcon,
 } from "lucide-react";
 import { RotateLoader } from "react-spinners";
+
+// Utility function to get local image path from product name
+const getProductImage = (productName: string): string => {
+  // Combine all products from all categories
+  const allProducts = [
+    ...mobileGames,
+    ...pcGames,
+    ...giftCards,
+    ...aiTools,
+    ...subscriptions,
+    ...productivity
+  ];
+
+  // Find the product by name (case-insensitive)
+  const product = allProducts.find(p => 
+    p.title.toLowerCase() === productName.toLowerCase()
+  );
+
+  // Return the local image path or fallback to placeholder
+  return product?.image || "/assets/placeholder.svg";
+};
 
 // Timer component for pending orders
 const DeliveryTimer = ({ createdAt, status }: { createdAt: string; status: string }) => {
@@ -456,7 +478,7 @@ const MyOrders = () => {
                             <div className="flex items-center space-x-4">
                               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                 <img
-                                  src={order.productImage}
+                                  src={getProductImage(order.productName)}
                                   alt={order.productName}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
@@ -561,7 +583,7 @@ const MyOrders = () => {
                         <div className="flex items-center space-x-3">
                           <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                             <img
-                              src={order.productImage}
+                              src={getProductImage(order.productName)}
                               alt={order.productName}
                               className="w-full h-full object-cover"
                               onError={(e) => {
@@ -700,7 +722,7 @@ const MyOrders = () => {
                 <div className="flex flex-row items-center w-full gap-3">
                   <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                     <img
-                      src={selectedOrder.productImage}
+                      src={getProductImage(selectedOrder.productName)}
                       alt={selectedOrder.productName}
                       className="w-full h-full object-cover"
                       onError={(e) => {

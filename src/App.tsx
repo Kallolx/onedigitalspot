@@ -51,23 +51,24 @@ import Windsurf from "./Products/ai-tools/Windsurf";
 import AppleMusic from "./Products/subscriptions/AppleMusic";
 import AmazonPrime from "./Products/subscriptions/AmazonPrime";
 import AppleTV from "./Products/subscriptions/AppleTV";
-import CanvaPro from "./Products/subscriptions/CanvaPro";
+import CanvaPro from "./Products/design/CanvaPro";
 import DisneyPlus from "./Products/subscriptions/DisneyPlus";
-import Duolingo from "./Products/subscriptions/Duolingo";
+import Duolingo from "./Products/design/Duolingo";
 import Zee5 from "./Products/subscriptions/Zee5";
 import Ullu from "./Products/subscriptions/Ullu";
 import SonyLiv from "./Products/subscriptions/SonyLiv";
-import CapCut from "./Products/subscriptions/CapCut";
-import GoogleOne from "./Products/subscriptions/GoogleOne";
-import Grammarly from "./Products/subscriptions/Grammerly";
+import CapCut from "./Products/design/CapCut";
+import GoogleOne from "./Products/design/GoogleOne";
+import Grammarly from "./Products/design/Grammerly";
 import Hulu from "./Products/subscriptions/Hulu";
-import LinkedIn from "./Products/subscriptions/LinkedIn";
-import Office365 from "./Products/subscriptions/Office365";
-import Photoshop from "./Products/subscriptions/Photoshop";
+import LinkedIn from "./Products/design/LinkedIn";
+import Office365 from "./Products/design/Office365";
+import Photoshop from "./Products/design/Photoshop";
 import Shopify from "./Products/subscriptions/Shopify";
 import YoutubePremium from "./Products/subscriptions/YoutubePremium";
-import ZoomPro from "./Products/subscriptions/ZoomPro";
+import ZoomPro from "./Products/design/ZoomPro";
 import Productivity from "./pages/Productivity";
+import AllGames from "./pages/AllGames";
 
 const queryClient = new QueryClient();
 
@@ -94,6 +95,9 @@ const App = () => {
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/ai-tools" element={<AiTools />} />
             <Route path="/productivity" element={<Productivity />} />
+            <Route path="/all-games" element={<AllGames />} />
+
+            {/* Game Categories */}
 
             {/* Game Details */}
 
