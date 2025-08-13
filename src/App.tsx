@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import ChatBubble from "./components/ChatBubble";
 import NotFound from "./pages/NotFound";
 import MobileGames from "./pages/MobileGames";
 import PCGames from "./pages/PcGames";
@@ -34,7 +33,6 @@ import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
 import Products from "./admin/Products";
-import Stock from "./admin/Stock";
 import Users from "./admin/Users";
 import Subscriptions from "./pages/Subscriptions";
 
@@ -69,6 +67,7 @@ import YoutubePremium from "./Products/subscriptions/YoutubePremium";
 import ZoomPro from "./Products/design/ZoomPro";
 import Productivity from "./pages/Productivity";
 import AllGames from "./pages/AllGames";
+import TawkToWidget from "./components/TawkToWidget";
 
 const queryClient = new QueryClient();
 
@@ -176,7 +175,6 @@ const App = () => {
                 <Route index element={<Dashboard />} />
                 <Route path="orders" element={<Orders />} />
                 <Route path="products" element={<Products />} />
-                <Route path="stock" element={<Stock />} />
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
@@ -185,7 +183,7 @@ const App = () => {
             {/* 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <ChatBubble />
+          <TawkToWidget />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

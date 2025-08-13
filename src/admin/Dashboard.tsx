@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, Users, ShoppingCart, Package, DollarSign, Eye, Settings, Plus, Bell, Search, Filter, Calendar, Download } from 'lucide-react';
 
 const Dashboard = () => {
