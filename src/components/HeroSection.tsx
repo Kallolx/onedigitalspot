@@ -34,15 +34,7 @@ const avatars = [
   {
     imageUrl: "https://avatars.githubusercontent.com/u/59228569",
     profileUrl: "https://github.com/safethecode",
-  },
-  {
-    imageUrl: "https://avatars.githubusercontent.com/u/59442788",
-    profileUrl: "https://github.com/sanjay-mali",
-  },
-  {
-    imageUrl: "https://avatars.githubusercontent.com/u/89768406",
-    profileUrl: "https://github.com/itsarghyadas",
-  },
+  }
 ];
 
 const heroSlides = [
@@ -80,9 +72,8 @@ const HeroSection = () => {
         <div className="flex flex-col md:flex-row gap-8 items-stretch">
           {/* Aspect ratio wrapper for both columns */}
           <div className="w-full flex aspect-[2/1] max-h-[400px]">
-            {/* Left: Info section, hidden <1250px */}
-            <div className="hide-1250 mt-4 hidden md:flex w-2/5 h-full items-center justify-center">
-              <div className="w-full h-full rounded-xl flex flex-col justify-center items-start px-6">
+            <div className="hide-1250 hidden md:flex p-2 w-2/5 h-full">
+              <div className="w-full h-full rounded-xl flex flex-col -ml-8 justify-center items-start px-8">
                 <h1 className="flex gap-2 text-5xl font-semibold tracking-tighter text-black mb-2 text-left">
                   <img
                     src="/assets/only-icon.svg"
@@ -119,16 +110,16 @@ const HeroSection = () => {
                   <Input
                     type="text"
                     placeholder="Search any products..."
-                    className="flex-1 h-12 rounded-full bg-muted border border-gray-300 pl-4"
+                    className="flex-1 h-12 rounded-full border border-secondary/40 pl-4"
                   />
-                  <button className="absolute right-1 top-1 bg-primary text-white p-2 font-semibold rounded-full transition active:scale-90 focus:outline-none">
+                  <button className="absolute right-1 top-1  text-white p-2 font-semibold rounded-full transition active:scale-90 focus:outline-none">
                     <SearchIcon className="w-6 h-6" />
                   </button>
                 </div>
               </div>
             </div>
             {/* Right: Carousel section */}
-            <div className="w-full md:w-3/5 h-full flex items-center grow-1250 pt-8">
+            <div className="w-full md:w-3/5 h-full flex items-center grow-1250 pt-0 md:pt-8">
               <div className="w-full h-full">
                 <Carousel
                   setApi={setApi}

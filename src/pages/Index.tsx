@@ -9,15 +9,11 @@ const Index = () => {
       <Header />      
       <main className="flex-1 w-full">
         <section className="w-full">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-7xl mx-auto px-0 md:px-8">
             <HeroSection />
-          </div>
-        </section>        
-        <section>
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <GameCategories />
           </div>
-        </section>
+        </section>        
       </main>
 
     </div>
