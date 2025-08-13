@@ -62,7 +62,7 @@ export default function GrammarlySubscription() {
           setPriceList([
             {
               title: "Grammarly Premium Subscription",
-              categoryIcon: "/assets/icons/grammarly.svg",
+              categoryIcon: "/assets/icons/design/grammarly.svg",
               items,
             },
           ]);

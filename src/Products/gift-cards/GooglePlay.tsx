@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Google Play Gift Cards (USD)": "/assets/icons/google-play-card.svg",
+  "Google Play Gift Cards (USD)": "/assets/icons/gift-cards/google-play.svg",
 };
 
 const infoSections = [
@@ -35,8 +35,11 @@ export default function GooglePlayGiftCard() {
   const [gpgc, setGpgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+  // Use image from subscriptions array
+  const googlePlayGiftCardProduct = giftCards.find(p => p.title === "Google-Play Gift Card");
+  const infoImage = googlePlayGiftCardProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -97,7 +100,7 @@ export default function GooglePlayGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Google Play"
-      image={gpgc?.image || ""}
+      image={googlePlayGiftCardProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Discord Nitro": "/assets/icons/discord.svg",
+  "Discord Nitro": "/assets/icons/gift-cards/discord.svg",
 };
 
 const infoSections = [
@@ -49,8 +49,11 @@ export default function DiscordNitro() {
   const [discord, setDiscord] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+  // Use image from subscriptions array
+  const discordNitroProduct = giftCards.find(p => p.title === "Discord Nitro");
+  const infoImage = discordNitroProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -111,7 +114,7 @@ export default function DiscordNitro() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Discord Nitro"
-      image={discord?.image || ""}
+      image={discordNitroProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

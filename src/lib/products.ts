@@ -229,7 +229,7 @@ export const giftCards: Product[] = [
     route: "/gift-cards/gamestop",
   },
   {
-    title: "Discord Nitro Code",
+    title: "Discord Nitro",
     image: "/products/gift-cards/discord-nitro.avif",
     price: "1200",
     rating: 5,

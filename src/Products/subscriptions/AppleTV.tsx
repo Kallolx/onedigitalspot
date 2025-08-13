@@ -82,7 +82,7 @@ export default function AppleTVSubscription() {
           setPriceList([
             {
               title: "Apple TV+ Subscription",
-              categoryIcon: "/assets/icons/apple.svg",
+              categoryIcon: "/assets/icons/subscriptions/apple.svg",
               items,
             },
           ]);

@@ -118,6 +118,19 @@ const GameDetailsLayout: React.FC<
     setTimeout(() => setCopiedText(""), 2000);
   };
 
+  // Utility to convert English digits to Bangla digits
+  const toBanglaNumber = (num: string | number) => {
+    const en = "0123456789";
+    const bn = "০১২৩৪৫৬৭৮৯";
+    // Format with commas (Indian system)
+    const formatted = Number(num).toLocaleString("en-IN");
+    // Convert to Bangla digits
+    return formatted
+      .split("")
+      .map((c) => (en.includes(c) ? bn[en.indexOf(c)] : c))
+      .join("");
+  };
+
   // Handle order creation
   const handleCompletePayment = async () => {
     if (
@@ -239,8 +252,8 @@ const GameDetailsLayout: React.FC<
       qr: "/assets/qr/bkash.png",
       instructions: [
         'Open up the bKash app & Choose "Send Money" Its a Personal Account',
-        'Enter the bKash Account Number: <span class="font-bold text-primary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold text-primary\">${totalAmount}৳</span>`,
+        'Enter the bKash Account Number: <span class="font-bold text-foreground">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold text-foreground\">${totalAmount}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a bKash Transaction ID (TRX ID)",
       ],
@@ -254,8 +267,8 @@ const GameDetailsLayout: React.FC<
       type: "Send Money",
       instructions: [
         'Open up the Nagad app & Choose "Send Money"',
-        'Enter the Nagad Account Number: <span class="font-bold text-primary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold text-primary\">${totalAmount}৳</span>`,
+        'Enter the Nagad Account Number: <span class="font-bold text-foreground">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold text-foreground\">${totalAmount}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Nagad Transaction ID",
       ],
@@ -269,8 +282,8 @@ const GameDetailsLayout: React.FC<
       type: "Send Money",
       instructions: [
         'Open up the Rocket app & Choose "Send Money"',
-        'Enter the Rocket Account Number:  <span class="font-bold text-primary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold text-primary\">${totalAmount}৳</span>`,
+        'Enter the Rocket Account Number:  <span class="font-bold text-foreground">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold text-foreground\">${totalAmount}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Rocket Transaction ID",
       ],
@@ -381,13 +394,13 @@ const GameDetailsLayout: React.FC<
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tighter text-center mb-6 font-pixel text-primary">
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tighter text-center mb-6 font-pixel text-foreground">
           Purchase {title}
         </h1>
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Game Image Section - Compact */}
           <div className="lg:col-span-4">
-            <div className="bg-white rounded-2xl shadow-card p-4 sticky top-8">
+            <div className="bg-muted rounded-2xl shadow-card p-4 sticky top-8">
               <div className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto">
                 {/* Loader while loading or error */}
                 {(!imgLoaded || imgError) && (
@@ -410,7 +423,7 @@ const GameDetailsLayout: React.FC<
                   draggable={false}
                 />
               </div>
-              <h2 className="font-pixel text-xl tracking-tighter text-primary font-semibold text-center">
+              <h2 className="font-pixel text-xl tracking-tighter text-foreground font-semibold text-center">
                 {title}
               </h2>
               {/* Review text under title */}
@@ -428,10 +441,11 @@ const GameDetailsLayout: React.FC<
                     </svg>
                   ))}
                   <span
-                    className="text-md text-gray-700 font-semibold font-sans cursor-pointer transition border-b-2 hover:text-primary px-1"
+                    className="text-md text-gray-700 font-semibold font-sans cursor-pointer transition border-b-2 hover:text-foreground px-1"
                     title="See all reviews"
                   >
-                    Reviews <span className="text-primary font-bold">(123)</span>
+                    Reviews{" "}
+                    <span className="text-foreground font-bold">(123)</span>
                   </span>
                 </div>
               </div>
@@ -443,7 +457,7 @@ const GameDetailsLayout: React.FC<
               <div className="flex flex-col gap-6">
                 {priceList.map((category, catIdx) => (
                   <div key={catIdx}>
-                    <h3 className="font-pixel text-base text-primary mb-2 pl-1 opacity-80">
+                    <h3 className="font-pixel text-base text-foreground mb-2 pl-1 opacity-80">
                       {category.title}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -486,13 +500,13 @@ const GameDetailsLayout: React.FC<
                             )}
                           </span>
                           <span
-                            className={`font-bold transition-colors duration-150 ${
+                            className={`font-bold font-anekbangla transition-colors duration-150 ${
                               isItemSelected(catIdx, itemIdx)
-                                ? "text-white"
-                                : "text-primary"
+                                ? "text-foreground"
+                                : "text-secondary"
                             } group-hover:text-white`}
                           >
-                            {item.price}৳
+                            ৳{toBanglaNumber(item.price)}
                           </span>
                         </Button>
                       ))}
@@ -512,7 +526,7 @@ const GameDetailsLayout: React.FC<
                       typeof setPlayerId !== "undefined" && (
                         <div className="flex-1">
                           <label
-                            className="block font-pixel text-base text-primary mb-1"
+                            className="block font-pixel text-base text-foreground mb-1"
                             htmlFor="playerId"
                           >
                             Player ID <span className="text-red-500">*</span>
@@ -530,7 +544,7 @@ const GameDetailsLayout: React.FC<
                             />
                             <button
                               type="button"
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-blue-600 focus:outline-none"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground hover:text-blue-600 focus:outline-none"
                               tabIndex={-1}
                               aria-label="Where to find Player ID"
                               onClick={() => setShowInfo("player")}
@@ -546,7 +560,7 @@ const GameDetailsLayout: React.FC<
                       typeof setUuid !== "undefined" && (
                         <div className="flex-1">
                           <label
-                            className="block font-pixel text-base text-primary mb-1"
+                            className="block font-pixel text-base text-foreground mb-1"
                             htmlFor="uuid"
                           >
                             UUID <span className="text-red-500">*</span>
@@ -564,7 +578,7 @@ const GameDetailsLayout: React.FC<
                             />
                             <button
                               type="button"
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-blue-600 focus:outline-none"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground hover:text-blue-600 focus:outline-none"
                               tabIndex={-1}
                               aria-label="Where to find UUID"
                               onClick={() => setShowInfo("uuid")}
@@ -580,7 +594,7 @@ const GameDetailsLayout: React.FC<
                       typeof setZoneId !== "undefined" && (
                         <div className="flex-1">
                           <label
-                            className="block font-pixel text-base text-primary mb-1"
+                            className="block font-pixel text-base text-foreground mb-1"
                             htmlFor="zoneId"
                           >
                             Zone ID <span className="text-red-500">*</span>
@@ -598,7 +612,7 @@ const GameDetailsLayout: React.FC<
                             />
                             <button
                               type="button"
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-blue-600 focus:outline-none"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground hover:text-blue-600 focus:outline-none"
                               tabIndex={-1}
                               aria-label="Where to find Zone ID"
                               onClick={() => setShowInfo("zone")}
@@ -616,13 +630,13 @@ const GameDetailsLayout: React.FC<
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                     <div className="bg-white rounded-xl shadow-lg p-6 max-w-xs w-full relative">
                       <button
-                        className="absolute top-2 right-2 text-gray-500 hover:text-primary"
+                        className="absolute top-2 right-2 text-gray-500 hover:text-foreground"
                         onClick={() => setShowInfo(null)}
                         aria-label="Close"
                       >
                         <X className="w-6 h-6" />
                       </button>
-                      <h3 className="font-pixel text-lg text-primary mb-2 text-center">
+                      <h3 className="font-pixel text-lg text-foreground mb-2 text-center">
                         Where to find{" "}
                         {showInfo === "player" ? "Player ID" : "Zone ID"}?
                       </h3>
@@ -640,7 +654,7 @@ const GameDetailsLayout: React.FC<
                 {/* Multiple Items Display - replaces old quantity selector */}
                 {selectedItems.length > 0 && (
                   <div className="mb-4">
-                    <span className="font-pixel text-xl text-primary font-semibold">
+                    <span className="font-pixel text-xl text-foreground font-semibold">
                       Order Summary
                     </span>
                     <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -691,7 +705,7 @@ const GameDetailsLayout: React.FC<
                               >
                                 +
                               </button>
-                              <span className="ml-1 font-semibold text-primary text-sm">
+                              <span className="ml-1 font-semibold text-foreground text-sm">
                                 {typeof item.price === "number"
                                   ? item.price * selectedItem.quantity
                                   : item.price}
@@ -710,10 +724,10 @@ const GameDetailsLayout: React.FC<
                   <div className="rounded-xl border border-primary/30 px-4 py-3 mb-3 shadow-sm">
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-between items-center">
-                        <span className="font-pixel text-lg text-primary font-bold">
+                        <span className="font-pixel text-lg text-foreground font-bold">
                           Total
                         </span>
-                        <span className="font-pixel text-2xl text-primary font-bold">
+                        <span className="font-pixel text-2xl text-foreground font-bold">
                           {totalAmount}
                           <span className="text-lg font-normal ml-1">৳</span>
                         </span>
@@ -772,7 +786,7 @@ const GameDetailsLayout: React.FC<
               <div className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden mb-8">
                 {/* Header */}
                 <div className="p-4">
-                  <h3 className="font-pixel text-xl text-primary tracking-tighter mt-2">
+                  <h3 className="font-pixel text-xl text-foreground tracking-tighter mt-2">
                     Choose Payment Method
                   </h3>
                 </div>
@@ -815,7 +829,7 @@ const GameDetailsLayout: React.FC<
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                               {/* Instructions */}
                               <div className="space-y-4">
-                                <h5 className="font-pixel text-base text-primary mb-4">
+                                <h5 className="font-pixel text-base text-foreground mb-4">
                                   {method.name} Payment Instructions
                                 </h5>
 
@@ -841,7 +855,7 @@ const GameDetailsLayout: React.FC<
 
                                 {/* Form */}
                                 <div className="space-y-4">
-                                  <h6 className="font-pixel text-sm text-primary">
+                                  <h6 className="font-pixel text-sm text-foreground">
                                     Transaction Details
                                   </h6>
 
@@ -893,7 +907,7 @@ const GameDetailsLayout: React.FC<
                               <div className="">
                                 {/* Account Details */}
                                 <div className="bg-white rounded-xl p-4 border border-gray-200 mb-8">
-                                  <h6 className="font-pixel text-sm text-primary mb-3">
+                                  <h6 className="font-pixel text-sm text-foreground mb-3">
                                     Account Details
                                   </h6>
                                   <div className="space-y-2">
@@ -1009,7 +1023,7 @@ const GameDetailsLayout: React.FC<
             {/* Info Section */}
             {infoSections.map((section, i) => (
               <Card key={i} className="mb-8 p-4">
-                <h2 className="font-semibold text-lg mb-2 font-pixel text-primary">
+                <h2 className="font-semibold text-lg mb-2 font-pixel text-foreground">
                   {section.title}
                 </h2>
                 <div>{section.content}</div>
@@ -1021,7 +1035,7 @@ const GameDetailsLayout: React.FC<
 
         {/* Similar Products */}
         <div className="mt-12">
-          <h2 className="font-bold text-xl mb-4 font-pixel text-primary">
+          <h2 className="font-bold text-xl mb-4 font-pixel text-foreground">
             Similar Products
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

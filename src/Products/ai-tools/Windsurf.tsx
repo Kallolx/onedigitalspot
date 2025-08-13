@@ -4,7 +4,7 @@ import { aiTools } from "@/lib/products";
 import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
 
 const categoryIcons = {
-  Personal: "/assets/icons/windsurf.svg",
+  Personal: "/assets/icons/ai-tools/windsurf.svg",
 };
 
 const infoSections = [

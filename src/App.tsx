@@ -17,7 +17,7 @@ import SteamWallet from "./Products/gift-cards/SteamWallet";
 import GooglePlay from "./Products/gift-cards/GooglePlay";
 import PlayStation from "./Products/gift-cards/PlayStation";
 import ValorantGiftCard from "./Products/gift-cards/Valorant";
-import ITunes from "./Products/gift-cards/iTunes";
+import ITunes from "./Products/gift-cards/Apple";
 import Amazon from "./Products/gift-cards/Amazon";
 import Apple from "./Products/gift-cards/Apple";
 import DiscordNitro from "./Products/gift-cards/DiscordNitro";

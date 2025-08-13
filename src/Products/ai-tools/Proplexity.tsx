@@ -4,8 +4,8 @@ import { aiTools } from "@/lib/products";
 import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
 
 const categoryIcons = {
-  Shared: "/assets/icons/perplexity.svg", // Change to your Perplexity icon
-  Personal: "/assets/icons/perplexity.svg",
+  Shared: "/assets/icons/ai-tools/perplexity.svg", 
+  Personal: "/assets/icons/ai-tools/perplexity.svg",
 };
 
 const infoSections = [

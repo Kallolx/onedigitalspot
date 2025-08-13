@@ -12,15 +12,164 @@ import {
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+interface MenuItem {
+  name: string;
+  path: string;
+  icon?: string;
+}
+
+interface MenuSection {
+  id: string;
+  title: string;
+  icon: React.ComponentType<any>;
+  items: MenuItem[];
+}
+
 interface MobileMenuProps {
   isOpen: boolean;
 }
 
+const MENU_SECTIONS: MenuSection[] = [
+  {
+    id: "gaming",
+    title: "Gaming",
+    icon: ShopSignIcon,
+    items: [
+      { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile", icon: "/assets/icons/games/pubg-mobile.svg" },
+      { name: "Free Fire", path: "/mobile-games/free-fire", icon: "/assets/icons/games/free-fire.svg" },
+      { name: "Valorant", path: "/pc-games/valorant", icon: "/assets/icons/gift-cards/valorant.svg" },
+      { name: "Apex Legends", path: "/pc-games/apex-legends", icon: "/assets/icons/games/apex.svg" },
+      { name: "More", path: "/all-games" },
+    ],
+  },
+  {
+    id: "design-tools",
+    title: "Design Tools",
+    icon: CoinsDollarIcon,
+    items: [
+      { name: "Canva Pro", path: "/design-tools/canva", icon: "/assets/icons/design/canva.svg" },
+      { name: "CapCut Pro", path: "/design-tools/capcut", icon: "/assets/icons/design/capcut.svg" },
+      { name: "Figma Pro", path: "/design-tools/figma", icon: "/assets/icons/design/figma.svg" },
+      { name: "Telegram Stars", path: "/design-tools/discord-nitro", icon: "/assets/icons/design/telegram.svg" },
+      { name: "More", path: "/design-tools" },
+    ],
+  },
+  {
+    id: "ai-tools",
+    title: "AI Tools",
+    icon: AiMagicIcon,
+    items: [
+      { name: "ChatGPT Pro", path: "/ai-tools/chatgpt", icon: "/assets/icons/ai-tools/chatgpt.svg" },
+      { name: "Claude Pro", path: "/ai-tools/claude", icon: "/assets/icons/ai-tools/claude.svg" },
+      { name: "Cursor Pro", path: "/ai-tools/midjourney", icon: "/assets/icons/ai-tools/cursor.svg" },
+      { name: "Github Pro", path: "/ai-tools/github", icon: "/assets/icons/ai-tools/github.svg" },
+      { name: "More", path: "/ai-tools" },
+    ],
+  },
+  {
+    id: "gift-cards",
+    title: "Gift Cards",
+    icon: GiftCardIcon,
+    items: [
+      { name: "Steam", path: "/gift-cards/steam-wallet", icon: "/assets/icons/gift-cards/steam-card.svg" },
+      { name: "Google Play", path: "/gift-cards/google-play", icon: "/assets/icons/gift-cards/google-play.svg" },
+      { name: "Apple Store", path: "/gift-cards/apple-store", icon: "/assets/icons/subscriptions/apple.svg" },
+      { name: "Discord Nitro", path: "/gift-cards/playstation", icon: "/assets/icons/gift-cards/discord.svg" },
+      { name: "More", path: "/gift-cards" },
+    ],
+  },
+  {
+    id: "subscriptions",
+    title: "Subscriptions",
+    icon: Tv01Icon,
+    items: [
+      { name: "Netflix", path: "/subscriptions/netflix", icon: "/assets/icons/subscriptions/netflix.svg" },
+      { name: "Crunchyroll", path: "/subscriptions/crunchyroll", icon: "/assets/icons/subscriptions/crunchyroll.svg" },
+      { name: "Disney+", path: "/subscriptions/tinder", icon: "/assets/icons/subscriptions/disney.svg" },
+      { name: "Spotify", path: "/subscriptions/youtube", icon: "/assets/icons/subscriptions/spotify.svg" },
+      { name: "More", path: "/subscriptions" },
+    ],
+  },
+];
+
+const MenuButton = ({ 
+  section, 
+  isActive, 
+  onToggle 
+}: { 
+  section: MenuSection; 
+  isActive: boolean; 
+  onToggle: () => void; 
+}) => (
+  <button
+    onClick={onToggle}
+    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
+  >
+    <div className="flex items-center gap-2">
+      <section.icon className="w-5 h-5" />
+      <span className="font-medium">{section.title}</span>
+    </div>
+    <ArrowDown01Icon
+      className={`w-4 h-4 transition-transform ${isActive ? "rotate-180" : ""}`}
+    />
+  </button>
+);
+
+const MenuItemLink = ({ item }: { item: MenuItem }) => (
+  <Link
+    to={item.path}
+    className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+  >
+    {item.icon && item.name !== "More" && (
+      <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
+        <img
+          src={item.icon}
+          alt={item.name}
+          className="w-full h-full object-cover"
+        />
+      </span>
+    )}
+    {item.name}
+    {item.name === "More" && (
+      <MoreHorizontalSquare01Icon className="w-3 h-3" />
+    )}
+  </Link>
+);
+
+const MenuSection = ({ 
+  section, 
+  activeSubmenu, 
+  onToggleSubmenu 
+}: { 
+  section: MenuSection; 
+  activeSubmenu: string | null; 
+  onToggleSubmenu: (id: string) => void; 
+}) => {
+  const isActive = activeSubmenu === section.id;
+
+  return (
+    <div>
+      <MenuButton
+        section={section}
+        isActive={isActive}
+        onToggle={() => onToggleSubmenu(section.id)}
+      />
+      {isActive && (
+        <div className="mt-2 space-y-1">
+          {section.items.map((item) => (
+            <MenuItemLink key={item.name} item={item} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
 
-  const toggleSubmenu = (menu: string) => {
-    setActiveSubmenu(activeSubmenu === menu ? null : menu);
+  const toggleSubmenu = (menuId: string) => {
+    setActiveSubmenu(activeSubmenu === menuId ? null : menuId);
   };
 
   return (
@@ -37,334 +186,26 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
     >
       <div className="container px-4 py-4 max-h-[calc(100vh-73px)] overflow-y-auto">
         <nav className="flex flex-col gap-2 mb-4 tracking-tighter">
-          {/* Home */}
+          {/* Home Link */}
           <Link
             to="/"
             className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
           >
             <div className="flex items-center gap-2">
               <Home03Icon className="w-5 h-5" />
-              <span className="font-semibold">Home</span>
+              <span className="font-medium">Home</span>
             </div>
           </Link>
 
-          {/* Shop */}
-          <div>
-            <button
-              onClick={() => toggleSubmenu("Gaming")}
-              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <ShopSignIcon className="w-5 h-5" />
-                <span className="font-semibold">Gaming</span>
-              </div>
-              <ArrowDown01Icon
-                className={`w-4 h-4 transition-transform ${
-                  activeSubmenu === "Gaming" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {activeSubmenu === "Gaming" && (
-              <div className="mt-2 space-y-1">
-                {[
-                  { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
-                  { name: "Free Fire", path: "/mobile-games/free-fire" },
-                  { name: "Valorant", path: "/pc-games/valorant" },
-                  { name: "Apex Legends", path: "/pc-games/apex-legends" },
-                  { name: "More", path: "/all-games" },
-                ].map((dropItem) => {
-                  const productImages = {
-                    "Mobile Legends": "/assets/icons/mobile-legends.svg",
-                    "PUBG Mobile": "/assets/icons/pubg-mobile.svg",
-                    "Free Fire": "/assets/icons/free-fire.svg",
-                    Roblox: "/assets/icons/roblox-banner.svg",
-                  };
-                  const imgSrc =
-                    productImages[dropItem.name] ||
-                    "/src/assets/icons/placeholder.svg";
-                  return (
-                    <a
-                      key={dropItem.name}
-                      href={dropItem.path}
-                      className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                    >
-                      {dropItem.name !== "More" && (
-                        <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-                          <img
-                            src={imgSrc}
-                            alt={dropItem.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </span>
-                      )}
-                      {dropItem.name}
-                      {dropItem.name === "More" && (
-                        <span className="inline-block">
-                          <MoreHorizontalSquare01Icon className="w-3 h-3" />
-                        </span>
-                      )}
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Design Tools */}
-          <div>
-            <button
-              onClick={() => toggleSubmenu("Design Tools")}
-              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <CoinsDollarIcon className="w-5 h-5" />
-                <span className="font-semibold">Design Tools</span>
-              </div>
-              <ArrowDown01Icon
-                className={`w-4 h-4 transition-transform ${
-                  activeSubmenu === "Design Tools" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {activeSubmenu === "Design Tools" && (
-              <div className="mt-2 space-y-1">
-                {[
-                  {
-                    name: "Canva Pro",
-                    path: "/design-tools/canva",
-                  },
-                  { name: "CapCut Pro", path: "/design-tools/capcut" },
-                  { name: "Tinder+", path: "/design-tools/tinder" },
-                  {
-                    name: "Discord Nitro",
-                    path: "/design-tools/discord-nitro",
-                  },
-                  { name: "More", path: "/design-tools" },
-                ].map((dropItem) => {
-                  const productImages = {
-                    "Canva Pro": "/assets/icons/canva.svg",
-                    "CapCut Pro": "/assets/icons/capcut.svg",
-                    "Tinder+": "/assets/icons/tinder.svg",
-                    "Discord Nitro": "/assets/icons/discord-nitro.svg",
-                    "Free Fire": "/assets/icons/free-fire.svg",
-                    Roblox: "/assets/icons/roblox-banner.svg",
-                  };
-                  const imgSrc =
-                    productImages[dropItem.name] ||
-                    "/src/assets/icons/placeholder.svg";
-                  return (
-                    <a
-                      key={dropItem.name}
-                      href={dropItem.path}
-                      className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                    >
-                      {dropItem.name !== "More" && (
-                        <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-                          <img
-                            src={imgSrc}
-                            alt={dropItem.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </span>
-                      )}
-                      {dropItem.name}
-                      {dropItem.name === "More" && (
-                        <span className="inline-block">
-                          <MoreHorizontalSquare01Icon className="w-3 h-3" />
-                        </span>
-                      )}
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* AI Tools */}
-          <div>
-            <button
-              onClick={() => toggleSubmenu("aitools")}
-              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <AiMagicIcon className="w-5 h-5" />
-                <span className="font-semibold">AI Tools</span>
-              </div>
-              <ArrowDown01Icon
-                className={`w-4 h-4 transition-transform ${
-                  activeSubmenu === "aitools" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {activeSubmenu === "aitools" && (
-              <div className="mt-2 space-y-1">
-                {[
-                  { name: "ChatGPT Pro", path: "/ai-tools/chatgpt" },
-                  { name: "Claude Pro", path: "/ai-tools/claude" },
-                  { name: "Midjourney Pro", path: "/ai-tools/midjourney" },
-                  { name: "Github Pro", path: "/ai-tools/github" },
-                  { name: "More", path: "/ai-tools" },
-                ].map((dropItem) => {
-                  const productImages = {
-                    "ChatGPT Pro": "/assets/icons/chatgpt.svg",
-                    "Claude Pro": "/assets/icons/claude.svg",
-                    "Midjourney Pro": "/assets/icons/midjourney.svg",
-                    "Github Pro": "/assets/icons/github.svg",
-                  };
-                  const imgSrc =
-                    productImages[dropItem.name] ||
-                    "/src/assets/icons/placeholder.svg";
-                  return (
-                    <a
-                      key={dropItem.name}
-                      href={dropItem.path}
-                      className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                    >
-                      {dropItem.name !== "More" && (
-                        <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-                          <img
-                            src={imgSrc}
-                            alt={dropItem.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </span>
-                      )}
-                      {dropItem.name}
-                      {dropItem.name === "More" && (
-                        <span className="inline-block">
-                          <MoreHorizontalSquare01Icon className="w-3 h-3" />
-                        </span>
-                      )}
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Gift Cards */}
-          <div>
-            <button
-              onClick={() => toggleSubmenu("giftcards")}
-              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <GiftCardIcon className="w-5 h-5" />
-                <span className="font-semibold">Gift Cards</span>
-              </div>
-              <ArrowDown01Icon
-                className={`w-4 h-4 transition-transform ${
-                  activeSubmenu === "giftcards" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {activeSubmenu === "giftcards" && (
-              <div className="mt-2 space-y-1">
-                {[
-                  { name: "Steam", path: "/gift-cards/steam-wallet" },
-                  { name: "Google Play", path: "/gift-cards/google-play" },
-                  { name: "Apple Store", path: "/gift-cards/apple-store" },
-                  { name: "PlayStation", path: "/gift-cards/playstation" },
-                  { name: "More", path: "/gift-cards" },
-                ].map((dropItem) => {
-                  const productImages = {
-                    Steam: "/assets/icons/steam-card.svg",
-                    "Google Play": "/assets/icons/google-play.svg",
-                    "Apple Store": "/assets/icons/apple-store.svg",
-                    PlayStation: "/assets/icons/playstation.svg",
-                  };
-                  const imgSrc =
-                    productImages[dropItem.name] ||
-                    "/src/assets/icons/placeholder.svg";
-                  return (
-                    <a
-                      key={dropItem.name}
-                      href={dropItem.path}
-                      className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                    >
-                      {dropItem.name !== "More" && (
-                        <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-                          <img
-                            src={imgSrc}
-                            alt={dropItem.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </span>
-                      )}
-                      {dropItem.name}
-                      {dropItem.name === "More" && (
-                        <span className="inline-block">
-                          <MoreHorizontalSquare01Icon className="w-3 h-3" />
-                        </span>
-                      )}
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Subscriptions */}
-          <div>
-            <button
-              onClick={() => toggleSubmenu("subscriptions")}
-              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <Tv01Icon className="w-5 h-5" />
-                <span className="font-semibold">Subscriptions</span>
-              </div>
-              <ArrowDown01Icon
-                className={`w-4 h-4 transition-transform ${
-                  activeSubmenu === "subscriptions" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {activeSubmenu === "subscriptions" && (
-              <div className="mt-2 space-y-1">
-                {[
-                  { name: "Netflix", path: "/subscriptions/netflix" },
-                  { name: "Crunchyroll", path: "/subscriptions/crunchyroll" },
-                  { name: "Tinder", path: "/subscriptions/tinder" },
-                  { name: "Youtube Premium", path: "/subscriptions/youtube" },
-                  { name: "More", path: "/subscriptions" },
-                ].map((dropItem) => {
-                  const productImages = {
-                    Netflix: "/assets/icons/netflix.svg",
-                    Crunchyroll: "/assets/icons/crunchyroll.svg",
-                    Tinder: "/assets/icons/tinder.svg",
-                    "Youtube Premium": "/assets/icons/youtube-premium.svg",
-                  };
-                  const imgSrc =
-                    productImages[dropItem.name] ||
-                    "/src/assets/icons/placeholder.svg";
-                  return (
-                    <a
-                      key={dropItem.name}
-                      href={dropItem.path}
-                      className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-                    >
-                      {dropItem.name !== "More" && (
-                        <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-                          <img
-                            src={imgSrc}
-                            alt={dropItem.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </span>
-                      )}
-                      {dropItem.name}
-                      {dropItem.name === "More" && (
-                        <span className="inline-block">
-                          <MoreHorizontalSquare01Icon className="w-3 h-3" />
-                        </span>
-                      )}
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          {/* Dynamic Menu Sections */}
+          {MENU_SECTIONS.map((section) => (
+            <MenuSection
+              key={section.id}
+              section={section}
+              activeSubmenu={activeSubmenu}
+              onToggleSubmenu={toggleSubmenu}
+            />
+          ))}
         </nav>
       </div>
     </div>

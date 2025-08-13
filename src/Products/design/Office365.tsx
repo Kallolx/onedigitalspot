@@ -63,7 +63,7 @@ export default function Office365Subscription() {
           setPriceList([
             {
               title: "Office 365 Subscription",
-              categoryIcon: "/assets/icons/office365.svg",
+              categoryIcon: "/assets/icons/design/office.svg",
               items,
             },
           ]);

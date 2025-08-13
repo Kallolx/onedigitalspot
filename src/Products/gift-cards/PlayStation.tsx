@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "PlayStation Gift Cards (USD)": "/assets/icons/playstation.svg",
+  "PlayStation Gift Cards (USD)": "/assets/icons/gift-cards/playstation.svg",
 };
 
 const infoSections = [
@@ -48,8 +48,11 @@ export default function PlayStationGiftCard() {
   const [psgc, setPsgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+      // Use image from subscriptions array
+  const playStationProduct = giftCards.find(p => p.title === "PlayStation");
+  const infoImage = playStationProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -110,7 +113,7 @@ export default function PlayStationGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="PlayStation"
-      image={psgc?.image || ""}
+      image={playStationProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

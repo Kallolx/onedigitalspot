@@ -4,8 +4,8 @@ import { aiTools } from "@/lib/products";
 import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
 
 const categoryIcons = {
-  Individual: "/assets/icons/github.svg",
-  Team: "/assets/icons/github.svg",
+  Individual: "/assets/icons/ai-tools/github.svg",
+  Team: "/assets/icons/ai-tools/github.svg",
 };
 
 const infoSections = [

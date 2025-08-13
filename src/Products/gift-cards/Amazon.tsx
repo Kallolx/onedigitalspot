@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Amazon Gift Cards (USD)": "/assets/icons/amazon.svg",
+  "Amazon Gift Cards (USD)": "/assets/icons/gift-cards/amazon.svg",
 };
 
 const infoSections = [
@@ -48,8 +48,11 @@ export default function AmazonGiftCard() {
   const [agc, setAgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+    // Use image from subscriptions array
+    const amazonGiftCardProduct = giftCards.find(p => p.title === "Amazon Gift Cards");
+    const infoImage = amazonGiftCardProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -110,7 +113,7 @@ export default function AmazonGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Amazon"
-      image={agc?.image || ""}
+      image={amazonGiftCardProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

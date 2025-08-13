@@ -63,7 +63,7 @@ export default function CapcutProSubscription() {
           setPriceList([
             {
               title: "Capcut Pro Subscription",
-              categoryIcon: "/assets/icons/capcut.svg",
+              categoryIcon: "/assets/icons/design/capcut.svg",
               items,
             },
           ]);

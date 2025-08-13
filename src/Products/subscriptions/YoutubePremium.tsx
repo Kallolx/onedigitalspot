@@ -62,7 +62,7 @@ export default function YouTubePremiumSubscription() {
           setPriceList([
             {
               title: "YouTube Premium Subscription",
-              categoryIcon: "/assets/icons/youtube.svg",
+              categoryIcon: "/assets/icons/subscriptions/youtube.svg",
               items,
             },
           ]);

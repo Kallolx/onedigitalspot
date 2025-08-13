@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Spotify Gift Cards (USD)": "/assets/icons/spotify.svg",
+  "Spotify Gift Cards (USD)": "/assets/icons/subscriptions/spotify.svg",
 };
 
 const infoSections = [
@@ -49,8 +49,11 @@ export default function SpotifyGiftCard() {
   const [sgc, setSgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+      // Use image from subscriptions array
+  const spotifyGiftCardProduct = giftCards.find(p => p.title === "Spotify Gift Card");
+  const infoImage = spotifyGiftCardProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -111,7 +114,7 @@ export default function SpotifyGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Spotify"
-      image={sgc?.image || ""}
+      image={spotifyGiftCardProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Apple Gift Cards (USD)": "/assets/icons/apple-store.svg",
+  "Apple Gift Cards (USD)": "/assets/icons/subscriptions/apple.svg",
 };
 
 const infoSections = [
@@ -49,8 +49,11 @@ export default function AppleGiftCard() {
   const [apgc, setApgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+    // Use image from subscriptions array
+  const appleGiftCardProduct = giftCards.find(p => p.title === "Apple Gift Card");
+  const infoImage = appleGiftCardProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -111,7 +114,7 @@ export default function AppleGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Apple"
-      image={apgc?.image || ""}
+      image={appleGiftCardProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

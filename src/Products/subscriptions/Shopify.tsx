@@ -63,7 +63,7 @@ export default function ShopifySubscription() {
           setPriceList([
             {
               title: "Shopify Subscription",
-              categoryIcon: "/assets/icons/shopify.svg",
+              categoryIcon: "/assets/icons/subscriptions/shopify.svg",
               items,
             },
           ]);

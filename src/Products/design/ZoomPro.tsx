@@ -63,7 +63,7 @@ export default function ZoomProSubscription() {
           setPriceList([
             {
               title: "Zoom Pro Subscription",
-              categoryIcon: "/assets/icons/zoom.svg",
+              categoryIcon: "/assets/icons/design/zoom.svg",
               items,
             },
           ]);

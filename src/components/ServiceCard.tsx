@@ -28,6 +28,14 @@ const ServiceCard = ({
   popular
   }: ServiceCardProps) => {
   const navigate = useNavigate();
+
+  // Utility to convert English digits to Bangla digits
+  const toBanglaNumber = (num: string | number) => {
+    const en = '0123456789';
+    const bn = '০১২৩৪৫৬৭৮৯';
+    return num.toString().split('').map(c => en.includes(c) ? bn[en.indexOf(c)] : c).join('');
+  };
+
   return (
     <Card
       className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xs bg-card border-2 border-border shadow-card hover:shadow-retro transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col cursor-pointer"
@@ -54,16 +62,10 @@ const ServiceCard = ({
             {title}
           </h3>
           {price && (
-            <div className="text-right ml-2 flex flex-col items-end">
-              <span className="font-pixel text-sm sm:text-xl md:text-xl text-primary font-bold">
-                ৳{price}
-                {isSubscription && (
-                  <span className="hidden sm:inline text-xs sm:text-sm text-muted-foreground font-sans font-normal ml-1 align-middle">/month</span>
-                )}
+            <div className="text-right ml-2 flex flex-col items-end">          
+              <span className="font-anekbangla text-lg md:text-xl font-bold text-secondary flex items-center gap-1">
+                ৳{toBanglaNumber(price)}
               </span>
-              {isSubscription && (
-                <span className="block sm:hidden text-xs text-muted-foreground font-sans font-normal mt-0.5">/month</span>
-              )}
             </div>
           )}
         </div>

@@ -63,7 +63,7 @@ export default function LinkedInSubscription() {
           setPriceList([
             {
               title: "LinkedIn Premium Subscription",
-              categoryIcon: "/assets/icons/linkedin.svg",
+              categoryIcon: "/assets/icons/design/linkedin.svg",
               items,
             },
           ]);

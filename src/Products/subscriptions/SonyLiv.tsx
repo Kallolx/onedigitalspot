@@ -74,7 +74,7 @@ export default function SonyLivSubscription() {
           setPriceList([
             {
               title: "Sony Liv Subscription",
-              categoryIcon: "/assets/icons/sonyliv.svg",
+              categoryIcon: "/assets/icons/subscriptions/video.svg",
               items,
             },
           ]);

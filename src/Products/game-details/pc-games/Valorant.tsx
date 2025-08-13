@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { databases, account } from "@/lib/appwrite";
 import { pcGames } from "@/lib/products";
-import GameDetailsLayout from "@/components/GameDetailsLayout"; // <-- Use GameDetailsLayout
+import GameDetailsLayout from "@/components/GameDetailsLayout";
 
 // Define the SelectedItem interface here since it's needed by the component
 interface SelectedItem {
@@ -9,22 +10,36 @@ interface SelectedItem {
   quantity: number;
 }
 
-const priceList = [
-  {
-    title: "Valorant Points Packages",
-    categoryIcon: "/assets/icons/valorant.svg",
-    items: [
-      { label: "Valorant 125 VP", price: 150 },
-      { label: "Valorant 250 VP", price: 290 },
-      { label: "Valorant 420 VP", price: 480 },
-      { label: "Valorant 700 VP", price: 790, hot: true },
-      { label: "Valorant 1375 VP", price: 1490 },
-      { label: "Valorant 2400 VP", price: 2590 },
-      { label: "Valorant 4000 VP", price: 4290 },
-      { label: "Valorant 8150 VP", price: 8490, hot: true },
-    ],
-  },
-];
+const categoryIcons = {
+  "Passes & Vouchers": "/assets/icons/voucher.svg",
+  "Diamonds": "/assets/icons/gift-cards/valorant.svg",
+};
+
+function groupPriceList(priceList) {
+  const passes = [];
+  const diamonds = [];
+  priceList.forEach((item) => {
+    const [label, price, hot, type] = item.split("|");
+    const obj = { label, price: Number(price), hot: hot === "true" };
+    if (type === "voucher") {
+      passes.push(obj);
+    } else if (type === "diamond") {
+      diamonds.push(obj);
+    }
+  });
+  return [
+    {
+      title: "Passes & Vouchers",
+      categoryIcon: categoryIcons["Passes & Vouchers"],
+      items: passes,
+    },
+    {
+      title: "Diamonds",
+      categoryIcon: categoryIcons["Diamonds"],
+      items: diamonds,
+    },
+  ];
+}
 
 const infoSections = [
   {
@@ -51,22 +66,65 @@ const infoSections = [
 
 export default function Valorant() {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
-  const [riotId, setRiotId] = useState("");
-  const valorant = pcGames?.find((g) => g.title === "Valorant");
-  const similar = pcGames?.filter((g) => g.title !== "Valorant").slice(0, 4) || [];
-  const infoImage = "/products/valorant.png";
+  const [playerId, setPlayerId] = useState("");
+  const [valorant, setValorant] = useState(null);
+  const [priceList, setPriceList] = useState([]);
+  const [similar, setSimilar] = useState([]);
+  const [isSignedIn, setIsSignedIn] = useState(false); // <-- Add this state
+
+    // Use image from subscriptions array
+    const valorantProduct = pcGames.find(p => p.title === "Valorant");
+    const infoImage = valorantProduct?.image;
+
+  useEffect(() => {
+    async function fetchProduct() {
+      try {
+        const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID;
+        // Get all PC games
+        const response = await databases.listDocuments(databaseId, collectionId);
+        const products = response.documents;
+        // Find Valorant (case-insensitive)
+        const valorantProduct = products.find((g) => g.title && g.title.toLowerCase() === "valorant");
+        setValorant(valorantProduct);
+        // Group priceList
+        if (valorantProduct && Array.isArray(valorantProduct.priceList)) {
+          setPriceList(groupPriceList(valorantProduct.priceList));
+        }
+        // Get similar products
+        setSimilar(pcGames.filter((g) => g.title !== "Valorant").slice(0, 4));
+      } catch (err) {
+        setValorant(null);
+        setPriceList([]);
+        setSimilar([]);
+      }
+    }
+
+    async function checkAuth() {
+      try {
+        await account.get();
+        setIsSignedIn(true);
+      } catch {
+        setIsSignedIn(false);
+      }
+    }
+
+    fetchProduct();
+    checkAuth(); // <-- Check Appwrite auth
+  }, []);
 
   return (
     <GameDetailsLayout
+      isSignedIn={isSignedIn}
       title="Valorant"
-      image={valorant?.image || ""}
+      image={valorantProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
       selectedItems={selectedItems}
       setSelectedItems={setSelectedItems}
-      playerId={riotId}
-      setPlayerId={setRiotId}
+      playerId={playerId}
+      setPlayerId={setPlayerId}
       infoImage={infoImage}
     />
   );

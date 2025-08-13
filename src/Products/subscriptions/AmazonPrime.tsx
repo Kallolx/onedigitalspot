@@ -87,7 +87,7 @@ export default function AmazonPrimeSubscription() {
           });
           setPriceList([{
             title: "Amazon Prime Subscription",
-            categoryIcon: "/assets/icons/amazon.svg",
+            categoryIcon: "/assets/icons/subscriptions/amazon.svg",
             items: items,
           }]);
         }

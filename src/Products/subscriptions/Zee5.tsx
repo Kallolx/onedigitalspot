@@ -74,7 +74,7 @@ export default function Zee5Subscription() {
           setPriceList([
             {
               title: "ZEE5 Subscription",
-              categoryIcon: "/assets/icons/zee5.svg", // Replace with actual icon path
+              categoryIcon: "/assets/icons/subscriptions/video.svg", // Replace with actual icon path
               items,
             },
           ]);

@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Roblox Gift Cards (USD)": "/assets/icons/roblox-banner.svg",
+  "Roblox Gift Cards (USD)": "/assets/icons/gift-cards/roblox.svg",
 };
 
 const infoSections = [
@@ -49,8 +49,11 @@ export default function RobloxGiftCard() {
   const [rgc, setRgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+      // Use image from subscriptions array
+  const robloxGiftCardProduct = giftCards.find(p => p.title === "Roblox Gift Cards");
+  const infoImage = robloxGiftCardProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -111,7 +114,7 @@ export default function RobloxGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Roblox"
-      image={rgc?.image || ""}
+      image={robloxGiftCardProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

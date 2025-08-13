@@ -63,7 +63,7 @@ export default function GoogleOneSubscription() {
           setPriceList([
             {
               title: "Google One Subscription",
-              categoryIcon: "/assets/icons/googleone.svg",
+              categoryIcon: "/assets/icons/design/google1.svg",
               items,
             },
           ]);

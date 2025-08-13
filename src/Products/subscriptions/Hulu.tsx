@@ -63,7 +63,7 @@ export default function HuluSubscription() {
           setPriceList([
             {
               title: "Hulu Subscription",
-              categoryIcon: "/assets/icons/hulu.svg",
+              categoryIcon: "/assets/icons/subscriptions/hulu.svg",
               items,
             },
           ]);

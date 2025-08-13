@@ -92,7 +92,7 @@ const HeroSection = () => {
                   Stop Platform for
                 </h1>
                 <h1 className="flex gap-2 text-5xl font-semibold tracking-tighter text-black mb-2 text-left">
-                  <span className="text-primary">All Digital</span> Products
+                  <span className="text-secondary">All Digital</span> Products
                 </h1>
                 <p className="text-base tracking-tight leading-tighter md:text-lg text-muted-foreground mb-5 text-left max-w-md mt-2">
                   Buy digital products in{" "}
@@ -128,7 +128,7 @@ const HeroSection = () => {
               </div>
             </div>
             {/* Right: Carousel section */}
-            <div className="w-full md:w-3/5 h-full flex items-center grow-1250">
+            <div className="w-full md:w-3/5 h-full flex items-center grow-1250 pt-8">
               <div className="w-full h-full">
                 <Carousel
                   setApi={setApi}

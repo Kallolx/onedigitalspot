@@ -74,7 +74,7 @@ export default function UlluPremiumSubscription() {
           setPriceList([
             {
               title: "Ullu Premium Subscription",
-              categoryIcon: "/assets/icons/ullu.svg", // Replace with actual icon path
+              categoryIcon: "/assets/icons/subscriptions/video.svg", // Replace with actual icon path
               items,
             },
           ]);

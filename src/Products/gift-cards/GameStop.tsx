@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "GameStop Gift Cards (USD)": "/assets/icons/gamestop.svg",
+  "GameStop Gift Cards (USD)": "/assets/icons/gift-cards/game.svg",
 };
 
 const infoSections = [
@@ -49,8 +49,11 @@ export default function GameStopGiftCard() {
   const [gsgc, setGsgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+    // Use image from subscriptions array
+  const gameStopGiftCardProduct = giftCards.find(p => p.title === "GameStop Gift Card");
+  const infoImage = gameStopGiftCardProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -111,7 +114,7 @@ export default function GameStopGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="GameStop"
-      image={gsgc?.image || ""}
+      image={gameStopGiftCardProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

@@ -5,8 +5,8 @@ import { aiTools } from "@/lib/products";
 import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
 
 const categoryIcons = {
-  Shared: "/assets/icons/chatgpt.svg",
-  Personal: "/assets/icons/chatgpt.svg",
+  Shared: "/assets/icons/ai-tools/chatgpt.svg",
+  Personal: "/assets/icons/ai-tools/chatgpt.svg",
 };
 
 const infoSections = [

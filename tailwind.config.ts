@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
+  darkMode: 'class',
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -108,6 +108,9 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         ticker: "ticker 40s linear infinite",
       },
+    },
+    colors: {
+      primary: '#111827', // Example: Tailwind's gray-900 (very dark)
     },
   },
   plugins: [require("tailwindcss-animate")],

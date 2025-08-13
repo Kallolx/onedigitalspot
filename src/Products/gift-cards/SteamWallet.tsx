@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Steam Wallet Codes (USD)": "/assets/icons/steam-card.svg",
+  "Steam Wallet Codes (USD)": "/assets/icons/gift-cards/steam-card.svg",
 };
 
 const infoSections = [
@@ -37,8 +37,11 @@ export default function SteamWallet() {
   const [sw, setSw] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+      // Use image from subscriptions array
+  const steamWalletProduct = giftCards.find(p => p.title === "Steam Wallet");
+  const infoImage = steamWalletProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -100,7 +103,7 @@ export default function SteamWallet() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Steam Wallet"
-      image={sw?.image || ""}
+      image={steamWalletProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

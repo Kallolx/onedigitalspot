@@ -119,12 +119,12 @@ export default function NetflixSubscription() {
           setPriceList([
             {
               title: "Netflix Subscription Personal Account",
-              categoryIcon: "/assets/icons/netflix.svg",
+              categoryIcon: "/assets/icons/subscriptions/netflix.svg",
               items: renewable,
             },
             {
               title: "Netflix Subscription Shared Account",
-              categoryIcon: "/assets/icons/netflix.svg",
+              categoryIcon: "/assets/icons/subscriptions/netflix.svg",
               items: nonRenewable,
             },
           ]);

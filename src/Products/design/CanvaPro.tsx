@@ -77,7 +77,7 @@ export default function CanvaProSubscription() {
           setPriceList([
             {
               title: "Canva Pro Subscription",
-              categoryIcon: "/assets/icons/canva.svg", // replace with your icon path
+              categoryIcon: "/assets/icons/design/canva.svg",
               items,
             },
           ]);

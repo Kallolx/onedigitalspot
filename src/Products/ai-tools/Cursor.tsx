@@ -4,7 +4,7 @@ import { aiTools } from "@/lib/products";
 import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
 
 const categoryIcons = {
-  Personal: "/assets/icons/cursor.svg",
+  Personal: "/assets/icons/ai-tools/cursor.svg",
 };
 
 const infoSections = [

@@ -63,7 +63,7 @@ export default function PhotoshopSubscription() {
           setPriceList([
             {
               title: "Photoshop Subscription",
-              categoryIcon: "/assets/icons/photoshop.svg",
+              categoryIcon: "/assets/icons/design/photoshop.svg",
               items,
             },
           ]);

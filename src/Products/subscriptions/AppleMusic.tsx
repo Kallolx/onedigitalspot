@@ -84,7 +84,7 @@ export default function AppleMusicSubscription() {
           setPriceList([
             {
               title: "Apple Music Subscription",
-              categoryIcon: "/assets/icons/apple.svg",
+              categoryIcon: "/assets/icons/subscriptions/apple.svg",
               items: items,
             },
           ]);

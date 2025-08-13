@@ -88,7 +88,7 @@ export default function DisneyPlusSubscription() {
           });
           setPriceList([{
             title: "Disney+ Subscription",
-            categoryIcon: "/assets/icons/disney.svg",
+            categoryIcon: "/assets/icons/subscriptions/disney.svg",
             items: items,
           }]);
         }

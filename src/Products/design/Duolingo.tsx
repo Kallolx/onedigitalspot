@@ -78,7 +78,7 @@ export default function DuolingoSubscription() {
           setPriceList([
             {
               title: "Duolingo Plus Subscription",
-              categoryIcon: "/assets/icons/duolingo.svg", // update with icon path
+              categoryIcon: "/assets/icons/design/duolingo.svg", // update with icon path
               items,
             },
           ]);

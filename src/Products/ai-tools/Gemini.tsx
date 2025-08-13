@@ -4,8 +4,8 @@ import { aiTools } from "@/lib/products";
 import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
 
 const categoryIcons = {
-  Shared: "/assets/icons/gemini.svg",
-  Personal: "/assets/icons/gemini.svg",
+  Shared: "/assets/icons/ai-tools/gemini.svg",
+  Personal: "/assets/icons/ai-tools/gemini.svg",
 };
 
 const infoSections = [

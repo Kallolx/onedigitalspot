@@ -11,7 +11,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Valorant Gift Cards (USD)": "/assets/icons/valorant.svg",
+  "Valorant Gift Cards (USD)": "/assets/icons/gift-cards/valorant.svg",
 };
 
 const infoSections = [
@@ -48,8 +48,11 @@ export default function ValorantGiftCard() {
   const [vgc, setVgc] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-
   const [isSignedIn, setIsSignedIn] = useState(false);
+
+      // Use image from subscriptions array
+  const valorantGiftCardProduct = giftCards.find(p => p.title === "Valorant Gift Cards");
+  const infoImage = valorantGiftCardProduct?.image;
 
   useEffect(() => {
     async function fetchGiftCards() {
@@ -110,7 +113,7 @@ export default function ValorantGiftCard() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Valorant"
-      image={vgc?.image || ""}
+      image={valorantGiftCardProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
