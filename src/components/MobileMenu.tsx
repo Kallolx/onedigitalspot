@@ -175,7 +175,7 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   return (
     <div
       className={`
-        2xl:hidden fixed inset-x-0 top-[64px] bg-background border-b-4 border-border
+        lg:hidden fixed inset-x-0 top-[64px] bg-background border-b-4 border-border
         transition-all duration-300 transform origin-top z-50
         ${
           isOpen
