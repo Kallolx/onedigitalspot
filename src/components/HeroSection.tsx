@@ -17,6 +17,7 @@ import { Button } from "./ui/button";
 import { AvatarCircles } from "@/components/ui/AvatarCircles";
 import { Input } from "./ui/input";
 import { SearchCircleIcon } from "hugeicons-react";
+import SearchComponent from "./SearchComponent";
 
 const avatars = [
   {
@@ -106,15 +107,11 @@ const HeroSection = () => {
                   </div>
                 </div>
                 {/* Add search input and button below */}
-                <div className="relative mt-2 w-full max-w-md">
-                  <Input
-                    type="text"
+                <div className="mt-2 w-full max-w-md">
+                  <SearchComponent 
                     placeholder="Search any products..."
-                    className="flex-1 h-12 rounded-full border border-secondary/40 pl-4"
+                    className="w-full"
                   />
-                  <button className="absolute right-1 top-1  text-white p-2 font-semibold rounded-full transition active:scale-90 focus:outline-none">
-                    <SearchIcon className="w-6 h-6" />
-                  </button>
                 </div>
               </div>
             </div>

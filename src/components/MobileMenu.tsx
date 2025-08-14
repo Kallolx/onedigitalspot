@@ -7,10 +7,13 @@ import {
   Tv01Icon,
   ArrowDown01Icon,
   MoreHorizontalSquare01Icon,
+  ShoppingCart02Icon,
 } from "hugeicons-react";
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import SearchComponent from "./SearchComponent";
+import { Button } from "./ui/button";
 
 interface MenuItem {
   name: string;
@@ -35,10 +38,26 @@ const MENU_SECTIONS: MenuSection[] = [
     title: "Gaming",
     icon: ShopSignIcon,
     items: [
-      { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile", icon: "/assets/icons/games/pubg-mobile.svg" },
-      { name: "Free Fire", path: "/mobile-games/free-fire", icon: "/assets/icons/games/free-fire.svg" },
-      { name: "Valorant", path: "/pc-games/valorant", icon: "/assets/icons/gift-cards/valorant.svg" },
-      { name: "Apex Legends", path: "/pc-games/apex-legends", icon: "/assets/icons/games/apex.svg" },
+      {
+        name: "PUBG Mobile",
+        path: "/mobile-games/pubg-mobile",
+        icon: "/assets/icons/games/pubg-mobile.svg",
+      },
+      {
+        name: "Free Fire",
+        path: "/mobile-games/free-fire",
+        icon: "/assets/icons/games/free-fire.svg",
+      },
+      {
+        name: "Valorant",
+        path: "/pc-games/valorant",
+        icon: "/assets/icons/gift-cards/valorant.svg",
+      },
+      {
+        name: "Apex Legends",
+        path: "/pc-games/apex-legends",
+        icon: "/assets/icons/games/apex.svg",
+      },
       { name: "More", path: "/all-games" },
     ],
   },
@@ -47,10 +66,26 @@ const MENU_SECTIONS: MenuSection[] = [
     title: "Design Tools",
     icon: CoinsDollarIcon,
     items: [
-      { name: "Canva Pro", path: "/design-tools/canva", icon: "/assets/icons/design/canva.svg" },
-      { name: "CapCut Pro", path: "/design-tools/capcut", icon: "/assets/icons/design/capcut.svg" },
-      { name: "Figma Pro", path: "/design-tools/figma", icon: "/assets/icons/design/figma.svg" },
-      { name: "Telegram Stars", path: "/design-tools/discord-nitro", icon: "/assets/icons/design/telegram.svg" },
+      {
+        name: "Canva Pro",
+        path: "/design-tools/canva",
+        icon: "/assets/icons/design/canva.svg",
+      },
+      {
+        name: "CapCut Pro",
+        path: "/design-tools/capcut",
+        icon: "/assets/icons/design/capcut.svg",
+      },
+      {
+        name: "Figma Pro",
+        path: "/design-tools/figma",
+        icon: "/assets/icons/design/figma.svg",
+      },
+      {
+        name: "Telegram Stars",
+        path: "/design-tools/discord-nitro",
+        icon: "/assets/icons/design/telegram.svg",
+      },
       { name: "More", path: "/design-tools" },
     ],
   },
@@ -59,10 +94,26 @@ const MENU_SECTIONS: MenuSection[] = [
     title: "AI Tools",
     icon: AiMagicIcon,
     items: [
-      { name: "ChatGPT Pro", path: "/ai-tools/chatgpt", icon: "/assets/icons/ai-tools/chatgpt.svg" },
-      { name: "Claude Pro", path: "/ai-tools/claude", icon: "/assets/icons/ai-tools/claude.svg" },
-      { name: "Cursor Pro", path: "/ai-tools/midjourney", icon: "/assets/icons/ai-tools/cursor.svg" },
-      { name: "Github Pro", path: "/ai-tools/github", icon: "/assets/icons/ai-tools/github.svg" },
+      {
+        name: "ChatGPT Pro",
+        path: "/ai-tools/chatgpt",
+        icon: "/assets/icons/ai-tools/chatgpt.svg",
+      },
+      {
+        name: "Claude Pro",
+        path: "/ai-tools/claude",
+        icon: "/assets/icons/ai-tools/claude.svg",
+      },
+      {
+        name: "Cursor Pro",
+        path: "/ai-tools/midjourney",
+        icon: "/assets/icons/ai-tools/cursor.svg",
+      },
+      {
+        name: "Github Pro",
+        path: "/ai-tools/github",
+        icon: "/assets/icons/ai-tools/github.svg",
+      },
       { name: "More", path: "/ai-tools" },
     ],
   },
@@ -71,10 +122,26 @@ const MENU_SECTIONS: MenuSection[] = [
     title: "Gift Cards",
     icon: GiftCardIcon,
     items: [
-      { name: "Steam", path: "/gift-cards/steam-wallet", icon: "/assets/icons/gift-cards/steam-card.svg" },
-      { name: "Google Play", path: "/gift-cards/google-play", icon: "/assets/icons/gift-cards/google-play.svg" },
-      { name: "Apple Store", path: "/gift-cards/apple-store", icon: "/assets/icons/subscriptions/apple.svg" },
-      { name: "Discord Nitro", path: "/gift-cards/playstation", icon: "/assets/icons/gift-cards/discord.svg" },
+      {
+        name: "Steam",
+        path: "/gift-cards/steam-wallet",
+        icon: "/assets/icons/gift-cards/steam-card.svg",
+      },
+      {
+        name: "Google Play",
+        path: "/gift-cards/google-play",
+        icon: "/assets/icons/gift-cards/google-play.svg",
+      },
+      {
+        name: "Apple Store",
+        path: "/gift-cards/apple-store",
+        icon: "/assets/icons/subscriptions/apple.svg",
+      },
+      {
+        name: "Discord Nitro",
+        path: "/gift-cards/playstation",
+        icon: "/assets/icons/gift-cards/discord.svg",
+      },
       { name: "More", path: "/gift-cards" },
     ],
   },
@@ -83,23 +150,39 @@ const MENU_SECTIONS: MenuSection[] = [
     title: "Subscriptions",
     icon: Tv01Icon,
     items: [
-      { name: "Netflix", path: "/subscriptions/netflix", icon: "/assets/icons/subscriptions/netflix.svg" },
-      { name: "Crunchyroll", path: "/subscriptions/crunchyroll", icon: "/assets/icons/subscriptions/crunchyroll.svg" },
-      { name: "Disney+", path: "/subscriptions/tinder", icon: "/assets/icons/subscriptions/disney.svg" },
-      { name: "Spotify", path: "/subscriptions/youtube", icon: "/assets/icons/subscriptions/spotify.svg" },
+      {
+        name: "Netflix",
+        path: "/subscriptions/netflix",
+        icon: "/assets/icons/subscriptions/netflix.svg",
+      },
+      {
+        name: "Crunchyroll",
+        path: "/subscriptions/crunchyroll",
+        icon: "/assets/icons/subscriptions/crunchyroll.svg",
+      },
+      {
+        name: "Disney+",
+        path: "/subscriptions/tinder",
+        icon: "/assets/icons/subscriptions/disney.svg",
+      },
+      {
+        name: "Spotify",
+        path: "/subscriptions/youtube",
+        icon: "/assets/icons/subscriptions/spotify.svg",
+      },
       { name: "More", path: "/subscriptions" },
     ],
   },
 ];
 
-const MenuButton = ({ 
-  section, 
-  isActive, 
-  onToggle 
-}: { 
-  section: MenuSection; 
-  isActive: boolean; 
-  onToggle: () => void; 
+const MenuButton = ({
+  section,
+  isActive,
+  onToggle,
+}: {
+  section: MenuSection;
+  isActive: boolean;
+  onToggle: () => void;
 }) => (
   <button
     onClick={onToggle}
@@ -130,20 +213,18 @@ const MenuItemLink = ({ item }: { item: MenuItem }) => (
       </span>
     )}
     {item.name}
-    {item.name === "More" && (
-      <MoreHorizontalSquare01Icon className="w-3 h-3" />
-    )}
+    {item.name === "More" && <MoreHorizontalSquare01Icon className="w-3 h-3" />}
   </Link>
 );
 
-const MenuSection = ({ 
-  section, 
-  activeSubmenu, 
-  onToggleSubmenu 
-}: { 
-  section: MenuSection; 
-  activeSubmenu: string | null; 
-  onToggleSubmenu: (id: string) => void; 
+const MenuSection = ({
+  section,
+  activeSubmenu,
+  onToggleSubmenu,
+}: {
+  section: MenuSection;
+  activeSubmenu: string | null;
+  onToggleSubmenu: (id: string) => void;
 }) => {
   const isActive = activeSubmenu === section.id;
 
@@ -207,6 +288,26 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
             />
           ))}
         </nav>
+        {/* Mobile Search and Cart beside each other, full width */}
+        <div className="w-full mt-4 flex items-center gap-2">
+          <div className="flex-1">
+            <SearchComponent
+              placeholder="Search products..."
+              className="w-full"
+              showFullResults={true}
+            />
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative h-11 w-11 min-w-0 flex items-center justify-center"
+          >
+            <ShoppingCart02Icon className="w-6 h-6 text-secondary" />
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-xs font-bold text-primary-foreground rounded-full flex items-center justify-center">
+              0
+            </span>
+          </Button>
+        </div>
       </div>
     </div>
   );

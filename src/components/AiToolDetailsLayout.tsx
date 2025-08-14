@@ -193,25 +193,23 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
         productImage: image,
         itemLabel: selectedItem.label,
         quantity: quantity,
-        unitPrice:
-          typeof selectedItem.price === "number" ? selectedItem.price : 0,
+        unitPrice: typeof selectedItem.price === "number" ? selectedItem.price : 0,
         totalAmount: typeof totalAmount === "number" ? totalAmount : 0,
-        playerId:
-          !isSubscription &&
+        playerId: !isSubscription &&
           purchaseType === "personal" &&
           personalType === "existing"
-            ? email
-            : "", // Store email in playerId for AI tools only
-        zoneId:
-          !isSubscription &&
+          ? email
+          : "", // Store email in playerId for AI tools only
+        zoneId: !isSubscription &&
           purchaseType === "personal" &&
           personalType === "existing"
-            ? password
-            : "", // Store password in zoneId for AI tools only
+          ? password
+          : "", // Store password in zoneId for AI tools only
         paymentMethod: paymentMethod,
         paymentAccountNumber: userAccount,
         transactionId: trxId,
         status: "Pending",
+        deliveryInfo: undefined
       };
 
       // Create the order
@@ -413,7 +411,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                 <div className="flex gap-2 mb-4 flex-wrap">
                   <Button
                     type="button"
-                    variant={purchaseType === "shared" ? "default" : "ghost"}
+                    variant={purchaseType === "shared" ? "default" : "outline"}
                     onClick={() => setPurchaseType("shared")}
                     className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[110px]"
                   >
@@ -425,7 +423,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                   </Button>
                   <Button
                     type="button"
-                    variant={purchaseType === "personal" ? "default" : "ghost"}
+                    variant={purchaseType === "personal" ? "default" : "outline"}
                     onClick={() => setPurchaseType("personal")}
                     className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[110px]"
                   >

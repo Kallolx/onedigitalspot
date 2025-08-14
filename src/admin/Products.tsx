@@ -41,6 +41,7 @@ import {
   TableHead,
 } from "@/components/ui/table";
 import { databases } from "@/lib/appwrite";
+import { mobileGames, pcGames, giftCards, aiTools, subscriptions, productivity } from "@/lib/products";
 import {
   Dialog,
   DialogContent,
@@ -61,6 +62,27 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+
+// Add this utility function to get product images
+const getProductImage = (productName: string): string => {
+  // Combine all products from all categories
+  const allProducts = [
+    ...mobileGames,
+    ...pcGames,
+    ...giftCards,
+    ...aiTools,
+    ...subscriptions,
+    ...productivity
+  ];
+
+  // Find the product by name (case-insensitive)
+  const product = allProducts.find(p => 
+    p.title.toLowerCase() === productName.toLowerCase()
+  );
+
+  // Return the local image path or fallback to placeholder
+  return product?.image || "/assets/placeholder.svg";
+};
 
 const categories = [
   { key: "all", name: "All", icon: null },
@@ -586,7 +608,7 @@ const Products = () => {
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-pixel font-bold text-primary">
+        <h1 className="text-2xl font-pixel font-bold text-foreground">
           Product Management
         </h1>
         {isLoading && (
@@ -606,11 +628,11 @@ const Products = () => {
             <Button
               key={cat.key}
               type="button"
-              variant={isActive ? "default" : "ghost"}
+              variant={isActive ? "default" : "outline"}
               className={`px-4 py-2 text-xs sm:text-sm rounded-md min-w-[110px] font-pixel font-bold flex items-center gap-2 border ${
                 isActive
                   ? "bg-primary text-white border-primary"
-                  : "bg-background text-primary border-border hover:bg-primary/10 hover:text-primary"
+                  : "bg-background text-foreground border-border hover:bg-primary/10 hover:text-foreground"
               }`}
               onClick={() => handleCategoryChange(cat.key)}
               disabled={isLoading}
@@ -618,7 +640,7 @@ const Products = () => {
               {IconComp && (
                 <IconComp
                   className={`w-6 h-6 ${
-                    isActive ? "text-white" : "text-primary"
+                    isActive ? "text-white" : "text-foreground"
                   }`}
                 />
               )}
@@ -628,7 +650,7 @@ const Products = () => {
                 className={`ml-2 text-xs font-pixel ${
                   isActive
                     ? "bg-white/20 text-white border-white/20"
-                    : "bg-primary/10 text-primary border-primary/20"
+                    : "bg-primary/10 text-foreground border-primary/20"
                 }`}
               >
                 {productsByCategory[cat.key]?.length ?? 0}
@@ -669,7 +691,7 @@ const Products = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="font-pixel text-sm border border-border rounded px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="title">Sort by Title</option>
                     <option value="category">Sort by Category</option>
@@ -677,7 +699,7 @@ const Products = () => {
                     <option value="$createdAt">Sort by Date</option>
                   </select>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
                     className="font-pixel"
@@ -695,7 +717,7 @@ const Products = () => {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
-                    className="font-pixel text-sm border border-border rounded px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="font-pixel text-sm border border-border rounded-sm px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
@@ -711,7 +733,7 @@ const Products = () => {
                 {/* View Mode Toggle */}
                 <div className="flex border border-border rounded-md">
                   <Button
-                    variant={viewMode === "table" ? "default" : "ghost"}
+                    variant={viewMode === "table" ? "default" : "outline"}
                     size="sm"
                     onClick={() => setViewMode("table")}
                     className="font-pixel rounded-r-none"
@@ -719,7 +741,7 @@ const Products = () => {
                     <List className="w-4 h-4" />
                   </Button>
                   <Button
-                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    variant={viewMode === "grid" ? "default" : "outline"}
                     size="sm"
                     onClick={() => setViewMode("grid")}
                     className="font-pixel rounded-l-none"
@@ -743,14 +765,14 @@ const Products = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-4 text-sm text-muted-foreground font-pixel">
                 <span>
-                  Total: <span className="font-bold text-primary">{totalProducts}</span> products
+                  Total: <span className="font-bold text-foreground">{totalProducts}</span> products
                 </span>
                 <span>
-                  Showing: <span className="font-bold text-primary">{startIndex + 1}</span> - <span className="font-bold text-primary">{Math.min(endIndex, totalProducts)}</span>
+                  Showing: <span className="font-bold text-foreground">{startIndex + 1}</span> - <span className="font-bold text-foreground">{Math.min(endIndex, totalProducts)}</span>
                 </span>
                 {search && (
                   <span>
-                    Filter: "<span className="font-bold text-primary">{search}</span>"
+                    Filter: "<span className="font-bold text-foreground">{search}</span>"
                   </span>
                 )}
               </div>
@@ -885,13 +907,28 @@ const Products = () => {
                                 className="rounded border-border"
                               />
                             </TableCell>
-                            <TableCell className="font-pixel font-bold text-primary text-lg max-w-xs">
-                              <div className="truncate" title={prod.title}>
-                                {prod.title}
+                            <TableCell className="font-pixel font-bold text-foreground text-lg max-w-xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                                  <img
+                                    src={getProductImage(prod.title)}
+                                    alt={prod.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = "/placeholder.svg";
+                                    }}
+                                  />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="truncate font-pixel font-bold text-foreground text-lg" title={prod.title}>
+                                    {prod.title}
+                                  </div>
+                                </div>
                               </div>
                             </TableCell>
                             <TableCell className="text-muted-foreground">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-foreground">
                                 {prod.category}
                               </span>
                             </TableCell>
@@ -903,7 +940,7 @@ const Products = () => {
                             <TableCell className="text-sm">
                               {Array.isArray(prod.priceList) && prod.priceList.length > 0 ? (
                                 <div className="space-y-1">
-                                  <div className="font-semibold text-primary">
+                                  <div className="font-semibold text-foreground">
                                     {prod.priceList.length} option{prod.priceList.length > 1 ? 's' : ''}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
@@ -1015,18 +1052,22 @@ const Products = () => {
                         />
                         <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
                           <img
-                            src={prod.image}
+                            src={getProductImage(prod.title)}
                             alt={prod.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = "/assets/placeholder.svg";
+                            }}
                           />
                         </div>
-                        <h3 className="font-pixel font-bold text-primary mb-2 truncate">
+                        <h3 className="font-pixel font-bold text-foreground mb-2 truncate">
                           {prod.title}
                         </h3>
                         <p className="text-sm text-muted-foreground mb-2">
                           {prod.category}
                         </p>
-                        <p className="font-bold text-primary font-pixel mb-4">
+                        <p className="font-bold text-foreground font-pixel mb-4">
                           {prod.price}৳
                         </p>
                         <div className="flex items-center justify-between">
@@ -1212,7 +1253,7 @@ const Products = () => {
       <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-pixel text-xl text-primary">
+            <DialogTitle className="font-pixel text-xl text-foreground">
               Product Details
             </DialogTitle>
           </DialogHeader>
@@ -1222,9 +1263,13 @@ const Products = () => {
               <div className="space-y-4">
                 <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
                   <img
-                    src={viewProduct.image}
+                    src={getProductImage(viewProduct.title)}
                     alt={viewProduct.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/assets/placeholder.svg";
+                    }}
                   />
                 </div>
               </div>
@@ -1232,7 +1277,7 @@ const Products = () => {
               {/* Details Section */}
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-pixel text-2xl text-primary mb-2">
+                  <h3 className="font-pixel text-2xl text-foreground mb-2">
                     {viewProduct.title}
                   </h3>
                   <Badge variant="secondary" className="font-pixel">
@@ -1268,7 +1313,7 @@ const Products = () => {
                                   </Badge>
                                 )}
                               </div>
-                              <span className="font-pixel font-bold text-primary">
+                              <span className="font-pixel font-bold text-foreground">
                                 {price}
                               </span>
                             </div>
@@ -1298,7 +1343,7 @@ const Products = () => {
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-pixel text-xl text-primary">
+            <DialogTitle className="font-pixel text-xl text-foreground">
               Add New Product
             </DialogTitle>
           </DialogHeader>
@@ -1525,7 +1570,7 @@ const Products = () => {
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-pixel text-xl text-primary">
+            <DialogTitle className="font-pixel text-xl text-foreground">
               Edit Product
             </DialogTitle>
           </DialogHeader>

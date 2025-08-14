@@ -1,7 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Search, Download, Plus, Filter, Trash2, Edit, Eye, RefreshCw, CheckCircle, XCircle, Clock, Package, ShieldCheck } from "lucide-react";
+import {  Download, Trash2,  CheckCircle, XCircle, Clock, Package, ShieldCheck, Search, Eye, Edit, RefreshCw } from "lucide-react";
 import { getAllOrders, updateOrderStatus, OrderData } from "../lib/orders";
+import { mobileGames, pcGames, giftCards, aiTools, subscriptions, productivity } from "../lib/products";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
+import { Textarea } from "../components/ui/textarea";
 import { RotateLoader } from "react-spinners";
+
+// Add this utility function to get product images
+const getProductImage = (productName: string): string => {
+  // Combine all products from all categories
+  const allProducts = [
+    ...mobileGames,
+    ...pcGames,
+    ...giftCards,
+    ...aiTools,
+    ...subscriptions,
+    ...productivity
+  ];
+
+  // Find the product by name (case-insensitive)
+  const product = allProducts.find(p => 
+    p.title.toLowerCase() === productName.toLowerCase()
+  );
+
+  // Return the local image path or fallback to placeholder
+  return product?.image || "/assets/placeholder.svg";
+};
 
 const Orders = () => {
   const [search, setSearch] = useState("");
@@ -18,6 +45,10 @@ const Orders = () => {
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Modal states for Dialog components
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Fetch orders from database
   useEffect(() => {
@@ -195,7 +226,7 @@ const Orders = () => {
       </button>
       <button 
         onClick={handleBulkExport}
-        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 font-pixel text-xs"
+        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-primary/10 text-foreground hover:bg-primary/20 font-pixel text-xs"
       >
         <Download className="w-4 h-4" /> Export Selected
       </button>
@@ -256,203 +287,27 @@ const Orders = () => {
     a.click();
   };
 
-  // Enhanced order details modal
-  const OrderDetailsModal = ({ order, onClose }: { order: OrderData; onClose: () => void }) => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-lg shadow-retro w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-pixel font-bold text-primary">Order Details</h2>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <XCircle className="w-6 h-6" />
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Order Information */}
-            <div className="space-y-4">
-              <h3 className="font-pixel text-lg text-primary border-b pb-2">Order Information</h3>
-              <div className="space-y-2">
-                <div><span className="font-pixel text-xs text-gray-500">Order ID:</span> <span className="font-mono font-bold text-primary">{order.orderID}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Status:</span> <StatusBadge status={order.status} /></div>
-                <div><span className="font-pixel text-xs text-gray-500">Created:</span> <span className="font-mono">{new Date(order.createdAt).toLocaleString()}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Updated:</span> <span className="font-mono">{new Date(order.updatedAt).toLocaleString()}</span></div>
-              </div>
-            </div>
-
-            {/* Customer Information */}
-            <div className="space-y-4">
-              <h3 className="font-pixel text-lg text-primary border-b pb-2">Customer Information</h3>
-              <div className="space-y-2">
-                <div><span className="font-pixel text-xs text-gray-500">Name:</span> <span>{order.userName}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Email:</span> <span>{order.userEmail}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">User ID:</span> <span className="font-mono text-xs">{order.userId}</span></div>
-              </div>
-            </div>
-
-            {/* Product Information */}
-            <div className="space-y-4">
-              <h3 className="font-pixel text-lg text-primary border-b pb-2">Product Information</h3>
-              <div className="space-y-2">
-                <div><span className="font-pixel text-xs text-gray-500">Product:</span> <span className="font-semibold">{order.productName}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Type:</span> <span>{order.productType}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Item:</span> <span>{order.itemLabel}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Quantity:</span> <span>{order.quantity}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Unit Price:</span> <span className="font-semibold">{order.unitPrice}৳</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Total Amount:</span> <span className="font-bold text-primary text-lg">{order.totalAmount}৳</span></div>
-              </div>
-            </div>
-
-            {/* Game Information */}
-            {(order.playerId || order.zoneId) && (
-              <div className="space-y-4">
-                <h3 className="font-pixel text-lg text-primary border-b pb-2">Game Information</h3>
-                <div className="space-y-2">
-                  {order.playerId && <div><span className="font-pixel text-xs text-gray-500">Player ID:</span> <span className="font-mono">{order.playerId}</span></div>}
-                  {order.zoneId && <div><span className="font-pixel text-xs text-gray-500">Zone ID:</span> <span className="font-mono">{order.zoneId}</span></div>}
-                </div>
-              </div>
-            )}
-
-            {/* Payment Information */}
-            <div className="space-y-4 md:col-span-2">
-              <h3 className="font-pixel text-lg text-primary border-b pb-2">Payment Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div><span className="font-pixel text-xs text-gray-500">Method:</span> <span className="font-semibold">{order.paymentMethod}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Account:</span> <span className="font-mono">{order.paymentAccountNumber}</span></div>
-                <div><span className="font-pixel text-xs text-gray-500">Transaction ID:</span> <span className="font-mono">{order.transactionId}</span></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-            <button 
-              className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-pixel hover:bg-gray-200" 
-              onClick={onClose}
-            >
-              Close
-            </button>
-            <button 
-              className="px-4 py-2 rounded-lg bg-green-500 text-white font-pixel hover:bg-green-600 flex items-center gap-2" 
-              onClick={() => { 
-                window.open('/admin/receipt-verifier', '_blank');
-              }}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              Verify Receipt
-            </button>
-            <button 
-              className="px-4 py-2 rounded-lg bg-blue-500 text-white font-pixel hover:bg-blue-600" 
-              onClick={() => { setEditOrder(order); onClose(); }}
-            >
-              Edit Status
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // Enhanced edit order modal
-  const EditOrderModal = ({ order, onClose, onSave }: { order: OrderData; onClose: () => void; onSave: (status: string) => void }) => {
-    const [status, setStatus] = useState(order.status);
-    const [notes, setNotes] = useState("");
+  // Handle save status
+  const handleSaveStatus = async (status: string) => {
+    if (!editOrder) return;
     
-    console.log('EditOrderModal rendered with order:', order);
-    console.log('Order ID in modal:', order.id);
-    
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="bg-white rounded-lg shadow-retro w-full max-w-md">
-          <div className="p-6">
-            <h2 className="text-xl font-pixel font-bold text-primary mb-4">Edit Order</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="font-pixel text-xs text-gray-500 mb-2 block">Order ID</label>
-                <div className="px-3 py-2 bg-gray-50 rounded-lg font-mono text-primary font-bold">
-                  {order.orderID}
-                </div>
-              </div>
-              
-              <div>
-                <label className="font-pixel text-xs text-gray-500 mb-2 block">Customer</label>
-                <div className="px-3 py-2 bg-gray-50 rounded-lg">
-                  {order.userName} ({order.userEmail})
-                </div>
-              </div>
-              
-              <div>
-                <label className="font-pixel text-xs text-gray-500 mb-2 block">Product</label>
-                <div className="px-3 py-2 bg-gray-50 rounded-lg">
-                  {order.productName} - {order.itemLabel}
-                </div>
-              </div>
-              
-              <div>
-                <label className="font-pixel text-xs text-gray-500 mb-2 block">Status *</label>
-                <select 
-                  value={status} 
-                  onChange={e => setStatus(e.target.value)} 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="font-pixel text-xs text-gray-500 mb-2 block">Notes (Optional)</label>
-                <textarea
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  placeholder="Add any notes about this status change..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2 mt-6">
-              <button 
-                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-pixel hover:bg-gray-200" 
-                onClick={onClose}
-              >
-                Cancel
-              </button>
-              <button 
-                className="px-4 py-2 rounded-lg bg-primary text-white font-pixel hover:bg-primary/90" 
-                onClick={() => onSave(status)}
-              >
-                Update Status
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Save status change
-  const handleSaveStatus = (newStatus: string) => {
-    if (editOrder) {
+    try {
       // Appwrite uses $id instead of id
       const orderId = editOrder.$id || editOrder.id;
       
       if (orderId) {
-        console.log('Saving status:', { orderId, newStatus });
-        handleStatusUpdate(orderId, newStatus);
+        console.log('Saving status:', { orderId, status });
+        await updateOrderStatus(orderId, status);
+        setShowEditModal(false);
+        setEditOrder(null);
+        await fetchOrders();
       } else {
         console.error('Cannot save status: missing order ID', editOrder);
-        alert('Error: Order ID is missing. Please refresh the page and try again.');
       }
-    } else {
-      console.error('Cannot save status: no order selected');
-      alert('Error: No order selected. Please try again.');
+    } catch (error) {
+      console.error('Error updating order status:', error);
     }
-  };
+};
 
   // Get summary statistics
   const getOrderStats = () => {
@@ -472,7 +327,7 @@ const Orders = () => {
     return (
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-          <h1 className="text-2xl font-pixel font-bold text-primary">Order Management</h1>
+          <h1 className="text-2xl font-pixel font-bold text-foreground">Order Management</h1>
         </div>
         <div className="flex justify-center items-center min-h-[400px]">
           <RotateLoader color="green" size={15} />
@@ -485,7 +340,7 @@ const Orders = () => {
     return (
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-          <h1 className="text-2xl font-pixel font-bold text-primary">Order Management</h1>
+          <h1 className="text-2xl font-pixel font-bold text-foreground">Order Management</h1>
         </div>
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
@@ -505,7 +360,7 @@ const Orders = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-pixel font-bold text-primary">Order Management</h1>
+          <h1 className="text-3xl font-pixel font-bold text-foreground">Order Management</h1>
           <p className="text-gray-600 mt-1">Manage and track all customer orders</p>
         </div>
         <div className="flex items-center gap-2">
@@ -514,12 +369,12 @@ const Orders = () => {
             disabled={refreshing}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <RefreshCw className={`w-4 h-4 text-primary ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="font-pixel text-primary">Refresh</span>
+            <RefreshCw className={`w-4 h-4 text-foreground ${refreshing ? 'animate-spin' : ''}`} />
+            <span className="font-pixel text-foreground">Refresh</span>
           </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            <Download className="w-4 h-4 text-primary" />
-            <span className="font-pixel text-primary">Export All</span>
+            <Download className="w-4 h-4 text-foreground" />
+            <span className="font-pixel text-foreground">Export All</span>
           </button>
         </div>
       </div>
@@ -528,14 +383,14 @@ const Orders = () => {
       {!loading && !error && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-            <div className="text-2xl font-bold text-primary font-pixel">{stats.total}</div>
+            <div className="text-2xl font-bold text-foreground font-pixel">{stats.total}</div>
             <div className="text-sm text-gray-600">Total Orders</div>
           </div>
           <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200 shadow-sm">
             <div className="text-2xl font-bold text-yellow-600 font-pixel">{stats.pending}</div>
             <div className="text-sm text-yellow-700">Pending</div>
           </div>
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 shadow-sm">
+          <div className="bg-muted rounded-lg p-4 shadow-sm">
             <div className="text-2xl font-bold text-blue-600 font-pixel">{stats.processing}</div>
             <div className="text-sm text-blue-700">Processing</div>
           </div>
@@ -547,19 +402,19 @@ const Orders = () => {
             <div className="text-2xl font-bold text-red-600 font-pixel">{stats.cancelled}</div>
             <div className="text-sm text-red-700">Cancelled</div>
           </div>
-          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20 shadow-sm">
-            <div className="text-2xl font-bold text-primary font-pixel">{stats.totalRevenue}৳</div>
-            <div className="text-sm text-primary/70">Revenue</div>
+          <div className="bg-primary rounded-lg p-4 border border-primary/20 shadow-sm">
+            <div className="text-2xl font-bold text-foreground font-pixel">{stats.totalRevenue}৳</div>
+            <div className="text-sm text-foreground/70">Revenue</div>
           </div>
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+      <div className="">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
+            <Input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -571,7 +426,7 @@ const Orders = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+            className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -583,7 +438,7 @@ const Orders = () => {
           <select
             value={productTypeFilter}
             onChange={(e) => setProductTypeFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+            className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Products</option>
             <option value="Mobile Games">Mobile Games</option>
@@ -596,7 +451,7 @@ const Orders = () => {
           <select
             value={paymentMethodFilter}
             onChange={(e) => setPaymentMethodFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+            className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Payment Methods</option>
             <option value="bkash">bKash</option>
@@ -607,7 +462,7 @@ const Orders = () => {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+            className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Time</option>
             <option value="today">Today</option>
@@ -636,7 +491,7 @@ const Orders = () => {
                     type="checkbox" 
                     checked={selected.length === paginatedOrders.length && paginatedOrders.length > 0} 
                     onChange={e => setSelected(e.target.checked ? paginatedOrders.map(o => o.$id || o.id || "") : [])}
-                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                    className="rounded border-gray-300 text-foreground focus:ring-primary"
                   />
                 </th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Order ID</th>
@@ -673,11 +528,11 @@ const Orders = () => {
                             : selected.filter(id => id !== orderId)
                           );
                         }}
-                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                        className="rounded border-gray-300 text-foreground focus:ring-primary"
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-mono text-primary font-bold text-sm">{order.orderID}</div>
+                      <div className="font-mono text-foreground font-bold text-sm">{order.orderID}</div>
                       <div className="text-xs text-gray-500">#{(order.$id || order.id || "").slice(-8).toUpperCase()}</div>
                     </td>
                     <td className="px-4 py-3">
@@ -685,12 +540,27 @@ const Orders = () => {
                       <div className="text-sm text-gray-500">{order.userEmail}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">{order.productName}</div>
-                      <div className="text-sm text-gray-500">{order.productType}</div>
-                      <div className="text-xs text-gray-400">{order.itemLabel} × {order.quantity}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                          <img
+                            src={getProductImage(order.productName)}
+                            alt={order.productName}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = "/assets/placeholder.svg";
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">{order.productName}</div>
+                          <div className="text-sm text-gray-500">{order.productType}</div>
+                          <div className="text-xs text-gray-400">{order.itemLabel} × {order.quantity}</div>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-bold text-primary font-pixel">{order.totalAmount}৳</div>
+                      <div className="font-bold text-foreground font-pixel">{order.totalAmount}৳</div>
                       <div className="text-xs text-gray-500">{order.unitPrice}৳ each</div>
                     </td>
                     <td className="px-4 py-3">
@@ -711,7 +581,7 @@ const Orders = () => {
                           title="View Details" 
                           onClick={() => setViewOrder(order)}
                         >
-                          <Eye className="w-4 h-4 text-primary" />
+                          <Eye className="w-4 h-4 text-foreground" />
                         </button>
                         <button 
                           className="p-1 rounded-lg hover:bg-blue-100 transition-colors" 
@@ -778,7 +648,7 @@ const Orders = () => {
             <select 
               value={pageSize} 
               onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }} 
-              className="px-2 py-1 rounded-lg border border-gray-300 font-pixel text-sm"
+              className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value={5}>5 per page</option>
               <option value={10}>10 per page</option>
@@ -789,9 +659,221 @@ const Orders = () => {
         </div>
       </div>
 
-      {/* Modals */}
-      {viewOrder && <OrderDetailsModal order={viewOrder} onClose={() => setViewOrder(null)} />}
-      {editOrder && <EditOrderModal order={editOrder} onClose={() => setEditOrder(null)} onSave={handleSaveStatus} />}
+      {/* View Order Details Modal */}
+      <Dialog open={!!viewOrder} onOpenChange={(open) => !open && setViewOrder(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-pixel text-xl text-foreground">
+              Order Details
+            </DialogTitle>
+          </DialogHeader>
+          {viewOrder && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Product Image Section */}
+              <div className="space-y-4">
+                <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                  <img
+                    src={getProductImage(viewOrder.productName)}
+                    alt={viewOrder.productName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/assets/placeholder.svg";
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Order Details Section */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-pixel text-2xl text-foreground mb-2">
+                    {viewOrder.productName}
+                  </h3>
+                  <Badge variant="secondary" className="font-pixel">
+                    {viewOrder.productType}
+                  </Badge>
+                </div>
+
+                {/* Order Information */}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Order ID:</span>
+                      <div className="font-mono font-bold text-foreground">{viewOrder.orderID}</div>
+                    </div>
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Status:</span>
+                      <div className="mt-1"><StatusBadge status={viewOrder.status} /></div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Customer:</span>
+                      <div className="font-medium text-foreground">{viewOrder.userName}</div>
+                      <div className="text-sm text-muted-foreground">{viewOrder.userEmail}</div>
+                    </div>
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Created:</span>
+                      <div className="text-sm text-foreground">{new Date(viewOrder.createdAt).toLocaleString()}</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Item:</span>
+                      <div className="text-sm text-foreground">{viewOrder.itemLabel}</div>
+                      <div className="text-xs text-muted-foreground">Quantity: {viewOrder.quantity}</div>
+                    </div>
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Amount:</span>
+                      <div className="font-bold text-foreground font-pixel">{viewOrder.totalAmount}৳</div>
+                      <div className="text-xs text-muted-foreground">{viewOrder.unitPrice}৳ each</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Payment Method:</span>
+                      <div className="font-medium text-foreground">{viewOrder.paymentMethod}</div>
+                      <div className="text-xs text-muted-foreground font-mono">Transaction: {viewOrder.transactionId}</div>
+                    </div>
+                  </div>
+
+                  {viewOrder.deliveryInfo && (
+                    <div>
+                      <span className="font-pixel text-xs text-muted-foreground">Delivery Information:</span>
+                      <div className="text-sm text-foreground bg-muted p-3 rounded-lg mt-1">
+                        {viewOrder.deliveryInfo}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setViewOrder(null)}
+                    className="font-pixel"
+                  >
+                    Close
+                  </Button>
+                  <Button 
+                    variant="default"
+                    onClick={() => { 
+                      window.open('/admin/receipt-verifier', '_blank');
+                    }}
+                    className="font-pixel"
+                  >
+                    <ShieldCheck className="w-4 h-4 mr-2" />
+                    Send Item
+                  </Button>
+                  <Button 
+                    variant="default"
+                    onClick={() => { 
+                      setEditOrder(viewOrder); 
+                      setViewOrder(null); 
+                    }}
+                    className="font-pixel"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Status
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Order Status Modal */}
+      <Dialog open={!!editOrder} onOpenChange={(open) => !open && setEditOrder(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-pixel text-xl text-foreground">
+              Edit Order Status
+            </DialogTitle>
+          </DialogHeader>
+          {editOrder && (
+            <div className="space-y-4">
+              <div>
+                <label className="font-pixel text-xs text-muted-foreground mb-2 block">Order ID</label>
+                <div className="px-3 py-2 bg-muted rounded-lg font-mono text-foreground font-bold">
+                  {editOrder.orderID}
+                </div>
+              </div>
+
+              <div>
+                <label className="font-pixel text-xs text-muted-foreground mb-2 block">Product</label>
+                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-background flex-shrink-0">
+                    <img
+                      src={getProductImage(editOrder.productName)}
+                      alt={editOrder.productName}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/assets/placeholder.svg";
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <div className="font-medium text-foreground">{editOrder.productName}</div>
+                    <div className="text-sm text-muted-foreground">{editOrder.itemLabel}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-pixel text-xs text-muted-foreground mb-2 block">Customer</label>
+                <div className="px-3 py-2 bg-muted rounded-lg">
+                  <div className="font-medium text-foreground">{editOrder.userName}</div>
+                  <div className="text-sm text-muted-foreground">{editOrder.userEmail}</div>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-pixel text-xs text-muted-foreground mb-2 block">Current Status</label>
+                <div className="px-3 py-2 bg-muted rounded-lg">
+                  <StatusBadge status={editOrder.status} />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-pixel text-xs text-muted-foreground mb-2 block">New Status</label>
+                <select
+                  className="w-full font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  defaultValue={editOrder.status}
+                  onChange={(e) => {
+                    const newStatus = e.target.value;
+                    if (newStatus && newStatus !== editOrder.status) {
+                      if (confirm(`Change order status from "${editOrder.status}" to "${newStatus}"?`)) {
+                        handleSaveStatus(newStatus);
+                      }
+                    }
+                  }}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button 
+                  variant="outline"
+                  onClick={() => setEditOrder(null)}
+                  className="font-pixel"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

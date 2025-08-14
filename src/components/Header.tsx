@@ -18,6 +18,8 @@ import {
 import { account } from "@/lib/appwrite";
 import { getUserOrders } from "@/lib/orders";
 import MobileMenu from "./MobileMenu";
+import SearchComponent from "./SearchComponent";
+import MobileSearch from "./MobileSearch";
 
 // Types
 interface DropdownItem {
@@ -423,6 +425,7 @@ const Header = () => {
 
             {/* Right Actions */}
             <div className="flex items-center gap-4">
+
               {/* Cart Button - Changed from xl:inline-flex to lg:inline-flex */}
               <Button
                 variant="default"

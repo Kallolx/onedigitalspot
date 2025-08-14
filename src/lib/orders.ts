@@ -2,6 +2,7 @@ import { databases, account } from "./appwrite";
 import { ID, Query } from "appwrite";
 
 export interface OrderData {
+  deliveryInfo: any;
   id?: string;
   $id?: string; // Appwrite document ID
   orderID: string; // Auto-generated 6-character order ID (matches Appwrite attribute name)

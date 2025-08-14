@@ -100,7 +100,7 @@ export default function NetflixSubscription() {
         const products = response.documents;
         // Find Netflix (case-insensitive)
         const netflix = products.find(
-          (g) => g.title && g.title.toLowerCase() === "netflix subscription"
+          (g) => g.title && g.title.toLowerCase() === "netflix"
         );
         
         // Group priceList if available - map to shared/personal format
@@ -155,7 +155,7 @@ export default function NetflixSubscription() {
   return (
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
-      title="Netflix Subscription"
+      title="Netflix"
       image={netflixProduct?.image}
       priceList={priceList}
       infoSections={infoSections}

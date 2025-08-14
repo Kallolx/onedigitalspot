@@ -247,7 +247,7 @@ export const giftCards: Product[] = [
     route: "/gift-cards/roblox",
   },
   {
-    title: "Spotify Gift Card",
+    title: "Spotify",
     image: "/products/gift-cards/spotify.avif",
     price: "600",
     rating: 5,
@@ -289,7 +289,7 @@ export const aiTools: Product[] = [
     route: "/ai-tools/claude",
   },
   {
-    title: "Super Grok Premium",
+    title: "Grok Premium",
     image: "/products/ai-tools/grok-ai.avif",
     price: "1299",
     rating: 5,
