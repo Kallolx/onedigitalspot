@@ -80,7 +80,11 @@ export default function FreeFire() {
   const [priceList, setPriceList] = useState<any[]>([]);
   const [similar, setSimilar] = useState<any[]>([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const infoImage = "/products/freefire.png";
+  // Use image from subscriptions array
+  const freeFireProduct = mobileGames.find(
+    (p) => p.title === "Free Fire"
+  );
+  const infoImage = freeFireProduct?.image;
 
   useEffect(() => {
     async function fetchProduct() {
@@ -121,7 +125,7 @@ export default function FreeFire() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Free Fire"
-      image={freefire?.image || ""}
+      image={freeFireProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

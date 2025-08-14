@@ -3,7 +3,6 @@ import { databases, account } from "@/lib/appwrite";
 import { mobileGames } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
 
-// Define the SelectedItem interface here since it's needed by the component
 interface SelectedItem {
   categoryIdx: number;
   itemIdx: number;
@@ -12,42 +11,26 @@ interface SelectedItem {
 
 const categoryIcons = {
   "Passes & Vouchers": "/assets/icons/battle-pass.svg",
-  "UC Packages": "/assets/icons/uc.svg",
+  "Gems Packages": "/assets/icons/gems.svg",
 };
 
 function groupPriceList(priceList) {
   const passes = [];
-  const uc = [];
+  const gems = [];
   priceList.forEach((item) => {
-    // Support both string and object formats
     if (typeof item === "string") {
       const [label, price, hot, type] = item.split("|");
       const obj = { label, price: Number(price), hot: hot === "true" };
-      if (type === "pass") {
-        passes.push(obj);
-      } else if (type === "uc") {
-        uc.push(obj);
-      }
+      if (type === "pass") passes.push(obj);
+      else gems.push(obj); 
     } else if (typeof item === "object" && item.label && item.price) {
-      // fallback for object format
-      if (item.label.toLowerCase().includes("pass")) {
-        passes.push(item);
-      } else {
-        uc.push(item);
-      }
+      if (item.label.toLowerCase().includes("pass")) passes.push(item);
+      else gems.push(item);
     }
   });
   return [
-    {
-      title: "Battle Passes",
-      categoryIcon: categoryIcons["Passes & Vouchers"],
-      items: passes,
-    },
-    {
-      title: "UC Packages",
-      categoryIcon: categoryIcons["UC Packages"],
-      items: uc,
-    },
+    { title: "Battle Passes", categoryIcon: categoryIcons["Passes & Vouchers"], items: passes },
+    { title: "Gems Packages", categoryIcon: categoryIcons["Gems Packages"], items: gems },
   ];
 }
 
@@ -56,7 +39,7 @@ const infoSections = [
     title: "How to Buy",
     content: (
       <ul className="list-disc pl-5 text-base mb-4">
-        <li>Select your desired UC or pass package above.</li>
+        <li>Select your desired package above.</li>
         <li>Enter your Player ID.</li>
         <li>Choose quantity and proceed to payment.</li>
       </ul>
@@ -65,27 +48,21 @@ const infoSections = [
   {
     title: "How to Find Player ID",
     content: (
-      <div className="mb-2">
-        <p className="mb-2">
-          Open PUBG Mobile, tap your avatar in the top-right corner. Your Player ID is displayed below your avatar name.
-        </p>
-      </div>
+      <p>Open Brawl Stars, tap your avatar. Your Player ID is shown below your name.</p>
     ),
   },
 ];
 
-export default function PUBGMobile() {
+export default function BrawlStars() {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
-  const [pubg, setPubg] = useState(null);
+  const [game, setGame] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  // Use image from subscriptions array
-  const pubgProduct = mobileGames.find(
-    (p) => p.title === "PUBG Mobile"
-  );
-  const infoImage = pubgProduct?.image;
+
+  const product = mobileGames.find((p) => p.title === "Brawl Stars");
+  const infoImage = product?.image;
 
   useEffect(() => {
     async function fetchProduct() {
@@ -94,29 +71,23 @@ export default function PUBGMobile() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_MOBILE_GAMES_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        // Find PUBG Mobile (case-insensitive)
-        const pubgProduct = products.find((g) => g.title && g.title.toLowerCase() === "pubg mobile");
-        setPubg(pubgProduct);
-        // Group priceList
-        if (pubgProduct && Array.isArray(pubgProduct.priceList)) {
-          setPriceList(groupPriceList(pubgProduct.priceList));
-        }
-        // Get similar products
-        setSimilar(mobileGames.filter((g) => g.title !== "PUBG Mobile").slice(0, 4));
-      } catch (err) {
-        setPubg(null);
+
+        const brawl = products.find((g) => g.title?.toLowerCase() === "brawl stars");
+        setGame(brawl);
+
+        if (brawl && Array.isArray(brawl.priceList)) setPriceList(groupPriceList(brawl.priceList));
+
+        setSimilar(mobileGames.filter((g) => g.title !== "Brawl Stars").slice(0, 4));
+      } catch {
+        setGame(null);
         setPriceList([]);
         setSimilar([]);
       }
     }
 
     async function checkAuth() {
-      try {
-        await account.get();
-        setIsSignedIn(true);
-      } catch {
-        setIsSignedIn(false);
-      }
+      try { await account.get(); setIsSignedIn(true); } 
+      catch { setIsSignedIn(false); }
     }
 
     fetchProduct();
@@ -126,8 +97,8 @@ export default function PUBGMobile() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="PUBG Mobile"
-      image={pubgProduct?.image}
+      title="Brawl Stars"
+      image={product?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

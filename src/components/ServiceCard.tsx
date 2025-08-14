@@ -23,17 +23,21 @@ const ServiceCard = ({
   rating = 5,  
   buttonText = "Buy Now",
   isTopup = false,
-  isSubscription = false,
   route,
-  popular
   }: ServiceCardProps) => {
   const navigate = useNavigate();
 
   // Utility to convert English digits to Bangla digits
   const toBanglaNumber = (num: string | number) => {
-    const en = '0123456789';
-    const bn = '০১২৩৪৫৬৭৮৯';
-    return num.toString().split('').map(c => en.includes(c) ? bn[en.indexOf(c)] : c).join('');
+    const en = "0123456789";
+    const bn = "০১২৩৪৫৬৭৮৯";
+    // Format with commas (Indian system)
+    const formatted = Number(num).toLocaleString("en-IN");
+    // Convert to Bangla digits
+    return formatted
+      .split("")
+      .map((c) => (en.includes(c) ? bn[en.indexOf(c)] : c))
+      .join("");
   };
 
   return (

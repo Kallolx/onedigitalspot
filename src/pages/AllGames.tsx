@@ -26,6 +26,10 @@ const AllGames = () => {
     return priceNum >= selectedPrice.min && priceNum < selectedPrice.max;
   });
 
+  // Split filtered into mobile and pc games
+  const filteredMobile = filtered.filter(g => mobileGames.some(m => m.title === g.title)).slice(0, 8);
+  const filteredPc = filtered.filter(g => pcGames.some(p => p.title === g.title)).slice(0, 8);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -62,12 +66,28 @@ const AllGames = () => {
             </div>
           </div>
         </div>
-        {/* Games Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-          {filtered.length === 0 ? (
-            <div className="col-span-full text-center text-muted-foreground font-pixel text-xl">No games found.</div>
+        {/* Mobile Games Section */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-pixel text-2xl md:text-3xl text-primary">Mobile Games</h2>
+          <a href="/mobile-games" className="font-pixel text-sm md:text-base text-primary underline hover:text-primary/80">Show More</a>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+          {filteredMobile.length === 0 ? (
+            <div className="col-span-full text-center text-muted-foreground font-pixel text-xl">No mobile games found.</div>
           ) : (
-            filtered.map((game, idx) => <ServiceCard key={idx} {...game} />)
+            filteredMobile.map((game, idx) => <ServiceCard key={idx} {...game} />)
+          )}
+        </div>
+        {/* PC Games Section */}
+        <div className="flex items-center justify-between mb-4 mt-8">
+          <h2 className="font-pixel text-2xl md:text-3xl text-primary">PC Games</h2>
+          <a href="/pc-games" className="font-pixel text-sm md:text-base text-primary underline hover:text-primary/80">Show More</a>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+          {filteredPc.length === 0 ? (
+            <div className="col-span-full text-center text-muted-foreground font-pixel text-xl">No PC games found.</div>
+          ) : (
+            filteredPc.map((game, idx) => <ServiceCard key={idx} {...game} />)
           )}
         </div>
       </main>

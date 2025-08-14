@@ -65,7 +65,7 @@ export default function DuolingoSubscription() {
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
         const duo = products.find(
-          (g) => g.title && g.title.toLowerCase() === "duolingo"
+          (g) => g.title && g.title.toLowerCase() === "duolingo plus"
         );
         setDuolingo(duo);
 

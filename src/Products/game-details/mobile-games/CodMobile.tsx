@@ -3,7 +3,7 @@ import { databases, account } from "@/lib/appwrite";
 import { mobileGames } from "@/lib/products";
 import GameDetailsLayout from "@/components/GameDetailsLayout";
 
-// Define the SelectedItem interface here since it's needed by the component
+// Define the SelectedItem interface
 interface SelectedItem {
   categoryIdx: number;
   itemIdx: number;
@@ -12,14 +12,13 @@ interface SelectedItem {
 
 const categoryIcons = {
   "Passes & Vouchers": "/assets/icons/battle-pass.svg",
-  "UC Packages": "/assets/icons/uc.svg",
+  "CP Packages": "/assets/icons/cp.svg",
 };
 
 function groupPriceList(priceList) {
   const passes = [];
   const uc = [];
   priceList.forEach((item) => {
-    // Support both string and object formats
     if (typeof item === "string") {
       const [label, price, hot, type] = item.split("|");
       const obj = { label, price: Number(price), hot: hot === "true" };
@@ -29,7 +28,6 @@ function groupPriceList(priceList) {
         uc.push(obj);
       }
     } else if (typeof item === "object" && item.label && item.price) {
-      // fallback for object format
       if (item.label.toLowerCase().includes("pass")) {
         passes.push(item);
       } else {
@@ -44,8 +42,8 @@ function groupPriceList(priceList) {
       items: passes,
     },
     {
-      title: "UC Packages",
-      categoryIcon: categoryIcons["UC Packages"],
+      title: "CP Packages",
+      categoryIcon: categoryIcons["CP Packages"],
       items: uc,
     },
   ];
@@ -56,7 +54,7 @@ const infoSections = [
     title: "How to Buy",
     content: (
       <ul className="list-disc pl-5 text-base mb-4">
-        <li>Select your desired UC or pass package above.</li>
+        <li>Select your desired CP or pass package above.</li>
         <li>Enter your Player ID.</li>
         <li>Choose quantity and proceed to payment.</li>
       </ul>
@@ -67,25 +65,23 @@ const infoSections = [
     content: (
       <div className="mb-2">
         <p className="mb-2">
-          Open PUBG Mobile, tap your avatar in the top-right corner. Your Player ID is displayed below your avatar name.
+          Open Call of Duty Mobile, tap your avatar in the top-left corner. Your Player ID is displayed below your avatar name.
         </p>
       </div>
     ),
   },
 ];
 
-export default function PUBGMobile() {
+export default function CODMobile() {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
-  const [pubg, setPubg] = useState(null);
+  const [cod, setCod] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  // Use image from subscriptions array
-  const pubgProduct = mobileGames.find(
-    (p) => p.title === "PUBG Mobile"
-  );
-  const infoImage = pubgProduct?.image;
+
+  const codProduct = mobileGames.find((p) => p.title === "Call of Duty Mobile");
+  const infoImage = codProduct?.image;
 
   useEffect(() => {
     async function fetchProduct() {
@@ -94,17 +90,17 @@ export default function PUBGMobile() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_MOBILE_GAMES_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        // Find PUBG Mobile (case-insensitive)
-        const pubgProduct = products.find((g) => g.title && g.title.toLowerCase() === "pubg mobile");
-        setPubg(pubgProduct);
-        // Group priceList
-        if (pubgProduct && Array.isArray(pubgProduct.priceList)) {
-          setPriceList(groupPriceList(pubgProduct.priceList));
+        // Find Call of Duty Mobile
+        const codProduct = products.find((g) => g.title && g.title.toLowerCase() === "call of duty mobile");
+        setCod(codProduct);
+
+        if (codProduct && Array.isArray(codProduct.priceList)) {
+          setPriceList(groupPriceList(codProduct.priceList));
         }
-        // Get similar products
-        setSimilar(mobileGames.filter((g) => g.title !== "PUBG Mobile").slice(0, 4));
+
+        setSimilar(mobileGames.filter((g) => g.title !== "Call of Duty Mobile").slice(0, 4));
       } catch (err) {
-        setPubg(null);
+        setCod(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -126,8 +122,8 @@ export default function PUBGMobile() {
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="PUBG Mobile"
-      image={pubgProduct?.image}
+      title="Call of Duty Mobile"
+      image={codProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

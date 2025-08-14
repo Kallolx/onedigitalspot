@@ -12,7 +12,7 @@ interface SelectedItem {
 
 const categoryIcons = {
   "Passes & Vouchers": "/assets/icons/voucher.svg",
-  "Diamonds": "/assets/icons/diamond.svg",
+  Diamonds: "/assets/icons/diamond.svg",
 };
 
 function groupPriceList(priceList) {
@@ -81,25 +81,38 @@ export default function MobileLegends() {
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false); // <-- Add this state
-  const infoImage = "/products/mobile-legends.png";
+
+  // Use image from subscriptions array
+  const mobileLegendsProduct = mobileGames.find(
+    (p) => p.title === "Mobile Legends"
+  );
+  const infoImage = mobileLegendsProduct?.image;
 
   useEffect(() => {
     async function fetchProduct() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_MOBILE_GAMES_ID;
+        const collectionId = import.meta.env
+          .VITE_APPWRITE_COLLECTION_MOBILE_GAMES_ID;
         // Get all mobile games
-        const response = await databases.listDocuments(databaseId, collectionId);
+        const response = await databases.listDocuments(
+          databaseId,
+          collectionId
+        );
         const products = response.documents;
         // Find Mobile Legends (case-insensitive)
-        const mlProduct = products.find((g) => g.title && g.title.toLowerCase() === "mobile legends");
+        const mlProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "mobile legends"
+        );
         setMl(mlProduct);
         // Group priceList
         if (mlProduct && Array.isArray(mlProduct.priceList)) {
           setPriceList(groupPriceList(mlProduct.priceList));
         }
         // Get similar products
-        setSimilar(mobileGames.filter((g) => g.title !== "Mobile Legends").slice(0, 4));
+        setSimilar(
+          mobileGames.filter((g) => g.title !== "Mobile Legends").slice(0, 4)
+        );
       } catch (err) {
         setMl(null);
         setPriceList([]);
@@ -124,7 +137,7 @@ export default function MobileLegends() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Mobile Legends"
-      image={ml?.image || ""}
+      image={mobileLegendsProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

@@ -80,7 +80,7 @@ export default function PerplexityAI() {
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
         const perplexityProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "perplexity pro"
+          (g) => g.title && g.title.toLowerCase() === "perplexity premium"
         );
         setPerplexity(perplexityProduct);
 

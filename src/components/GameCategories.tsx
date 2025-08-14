@@ -48,15 +48,33 @@ const GameCategories = () => (
               />
 
               {/* Title */}
-              <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
-                Trending
+              <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
+                Most Populer
               </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Swiper Arrows */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="swiper-popular-prev h-8 w-8 p-0"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="swiper-popular-next h-8 w-8 p-0"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
             </div>
           </div>
           <CategorySwiper
             items={popularProducts}
             navigationPrevClass=".swiper-popular-prev"
             navigationNextClass=".swiper-popular-next"
+            autoplay={true}
           />
         </div>
       )}
@@ -74,7 +92,7 @@ const GameCategories = () => (
             />
 
             {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
               AI Tools
             </h2>
           </div>
@@ -125,14 +143,14 @@ const GameCategories = () => (
             />
 
             {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
               Subscriptions
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
             {/* See All */}
-            <a href="/ai-tools">
+            <a href="/subscriptions">
               <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
                 See All
               </Button>
@@ -177,14 +195,14 @@ const GameCategories = () => (
             />
 
             {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
               Productivity
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
             {/* See All */}
-            <a href="/ai-tools">
+            <a href="/productivity">
               <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
                 See All
               </Button>
@@ -229,14 +247,14 @@ const GameCategories = () => (
             />
 
             {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
               Gift Cards
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
             {/* See All */}
-            <a href="/ai-tools">
+            <a href="/gift-cards">
               <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
                 See All
               </Button>
@@ -280,14 +298,14 @@ const GameCategories = () => (
             />
 
             {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
               Mobile Games
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
             {/* See All */}
-            <a href="/ai-tools">
+            <a href="/mobile-games">
               <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
                 See All
               </Button>
@@ -331,14 +349,14 @@ const GameCategories = () => (
             />
 
             {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-bold font-pixel tracking-tighter">
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
               PC Games
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
             {/* See All */}
-            <a href="/ai-tools">
+            <a href="/pc-games">
               <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
                 See All
               </Button>

@@ -35,9 +35,9 @@ import Orders from "./admin/Orders";
 import Products from "./admin/Products";
 import Users from "./admin/Users";
 import Subscriptions from "./pages/Subscriptions";
-
 import Settings from "./admin/Settings";
 import GenshinImpact from "./Products/game-details/mobile-games/GenshinImpact";
+import CodMobile from "./Products/game-details/mobile-games/CodMobile";
 import FreeFire from "./Products/game-details/mobile-games/FreeFire";
 import Proplexity from "./Products/ai-tools/Proplexity";
 import Claude from "./Products/ai-tools/Claude";
@@ -68,6 +68,16 @@ import ZoomPro from "./Products/design/ZoomPro";
 import Productivity from "./pages/Productivity";
 import AllGames from "./pages/AllGames";
 import TawkToWidget from "./components/TawkToWidget";
+import DeltaForce from "./Products/game-details/mobile-games/DeltaForce";
+import BloodStrike from "./Products/game-details/mobile-games/BloodStrike";
+import ClashOfClans from "./Products/game-details/mobile-games/ClashOfClans";
+import ClashRoyale from "./Products/game-details/mobile-games/ClashRoyale";
+import BrawlStars from "./Products/game-details/mobile-games/BrawlStars";
+import Standoff2 from "./Products/game-details/mobile-games/Standoff2";
+import WutheringWaves from "./Products/game-details/mobile-games/WutheringWaves";
+import Efootball from "./Products/game-details/mobile-games/Efootball";
+import FifaMobile from "./Products/game-details/mobile-games/FifaMobile";
+import RobloxGame from "./Products/game-details/mobile-games/RobloxGame";
 
 const queryClient = new QueryClient();
 
@@ -96,10 +106,6 @@ const App = () => {
             <Route path="/productivity" element={<Productivity />} />
             <Route path="/all-games" element={<AllGames />} />
 
-            {/* Game Categories */}
-
-            {/* Game Details */}
-
             {/* Mobile Games Routes */}
             <Route
               path="/mobile-games/mobile-legends"
@@ -111,6 +117,17 @@ const App = () => {
               path="/mobile-games/genshin-impact"
               element={<GenshinImpact />}
             />
+            <Route path="/mobile-games/cod-mobile" element={<CodMobile />} />
+            <Route path="/mobile-games/delta-force" element={<DeltaForce />} />
+            <Route path="/mobile-games/blood-strike" element={<BloodStrike />} />
+            <Route path="/mobile-games/clash-of-clans" element={<ClashOfClans />} />
+            <Route path="/mobile-games/clash-royale" element={<ClashRoyale />} />
+            <Route path="/mobile-games/brawl-stars" element={<BrawlStars />} />
+            <Route path="/mobile-games/standoff-2" element={<Standoff2 />} />
+            <Route path="/mobile-games/wuthering-waves" element={<WutheringWaves />} />
+            <Route path="/mobile-games/roblox" element={<RobloxGame />} />
+            <Route path="/mobile-games/efootball" element={<Efootball />} />
+            <Route path="/mobile-games/fifa-mobile" element={<FifaMobile />} />
 
             {/* PC Games Routes */}
             <Route path="/pc-games/valorant" element={<Valorant />} />

@@ -198,7 +198,7 @@ const GameDetailsLayout: React.FC<
           paymentAccountNumber: userAccount,
           transactionId: trxId,
           status: "Pending",
-          deliveryInfo: undefined
+          deliveryInfo: undefined,
         };
 
         return await createOrder(orderData);
@@ -253,8 +253,8 @@ const GameDetailsLayout: React.FC<
       qr: "/assets/qr/bkash.png",
       instructions: [
         'Open up the bKash app & Choose "Send Money" Its a Personal Account',
-        'Enter the bKash Account Number: <span class="font-bold text-foreground">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold text-foreground\">${totalAmount}৳</span>`,
+        'Enter the bKash Account Number: <span class="font-bold text-secondary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(totalAmount)}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a bKash Transaction ID (TRX ID)",
       ],
@@ -268,8 +268,10 @@ const GameDetailsLayout: React.FC<
       type: "Send Money",
       instructions: [
         'Open up the Nagad app & Choose "Send Money"',
-        'Enter the Nagad Account Number: <span class="font-bold text-foreground">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold text-foreground\">${totalAmount}৳</span>`,
+        'Enter the Nagad Account Number: <span class="font-bold text-secondary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
+          totalAmount
+        )}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Nagad Transaction ID",
       ],
@@ -283,8 +285,10 @@ const GameDetailsLayout: React.FC<
       type: "Send Money",
       instructions: [
         'Open up the Rocket app & Choose "Send Money"',
-        'Enter the Rocket Account Number:  <span class="font-bold text-foreground">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold text-foreground\">${totalAmount}৳</span>`,
+        'Enter the Rocket Account Number:  <span class="font-bold text-secondary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
+          totalAmount
+        )}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Rocket Transaction ID",
       ],
@@ -401,7 +405,7 @@ const GameDetailsLayout: React.FC<
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Game Image Section - Compact */}
           <div className="lg:col-span-4">
-            <div className="bg-muted rounded-2xl shadow-card p-4 sticky top-8">
+            <div className="bg-background border rounded-2xl shadow-card p-4 sticky top-8">
               <div className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto">
                 {/* Loader while loading or error */}
                 {(!imgLoaded || imgError) && (
@@ -454,7 +458,7 @@ const GameDetailsLayout: React.FC<
           </div>
           <div className="flex-1">
             {/* Price List with Categories */}
-            <Card className="mb-6 p-4">
+            <Card className="mb-6 p-4 bg-transparent">
               <div className="flex flex-col gap-6">
                 {priceList.map((category, catIdx) => (
                   <div key={catIdx}>
@@ -469,7 +473,7 @@ const GameDetailsLayout: React.FC<
                           variant={
                             isItemSelected(catIdx, itemIdx)
                               ? "default"
-                              : "outline"
+                              : "ghost"
                           }
                           className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
                           onClick={() => handleItemSelection(catIdx, itemIdx)}
@@ -518,7 +522,7 @@ const GameDetailsLayout: React.FC<
             </Card>
 
             {/* Purchase Form */}
-            <Card className="mb-8 p-4">
+            <Card className="mb-8 p-4 bg-transparent">
               <form onSubmit={onSubmit || ((e) => e.preventDefault())}>
                 <div className="mb-4">
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -527,7 +531,7 @@ const GameDetailsLayout: React.FC<
                       typeof setPlayerId !== "undefined" && (
                         <div className="flex-1">
                           <label
-                            className="block font-pixel text-base text-foreground mb-1"
+                            className="block bg-background font-pixel text-base text-foreground mb-1"
                             htmlFor="playerId"
                           >
                             Player ID <span className="text-red-500">*</span>
@@ -535,7 +539,7 @@ const GameDetailsLayout: React.FC<
                           <div className="relative flex items-center">
                             <input
                               id="playerId"
-                              className="input w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-white/90 focus:border-primary focus:ring-2 focus:ring-primary transition"
+                              className="input w-full border rounded-lg px-4 py-3 text-base bg-background focus:border-primary focus:ring-2 focus:ring-primary transition"
                               placeholder="Enter your Player ID"
                               value={playerId || ""}
                               onChange={(e) =>
@@ -569,7 +573,7 @@ const GameDetailsLayout: React.FC<
                           <div className="relative flex items-center">
                             <input
                               id="uuid"
-                              className="input w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-white/90 focus:border-primary focus:ring-2 focus:ring-primary transition"
+                              className="input w-full border rounded-lg px-4 py-3 text-base bg-background focus:border-primary focus:ring-2 focus:ring-primary transition"
                               placeholder="Enter your UUID"
                               value={uuid || ""}
                               onChange={(e) =>
@@ -603,7 +607,7 @@ const GameDetailsLayout: React.FC<
                           <div className="relative flex items-center">
                             <input
                               id="zoneId"
-                              className="input w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-white/90 focus:border-primary focus:ring-2 focus:ring-primary transition"
+                              className="input w-full border rounded-lg px-4 py-3 text-base bg-background focus:border-primary focus:ring-2 focus:ring-primary transition"
                               placeholder="Enter your Zone ID"
                               value={zoneId || ""}
                               onChange={(e) =>
@@ -669,7 +673,7 @@ const GameDetailsLayout: React.FC<
                         return (
                           <div
                             key={index}
-                            className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
+                            className="flex items-center justify-between border border-gray-200 bg-gray-50 rounded-lg p-3"
                           >
                             <div className="flex-1 min-w-0">
                               <span className="font-medium text-gray-900 truncate">
@@ -737,48 +741,69 @@ const GameDetailsLayout: React.FC<
                   </div>
                 )}
 
-                <Button
-                  type="button"
-                  variant="default"
-                  className="w-full font-pixel text-lg mt-2 flex items-center justify-center gap-2"
-                  disabled={
-                    selectedItems.length === 0 ||
-                    (typeof playerId !== "undefined" && !playerId) ||
-                    (typeof zoneId !== "undefined" && !zoneId)
-                  }
-                  onClick={() => {
-                    if (!isSignedIn) {
-                      localStorage.setItem(
-                        "gameOrderInputs",
-                        JSON.stringify({
-                          selectedItems,
-                          playerId,
-                          zoneId,
-                          pathname: location.pathname,
-                        })
-                      );
-                      navigate(
-                        `/auth/login?redirect=${encodeURIComponent(
-                          location.pathname
-                        )}`
-                      );
-                    } else {
-                      setShowPayment(true);
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                  <Button
+                    type="button"
+                    variant="default"
+                    className="w-full sm:flex-1 font-pixel text-base sm:text-lg flex items-center justify-center gap-2 py-3 sm:py-4"
+                    disabled={
+                      selectedItems.length === 0 ||
+                      (typeof playerId !== "undefined" && !playerId) ||
+                      (typeof zoneId !== "undefined" && !zoneId)
                     }
-                  }}
-                >
-                  {!isSignedIn ? (
-                    <>
-                      <LockKeyIcon className="w-7 h-7 mr-2" strokeWidth={3} />
-                      <span>Please Login to Continue</span>
-                    </>
-                  ) : (
-                    <>
-                      <SentIcon className="w-7 h-7 ml-2" strokeWidth={3} />
-                      Proceed to Payment
-                    </>
-                  )}
-                </Button>
+                    onClick={() => {
+                      if (!isSignedIn) {
+                        localStorage.setItem(
+                          "gameOrderInputs",
+                          JSON.stringify({
+                            selectedItems,
+                            playerId,
+                            zoneId,
+                            pathname: location.pathname,
+                          })
+                        );
+                        navigate(
+                          `/auth/login?redirect=${encodeURIComponent(
+                            location.pathname
+                          )}`
+                        );
+                      } else {
+                        setShowPayment(true);
+                      }
+                    }}
+                  >
+                    {!isSignedIn ? (
+                      <>
+                        <LockKeyIcon
+                          className="w-6 h-6 sm:w-7 sm:h-7 mr-2"
+                          strokeWidth={3}
+                        />
+                        <span>Please Login to Continue</span>
+                      </>
+                    ) : (
+                      <>
+                        <SentIcon
+                          className="w-6 h-6 sm:w-7 sm:h-7 ml-2"
+                          strokeWidth={3}
+                        />
+                        Proceed to Payment
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:w-36 font-pixel text-base sm:text-lg flex items-center justify-center gap-2 py-3 sm:py-4"
+                    disabled={selectedItems.length === 0}
+                    onClick={() => {
+                      // TODO: Implement add to cart logic
+                      alert("Added to cart!");
+                    }}
+                  >
+                    Add to Cart
+                  </Button>
+                </div>
               </form>
             </Card>
 
@@ -859,11 +884,7 @@ const GameDetailsLayout: React.FC<
                                   <h6 className="font-pixel text-sm text-foreground">
                                     Transaction Details
                                   </h6>
-
                                   <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                                      Your {method.name} Account
-                                    </label>
                                     <Input
                                       placeholder={`Enter your ${method.name} number`}
                                       value={userAccount}
@@ -874,11 +895,8 @@ const GameDetailsLayout: React.FC<
                                   </div>
 
                                   <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                                      Transaction ID (TRX ID)
-                                    </label>
                                     <Input
-                                      placeholder="Enter transaction ID"
+                                      placeholder="Enter Transaction ID (TRX ID)"
                                       value={trxId}
                                       onChange={(e) => setTrxId(e.target.value)}
                                     />
@@ -917,7 +935,7 @@ const GameDetailsLayout: React.FC<
                                         {method.name} Number:
                                       </span>
                                       <div className="flex items-center gap-2">
-                                        <span className="font-mono font-semibold text-md">
+                                        <span className="font-sans font-semibold text-md">
                                           {method.account}
                                         </span>
                                         <button
@@ -942,8 +960,8 @@ const GameDetailsLayout: React.FC<
                                         Total:
                                       </span>
                                       <div className="flex items-center gap-2">
-                                        <span className="font-sans text-xl font-bold">
-                                          = {totalAmount} BDT
+                                        <span className="text-2xl font-bold font-anekbangla text-secondary">
+                                          {toBanglaNumber(totalAmount)} BDT
                                         </span>
                                         <button
                                           onClick={() =>
@@ -1023,7 +1041,7 @@ const GameDetailsLayout: React.FC<
 
             {/* Info Section */}
             {infoSections.map((section, i) => (
-              <Card key={i} className="mb-8 p-4">
+              <Card key={i} className="mb-8 p-4 bg-background">
                 <h2 className="font-semibold text-lg mb-2 font-pixel text-foreground">
                   {section.title}
                 </h2>

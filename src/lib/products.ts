@@ -28,7 +28,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Action",
     buttonText: "Buy CP",
-    route: "/mobile-games/call-of-duty-mobile",
+    route: "/mobile-games/cod-mobile",
   },
   {
     title: "PUBG Mobile",
@@ -57,6 +57,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Action",
     buttonText: "Buy Credits",
+    route: "/mobile-games/delta-force",
   },
   {
     title: "Blood Strike",
@@ -65,6 +66,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Action",
     buttonText: "Buy Gold",
+    route: "/mobile-games/blood-strike",
   },
   {
     title: "Clash of Clans",
@@ -73,6 +75,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Strategy",
     buttonText: "Buy Gems",
+    route: "/mobile-games/clash-of-clans",
   },
   {
     title: "Clash Royale",
@@ -81,6 +84,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Strategy",
     buttonText: "Buy Gems",
+    route: "/mobile-games/clash-royale",
   },
   {
     title: "Brawl Stars",
@@ -89,6 +93,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Action",
     buttonText: "Buy Gems",
+    route: "/mobile-games/brawl-stars",
   },
   {
     title: "Standoff 2",
@@ -97,6 +102,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Action",
     buttonText: "Buy Gold",
+    route: "/mobile-games/standoff-2",
   },
   {
     title: "Genshin Impact",
@@ -114,6 +120,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "RPG",
     buttonText: "Buy Lunite",
+    route: "/mobile-games/wuthering-waves",
   },
   {
     title: "Roblox",
@@ -122,6 +129,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Sandbox",
     buttonText: "Buy Robux",
+    route: "/mobile-games/roblox",
   },
   {
     title: "eFootball",
@@ -130,6 +138,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Sports",
     buttonText: "Buy Coins",
+    route: "/mobile-games/efootball",
   },
   {
     title: "FIFA Mobile",
@@ -138,6 +147,7 @@ export const mobileGames: Product[] = [
     rating: 5,
     category: "Sports",
     buttonText: "Buy Points",
+    route: "/mobile-games/fifa-mobile",
   },
 ];
 

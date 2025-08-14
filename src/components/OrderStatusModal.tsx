@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { CheckCircleIcon, XCircleIcon, ArrowRightIcon, RefreshCwIcon } from "lucide-react";
+import { CheckCircleIcon, XCircleIcon, ArrowRightIcon, RefreshCwIcon, XIcon } from "lucide-react";
 
 interface OrderStatusModalProps {
   isOpen: boolean;
@@ -39,8 +39,16 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
     : "There was an issue processing your order. Please try again.";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <Card className="w-full max-w-md bg-white rounded-2xl shadow-retro border-2 border-primary/20 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-lg p-4">
+      <Card className="w-full max-w-md bg-background rounded-2xl shadow-retro border-2 border-primary/20 overflow-hidden">
+      {/* Close Icon */}
+          <button
+            onClick={onClose}
+            className="absolute top-10 right-10 text-secondary hover:text-gray-700 transition-colors"
+            aria-label="Close"
+          >
+            <XIcon className="w-6 h-6" />
+          </button>
         <div className="p-8 text-center">
           {/* Icon */}
           <div className="mb-6">
@@ -72,7 +80,7 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
           {/* Order Details (Success only) */}
           {isSuccess && orderData && (
             <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
-              <h3 className="font-pixel text-sm text-primary mb-3 uppercase tracking-wide">
+              <h3 className="font-pixel text-sm text-secondary mb-3 uppercase tracking-wide">
                 Order Details
               </h3>
               <div className="space-y-2 text-sm">
@@ -93,7 +101,7 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
                 {orderData.amount && (
                   <div className="flex justify-between">
                     <span className="text-gray-500">Amount:</span>
-                    <span className="font-bold text-primary font-pixel">
+                    <span className="font-bold text-secondary font-pixel">
                       {orderData.amount}৳
                     </span>
                   </div>

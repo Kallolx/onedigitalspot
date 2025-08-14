@@ -246,6 +246,7 @@ const MenuSection = ({
   );
 };
 
+
 const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
 
@@ -254,62 +255,71 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
   };
 
   return (
-    <div
-      className={`
-        lg:hidden fixed inset-x-0 top-[64px] bg-background border-b-4 border-border
-        transition-all duration-300 transform origin-top z-50
-        ${
-          isOpen
-            ? "translate-y-0 opacity-100 visible pointer-events-auto"
-            : "-translate-y-full opacity-0 invisible pointer-events-none"
-        }
-      `}
-    >
-      <div className="container px-4 py-4 max-h-[calc(100vh-73px)] overflow-y-auto">
-        <nav className="flex flex-col gap-2 mb-4 tracking-tighter">
-          {/* Home Link */}
-          <Link
-            to="/"
-            className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Home03Icon className="w-5 h-5" />
-              <span className="font-medium">Home</span>
+    <>
+      {/* Blurred overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-x-0 top-[64px] bottom-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300"
+          aria-hidden="true"
+        />
+      )}
+      <div
+        className={`
+          lg:hidden fixed inset-x-0 top-[64px] bg-background
+          transition-all duration-300 transform origin-top z-50
+          ${
+            isOpen
+              ? "translate-y-0 opacity-100 visible pointer-events-auto"
+              : "-translate-y-full opacity-0 invisible pointer-events-none"
+          }
+        `}
+      >
+        <div className="container px-4 py-4 max-h-[calc(100vh-73px)] overflow-y-auto rounded-lg">
+          {/* Mobile Search and Cart beside each other, full width */}
+          <div className="w-full mt-2 mb-4 flex items-center gap-2">
+            <div className="flex-1">
+              <SearchComponent
+                placeholder="Search products..."
+                className="w-full"
+                showFullResults={true}
+              />
             </div>
-          </Link>
-
-          {/* Dynamic Menu Sections */}
-          {MENU_SECTIONS.map((section) => (
-            <MenuSection
-              key={section.id}
-              section={section}
-              activeSubmenu={activeSubmenu}
-              onToggleSubmenu={toggleSubmenu}
-            />
-          ))}
-        </nav>
-        {/* Mobile Search and Cart beside each other, full width */}
-        <div className="w-full mt-4 flex items-center gap-2">
-          <div className="flex-1">
-            <SearchComponent
-              placeholder="Search products..."
-              className="w-full"
-              showFullResults={true}
-            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-11 w-11 min-w-0 flex items-center justify-center"
+            >
+              <ShoppingCart02Icon className="w-6 h-6 text-secondary" />
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-xs font-bold text-primary-foreground rounded-full flex items-center justify-center">
+                0
+              </span>
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative h-11 w-11 min-w-0 flex items-center justify-center"
-          >
-            <ShoppingCart02Icon className="w-6 h-6 text-secondary" />
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-xs font-bold text-primary-foreground rounded-full flex items-center justify-center">
-              0
-            </span>
-          </Button>
+          <nav className="flex flex-col gap-2 mb-4 tracking-tighter">
+            {/* Home Link */}
+            <Link
+              to="/"
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Home03Icon className="w-5 h-5" />
+                <span className="font-medium">Home</span>
+              </div>
+            </Link>
+
+            {/* Dynamic Menu Sections */}
+            {MENU_SECTIONS.map((section) => (
+              <MenuSection
+                key={section.id}
+                section={section}
+                activeSubmenu={activeSubmenu}
+                onToggleSubmenu={toggleSubmenu}
+              />
+            ))}
+          </nav>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

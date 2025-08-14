@@ -85,7 +85,11 @@ export default function GenshinImpact() {
   const [similar, setSimilar] = useState<any[]>([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [uuid, setUuid] = useState("");
-  const infoImage = "/products/genshin.png";
+  // Use image from subscriptions array
+  const genshinProduct = mobileGames.find(
+    (p) => p.title === "Genshin Impact"
+  );
+  const infoImage = genshinProduct?.image;
 
   useEffect(() => {
     async function fetchProduct() {
@@ -126,7 +130,7 @@ export default function GenshinImpact() {
     <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Genshin Impact"
-      image={genshin?.image || ""}
+      image={genshinProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}

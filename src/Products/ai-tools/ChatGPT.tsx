@@ -84,8 +84,8 @@ export default function ChatGPT() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        // Find ChatGPT Pro (case-insensitive)
-        const chatgpt = products.find((g) => g.title && g.title.toLowerCase() === "chatgpt pro");
+        // Find ChatGPT Premium (case-insensitive)
+        const chatgpt = products.find((g) => g.title && g.title.toLowerCase() === "chatgpt premium");
         setCg(chatgpt);
         // Group priceList if available
         if (chatgpt && Array.isArray(chatgpt.priceList)) {

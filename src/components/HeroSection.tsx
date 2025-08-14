@@ -88,7 +88,7 @@ const HeroSection = () => {
                 </h1>
                 <p className="text-base tracking-tight leading-tighter md:text-lg text-muted-foreground mb-5 text-left max-w-md mt-2">
                   Buy digital products in{" "}
-                  <span className="text-green-600 underline">Bangladesh</span>{" "}
+                  <span className="text-secondary underline">Bangladesh</span>{" "}
                   using bKash, Nagad, Rocket & more Fast, Easy & Reliable!
                 </p>
                 <div className="flex items-center gap-8 mb-4">

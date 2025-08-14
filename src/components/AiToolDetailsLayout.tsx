@@ -193,23 +193,26 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
         productImage: image,
         itemLabel: selectedItem.label,
         quantity: quantity,
-        unitPrice: typeof selectedItem.price === "number" ? selectedItem.price : 0,
+        unitPrice:
+          typeof selectedItem.price === "number" ? selectedItem.price : 0,
         totalAmount: typeof totalAmount === "number" ? totalAmount : 0,
-        playerId: !isSubscription &&
+        playerId:
+          !isSubscription &&
           purchaseType === "personal" &&
           personalType === "existing"
-          ? email
-          : "", // Store email in playerId for AI tools only
-        zoneId: !isSubscription &&
+            ? email
+            : "", // Store email in playerId for AI tools only
+        zoneId:
+          !isSubscription &&
           purchaseType === "personal" &&
           personalType === "existing"
-          ? password
-          : "", // Store password in zoneId for AI tools only
+            ? password
+            : "", // Store password in zoneId for AI tools only
         paymentMethod: paymentMethod,
         paymentAccountNumber: userAccount,
         transactionId: trxId,
         status: "Pending",
-        deliveryInfo: undefined
+        deliveryInfo: undefined,
       };
 
       // Create the order
@@ -352,7 +355,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Image Section */}
           <div className="lg:col-span-4">
-            <div className="bg-muted rounded-2xl shadow-card p-6 sticky top-8">
+            <div className="bg-background border rounded-2xl shadow-card p-6 sticky top-8">
               <div className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto">
                 {/* Loader while loading or error */}
                 {(!imgLoaded || imgError) && (
@@ -407,11 +410,11 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
           <div className="flex-1">
             {/* Purchase Type Switcher - Only show if there are multiple categories */}
             {priceList.length > 1 && (
-              <Card className="mb-6 p-4">
+              <Card className="mb-6 p-4 bg-background">
                 <div className="flex gap-2 mb-4 flex-wrap">
                   <Button
                     type="button"
-                    variant={purchaseType === "shared" ? "default" : "outline"}
+                    variant={purchaseType === "shared" ? "default" : "ghost"}
                     onClick={() => setPurchaseType("shared")}
                     className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[110px]"
                   >
@@ -423,7 +426,9 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                   </Button>
                   <Button
                     type="button"
-                    variant={purchaseType === "personal" ? "default" : "outline"}
+                    variant={
+                      purchaseType === "personal" ? "default" : "outline"
+                    }
                     onClick={() => setPurchaseType("personal")}
                     className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[110px]"
                   >
@@ -458,7 +463,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                   selected.categoryIdx === catIdx &&
                                   selected.itemIdx === itemIdx
                                     ? "default"
-                                    : "outline"
+                                    : "ghost"
                                 }
                                 className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
                                 onClick={() =>
@@ -512,7 +517,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                           <Button
                             type="button"
                             variant={
-                              personalType === "new" ? "default" : "ghost"
+                              personalType === "new" ? "default" : "outline"
                             }
                             onClick={() => {
                               setPersonalType("new");
@@ -525,7 +530,9 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                           <Button
                             type="button"
                             variant={
-                              personalType === "existing" ? "default" : "ghost"
+                              personalType === "existing"
+                                ? "default"
+                                : "outline"
                             }
                             onClick={() => {
                               setPersonalType("existing");
@@ -564,7 +571,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                       selected.categoryIdx === catIdx &&
                                       selected.itemIdx === itemIdx
                                         ? "default"
-                                        : "outline"
+                                        : "ghost"
                                     }
                                     className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
                                     onClick={() =>
@@ -614,18 +621,18 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                       {!isSubscription && personalType === "existing" && (
                         <div className="flex flex-col gap-3">
                           <label className="font-pixel text-base text-foreground">
-                            Provide your details
+                            Provide your {(title.split(" ")[0] || "")} details
                           </label>
                           <input
-                            className="w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-white/90 focus:border-primary focus:outline-none transition"
-                            placeholder="Enter your email"
+                            className="w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-background focus:border-foreground focus:outline-none transition"
+                            placeholder={`Enter your ${(title.split(" ")[0] || "").toLowerCase()} email`}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                           />
                           <input
-                            className="w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-white/90 focus:border-primary focus:outline-none transition"
-                            placeholder="Enter your password"
+                            className="w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-background focus:border-foreground focus:outline-none transition"
+                            placeholder={`Enter your ${(title.split(" ")[0] || "").toLowerCase()} password`}
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -641,7 +648,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
 
             {/* Show all price lists when there's only one category */}
             {priceList.length === 1 && (
-              <Card className="mb-6 p-4">
+              <Card className="mb-6 p-4 bg-background">
                 <div className="flex flex-col gap-6">
                   {priceList.map((category, catIdx) => (
                     <div key={catIdx}>
@@ -658,7 +665,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                               selected.categoryIdx === catIdx &&
                               selected.itemIdx === itemIdx
                                 ? "default"
-                                : "outline"
+                                : "ghost"
                             }
                             className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
                             onClick={() =>
@@ -705,7 +712,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
             )}
 
             {/* Quantity, Order Summary, and Proceed Button */}
-            <Card className="mb-8 p-4">
+            <Card className="mb-8 p-4 bg-background">
               <div className="flex items-center gap-4 mb-4">
                 <label className="font-pixel text-base text-foreground">
                   Quantity

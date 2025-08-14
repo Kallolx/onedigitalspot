@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import ServiceCard from "@/components/ServiceCard";
@@ -10,6 +10,7 @@ interface CategorySwiperProps {
   isSubscription?: boolean;
   navigationPrevClass: string;
   navigationNextClass: string;
+  autoplay?: boolean;
 }
 
 const CategorySwiper = ({
@@ -17,14 +18,21 @@ const CategorySwiper = ({
   isSubscription,
   navigationPrevClass,
   navigationNextClass,
+  autoplay = false,
 }: CategorySwiperProps) => (
   <div className="relative py-4">
     <Swiper
-      modules={[Navigation]}
+      modules={[Navigation, Autoplay]}
       navigation={{
         prevEl: navigationPrevClass,
         nextEl: navigationNextClass,
       }}
+      autoplay={autoplay ? {
+        delay: 2000,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: true,
+      } : false}
+      speed={1000}
       spaceBetween={16}
       slidesPerView={2}
       breakpoints={{
@@ -32,6 +40,7 @@ const CategorySwiper = ({
         1024: { slidesPerView: 4 },
       }}
       className="pb-2"
+      loop={items.length > 4}
     >
       {items.map((item, idx) => (
         <SwiperSlide key={idx}>

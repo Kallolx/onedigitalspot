@@ -79,8 +79,8 @@ export default function Claude() {
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        // Find Claude Pro (case-insensitive)
-        const claude = products.find((g) => g.title && g.title.toLowerCase() === "claude pro");
+        // Find Claude Premium (case-insensitive)
+        const claude = products.find((g) => g.title && g.title.toLowerCase() === "claude premium");
         setCg(claude);
         // Group priceList if available
         if (claude && Array.isArray(claude.priceList)) {
@@ -133,7 +133,7 @@ export default function Claude() {
   return (
     <AiToolDetailsLayout
       isSignedIn={isSignedIn}
-      title="Claude"
+      title="Claude Premium"
       image={claudeProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
