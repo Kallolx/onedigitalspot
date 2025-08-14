@@ -198,6 +198,7 @@ const GameDetailsLayout: React.FC<
           paymentAccountNumber: userAccount,
           transactionId: trxId,
           status: "Pending",
+          deliveryInfo: undefined
         };
 
         return await createOrder(orderData);
