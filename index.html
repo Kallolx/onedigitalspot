@@ -5,15 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.json" />
     
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <!-- Performance Optimization & Core Web Vitals -->
+    <link rel="preload" href="/assets/logo.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="/assets/1.png" as="image" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="//onedigitalspot.com">
+    
+    <!-- Critical CSS for above-the-fold content -->
+    <style>
+      .hero-section{min-height:100vh;display:flex;align-items:center;justify-content:center}
+      .lazy{opacity:0;transition:opacity 0.3s ease-in-out}
+      .lazy.loaded{opacity:1}
+      .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:loading 1.5s infinite}
+      @keyframes loading{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    </style>
+    
+    <!-- Google Analytics GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'GA_MEASUREMENT_ID', {
+      gtag('config', 'G-XXXXXXXXXX', {
         page_title: 'OneDigitalSpot - Bangladesh Digital Products',
         page_location: window.location.href,
+        country: 'BD',
         custom_map: {'custom_parameter_1': 'bangladesh_market'}
       });
     </script>
@@ -32,7 +49,7 @@
     <meta name="title" content="OneDigitalSpot - Best Digital Products Platform in Bangladesh | Game Top-ups, AI Tools, Gift Cards" />
     <meta name="description" content="OneDigitalSpot is Bangladesh's #1 trusted platform for instant game top-ups, AI tools, digital vouchers & online services. Buy Mobile Legends Diamonds, PUBG UC, ChatGPT, Steam Cards & more. Fast delivery, secure bKash/Nagad payment, 24/7 support. Best prices guaranteed!" />
     <meta name="author" content="OneDigitalSpot" />
-    <meta name="keywords" content="onedigitalspot, digital products bangladesh, game top up bangladesh, mobile legends diamonds bangladesh, pubg uc bangladesh, free fire diamonds bangladesh, steam wallet bangladesh, chatgpt premium bangladesh, netflix subscription bangladesh, bkash digital payment, nagad game topup, rocket payment bangladesh, cheap game credits bangladesh, instant delivery bangladesh, secure payment bangladesh, 24/7 support bangladesh, best game topup site bangladesh, digital services bangladesh, ai tools bangladesh, productivity tools bangladesh, gift cards bangladesh, gaming vouchers bangladesh, online gaming bangladesh, digital marketplace bangladesh, tech products bangladesh, software subscription bangladesh" />
+    <meta name="keywords" content="onedigitalspot, digital products bangladesh, mobile game topup, pubg uc, free fire diamonds, mobile legends diamonds, steam wallet, chatgpt pro, netflix subscription, bkash payment, nagad payment, instant delivery, gaming platform bangladesh, ai tools, gift cards" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow" />
     <meta name="bingbot" content="index, follow" />
@@ -64,25 +81,17 @@
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@oneditialspot" />
-    <meta name="twitter:creator" content="@oneditialspot" />
+    <meta name="twitter:site" content="@onedigitalspot" />
+    <meta name="twitter:creator" content="@onedigitalspot" />
     <meta name="twitter:url" content="https://onedigitalspot.com/" />
     <meta name="twitter:title" content="OneDigitalSpot - Best Digital Products Platform in Bangladesh" />
     <meta name="twitter:description" content="Bangladesh's #1 platform for game top-ups, AI tools & digital services. Mobile Legends, PUBG, ChatGPT, Steam Cards & more!" />
-    <meta name="twitter:image" content="https://onedigitalspot.com/twitter-card.jpg" />
+    <meta name="twitter:image" content="https://onedigitalspot.com/og-image.jpg" />
     <meta name="twitter:image:alt" content="OneDigitalSpot - Digital Products Platform Bangladesh" />
     
     <!-- Additional Social Media Meta -->
     <meta property="fb:app_id" content="YOUR_FACEBOOK_APP_ID" />
-    <meta property="article:publisher" content="https://www.facebook.com/oneditialspot" />
-    
-    <!-- WhatsApp Meta -->
-    <meta property="og:image:width" content="400" />
-    <meta property="og:image:height" content="400" />
-    
-    <!-- LinkedIn -->
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="627" />
+    <meta property="article:publisher" content="https://www.facebook.com/onedigitalspot" />
     
     <!-- Apple Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -139,9 +148,9 @@
         "areaServed": "BD"
       },
       "sameAs": [
-        "https://www.facebook.com/oneditialspot",
-        "https://www.instagram.com/oneditialspot",
-        "https://www.tiktok.com/@oneditialspot"
+        "https://www.facebook.com/onedigitalspot",
+        "https://www.instagram.com/onedigitalspot",
+        "https://www.tiktok.com/@onedigitalspot"
       ],
       "currenciesAccepted": "BDT",
       "paymentAccepted": ["bKash", "Nagad", "Rocket"],
@@ -169,14 +178,7 @@
     }
     </script>
     
-    <!-- Google Analytics (replace with your tracking ID) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'GA_TRACKING_ID');
-    </script>
+
     
   </head>
 

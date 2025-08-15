@@ -50,6 +50,7 @@ const ServiceCard = ({
           src={image} 
           alt={title}
           className="w-full h-full object-contain"
+          loading="lazy"
         />
         <div className="absolute top-4 left-2 gap-1 px-2 py-1 rounded-md hidden sm:flex items-center">
           {[...Array(5)].map((_, i) => (

@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/landing/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import React, { useEffect, useState, useRef } from "react";

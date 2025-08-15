@@ -1,7 +1,7 @@
 {
-  "name": "OneDigitalSpot - Digital Products Bangladesh",
+  "name": "OneDigitalSpot",
   "short_name": "OneDigitalSpot",
-  "description": "Bangladesh's #1 Platform for Digital Products, Mobile Top-up, Gift Cards, Game Credits & Premium Subscriptions",
+  "description": "Bangladesh's #1 Platform for Digital Products",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

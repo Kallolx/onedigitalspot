@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/landing/Header";
 import { useState } from "react";
 import { pcGames, mobileGames } from "../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";

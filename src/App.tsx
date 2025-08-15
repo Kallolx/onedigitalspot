@@ -78,12 +78,14 @@ import WutheringWaves from "./Products/game-details/mobile-games/WutheringWaves"
 import Efootball from "./Products/game-details/mobile-games/Efootball";
 import FifaMobile from "./Products/game-details/mobile-games/FifaMobile";
 import RobloxGame from "./Products/game-details/mobile-games/RobloxGame";
+import { PerformanceOptimization } from "@/components/PerformanceOptimization";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
+      <PerformanceOptimization />
       <TooltipProvider>
         <Toaster />
         <Sonner />
