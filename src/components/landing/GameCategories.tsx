@@ -57,14 +57,14 @@ const GameCategories = () => (
               <Button
                 variant="ghost"
                 size="sm"
-                className="swiper-popular-prev h-8 w-8 p-0"
+                className="swiper-popular-prev rounded-full h-8 w-8 p-0"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="swiper-popular-next h-8 w-8 p-0"
+                className="swiper-popular-next rounded-full h-8 w-8 p-0"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
@@ -108,16 +108,16 @@ const GameCategories = () => (
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-ai-prev h-8 w-8 p-0"
+              className="swiper-ai-prev rounded-full h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-ai-next h-8 w-8 p-0"
+              className="swiper-ai-next rounded-full h-8 w-8 p-0"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 " />
             </Button>
           </div>
         </div>
@@ -160,14 +160,14 @@ const GameCategories = () => (
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-sub-prev h-8 w-8 p-0"
+              className="swiper-sub-prev rounded-full h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-sub-next h-8 w-8 p-0"
+              className="swiper-sub-next rounded-full h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -212,14 +212,14 @@ const GameCategories = () => (
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-prod-prev h-8 w-8 p-0"
+              className="swiper-prod-prev rounded-full h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-prod-next h-8 w-8 p-0"
+              className="swiper-prod-next rounded-full h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -264,14 +264,14 @@ const GameCategories = () => (
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-gift-prev h-8 w-8 p-0"
+              className="swiper-gift-prev rounded-full h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-gift-next h-8 w-8 p-0"
+              className="swiper-gift-next rounded-full h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -315,14 +315,14 @@ const GameCategories = () => (
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-mobile-prev h-8 w-8 p-0"
+              className="swiper-mobile-prev rounded-full h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-mobile-next h-8 w-8 p-0"
+              className="swiper-mobile-next rounded-full h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -366,14 +366,14 @@ const GameCategories = () => (
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-pc-prev h-8 w-8 p-0"
+              className="swiper-pc-prev rounded-full h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-pc-next h-8 w-8 p-0"
+              className="swiper-pc-next rounded-full h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>

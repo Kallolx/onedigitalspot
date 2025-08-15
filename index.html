@@ -4,182 +4,304 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.json" />
-    
+
     <!-- Performance Optimization & Core Web Vitals -->
-    <link rel="preload" href="/assets/logo.svg" as="image" type="image/svg+xml">
-    <link rel="preload" href="/assets/1.png" as="image" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="//onedigitalspot.com">
-    
+    <link
+      rel="preload"
+      href="/assets/logo.svg"
+      as="image"
+      type="image/svg+xml"
+    />
+    <link rel="preload" href="/assets/1.png" as="image" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="//onedigitalspot.com" />
+
     <!-- Critical CSS for above-the-fold content -->
     <style>
-      .hero-section{min-height:100vh;display:flex;align-items:center;justify-content:center}
-      .lazy{opacity:0;transition:opacity 0.3s ease-in-out}
-      .lazy.loaded{opacity:1}
-      .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:loading 1.5s infinite}
-      @keyframes loading{0%{background-position:200% 0}100%{background-position:-200% 0}}
+      .hero-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .lazy {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      .lazy.loaded {
+        opacity: 1;
+      }
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          #f0f0f0 25%,
+          #e0e0e0 50%,
+          #f0f0f0 75%
+        );
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+      @keyframes loading {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
     </style>
-    
+
     <!-- Google Analytics GA4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX', {
-        page_title: 'OneDigitalSpot - Bangladesh Digital Products',
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-XXXXXXXXXX", {
+        page_title: "OneDigitalSpot - Bangladesh Digital Products",
         page_location: window.location.href,
-        country: 'BD',
-        custom_map: {'custom_parameter_1': 'bangladesh_market'}
+        country: "BD",
+        custom_map: { custom_parameter_1: "bangladesh_market" },
       });
     </script>
-    
+
     <!-- Google Search Console -->
-    <meta name="google-site-verification" content="YOUR_GOOGLE_SEARCH_CONSOLE_VERIFICATION_CODE" />
-    
+    <meta
+      name="google-site-verification"
+      content="YOUR_GOOGLE_SEARCH_CONSOLE_VERIFICATION_CODE"
+    />
+
     <!-- Bing Webmaster -->
     <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE" />
-    
+
     <!-- Yandex Webmaster -->
     <meta name="yandex-verification" content="YOUR_YANDEX_VERIFICATION_CODE" />
-    
+
     <!-- Primary Meta Tags -->
-    <title>OneDigitalSpot - Best Digital Products Platform in Bangladesh | Game Top-ups, AI Tools, Gift Cards</title>
-    <meta name="title" content="OneDigitalSpot - Best Digital Products Platform in Bangladesh | Game Top-ups, AI Tools, Gift Cards" />
-    <meta name="description" content="OneDigitalSpot is Bangladesh's #1 trusted platform for instant game top-ups, AI tools, digital vouchers & online services. Buy Mobile Legends Diamonds, PUBG UC, ChatGPT, Steam Cards & more. Fast delivery, secure bKash/Nagad payment, 24/7 support. Best prices guaranteed!" />
+    <title>
+      OneDigitalSpot - Best Digital Products Platform in Bangladesh | Game
+      Top-ups, AI Tools, Gift Cards
+    </title>
+    <meta
+      name="title"
+      content="OneDigitalSpot - Best Digital Products Platform in Bangladesh | Game Top-ups, AI Tools, Gift Cards"
+    />
+    <meta
+      name="description"
+      content="OneDigitalSpot is Bangladesh's #1 trusted platform for instant game top-ups, AI tools, digital vouchers & online services. Buy Mobile Legends Diamonds, PUBG UC, ChatGPT, Steam Cards & more. Fast delivery, secure bKash/Nagad payment, 24/7 support. Best prices guaranteed!"
+    />
     <meta name="author" content="OneDigitalSpot" />
-    <meta name="keywords" content="onedigitalspot, digital products bangladesh, mobile game topup, pubg uc, free fire diamonds, mobile legends diamonds, steam wallet, chatgpt pro, netflix subscription, bkash payment, nagad payment, instant delivery, gaming platform bangladesh, ai tools, gift cards" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta
+      name="keywords"
+      content="onedigitalspot, digital products bangladesh, mobile game topup, pubg uc, free fire diamonds, mobile legends diamonds, steam wallet, chatgpt pro, netflix subscription, bkash payment, nagad payment, instant delivery, gaming platform bangladesh, ai tools, gift cards"
+    />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
     <meta name="googlebot" content="index, follow" />
     <meta name="bingbot" content="index, follow" />
     <meta name="theme-color" content="#22c55e" />
     <meta name="msapplication-TileColor" content="#22c55e" />
-    
+
     <!-- Geographic targeting -->
     <meta name="geo.region" content="BD" />
     <meta name="geo.country" content="Bangladesh" />
     <meta name="geo.placename" content="Dhaka, Bangladesh" />
     <meta name="ICBM" content="23.8103, 90.4125" />
-    
+
     <!-- Language -->
     <meta http-equiv="content-language" content="en-BD" />
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="OneDigitalSpot" />
     <meta property="og:url" content="https://onedigitalspot.com/" />
-    <meta property="og:title" content="OneDigitalSpot - Best Digital Products Platform in Bangladesh" />
-    <meta property="og:description" content="Bangladesh's #1 platform for game top-ups, AI tools & digital services. Mobile Legends, PUBG, ChatGPT, Steam Cards & more. Fast delivery, secure bKash/Nagad payment!" />
-    <meta property="og:image" content="https://onedigitalspot.com/og-image.jpg" />
-    <meta property="og:image:secure_url" content="https://onedigitalspot.com/og-image.jpg" />
+    <meta
+      property="og:title"
+      content="OneDigitalSpot - Best Digital Products Platform in Bangladesh"
+    />
+    <meta
+      property="og:description"
+      content="Bangladesh's #1 platform for game top-ups, AI tools & digital services. Mobile Legends, PUBG, ChatGPT, Steam Cards & more. Fast delivery, secure bKash/Nagad payment!"
+    />
+    <meta
+      property="og:image"
+      content="https://onedigitalspot.com/og-image.jpg"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="https://onedigitalspot.com/og-image.jpg"
+    />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="OneDigitalSpot - Digital Products Platform Bangladesh" />
+    <meta
+      property="og:image:alt"
+      content="OneDigitalSpot - Digital Products Platform Bangladesh"
+    />
     <meta property="og:locale" content="en_BD" />
     <meta property="og:locale:alternate" content="bn_BD" />
-    
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@onedigitalspot" />
     <meta name="twitter:creator" content="@onedigitalspot" />
     <meta name="twitter:url" content="https://onedigitalspot.com/" />
-    <meta name="twitter:title" content="OneDigitalSpot - Best Digital Products Platform in Bangladesh" />
-    <meta name="twitter:description" content="Bangladesh's #1 platform for game top-ups, AI tools & digital services. Mobile Legends, PUBG, ChatGPT, Steam Cards & more!" />
-    <meta name="twitter:image" content="https://onedigitalspot.com/og-image.jpg" />
-    <meta name="twitter:image:alt" content="OneDigitalSpot - Digital Products Platform Bangladesh" />
-    
+    <meta
+      name="twitter:title"
+      content="OneDigitalSpot - Best Digital Products Platform in Bangladesh"
+    />
+    <meta
+      name="twitter:description"
+      content="Bangladesh's #1 platform for game top-ups, AI tools & digital services. Mobile Legends, PUBG, ChatGPT, Steam Cards & more!"
+    />
+    <meta
+      name="twitter:image"
+      content="https://onedigitalspot.com/og-image.jpg"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="OneDigitalSpot - Digital Products Platform Bangladesh"
+    />
+
     <!-- Additional Social Media Meta -->
     <meta property="fb:app_id" content="YOUR_FACEBOOK_APP_ID" />
-    <meta property="article:publisher" content="https://www.facebook.com/onedigitalspot" />
-    
+    <meta
+      property="article:publisher"
+      content="https://www.facebook.com/onedigitalspot"
+    />
+
     <!-- Apple Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="OneDigitalSpot" />
-    
+
     <!-- Microsoft Meta Tags -->
     <meta name="msapplication-config" content="/browserconfig.xml" />
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://onedigitalspot.com/" />
-    
+
     <!-- Alternate URLs for different languages/regions -->
     <link rel="alternate" hreflang="en-bd" href="https://onedigitalspot.com/" />
-    <link rel="alternate" hreflang="bn-bd" href="https://onedigitalspot.com/bn/" />
-    <link rel="alternate" hreflang="x-default" href="https://onedigitalspot.com/" />
-    
+    <link
+      rel="alternate"
+      hreflang="bn-bd"
+      href="https://onedigitalspot.com/bn/"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://onedigitalspot.com/"
+    />
+
     <!-- Favicon and Icons -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicon/favicon-16x16.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="android-chrome-192x192"
+      type="image/png"
+      sizes="192x192"
+      href="/favicon/android-chrome-192x192.png"
+    />
+    <link
+      rel="android-chrome-512x512"
+      type="image/png"
+      sizes="512x512"
+      href="/favicon/android-chrome-512x512.png"
+    />
+   <link rel="manifest" href="/manifest.json" />
+
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+    <link
+      rel="preconnect"
+      href="https://www.google-analytics.com"
+      crossorigin
+    />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-    
+
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "OneDigitalSpot",
-      "alternateName": "One Digital Spot",
-      "url": "https://onedigitalspot.com",
-      "logo": "https://onedigitalspot.com/assets/logo.svg",
-      "description": "Bangladesh's premier digital products platform offering game top-ups, AI tools, gift cards and digital services with instant delivery.",
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "BD",
-        "addressRegion": "Dhaka"
-      },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+880-XXX-XXXXXX",
-        "contactType": "customer service",
-        "availableLanguage": ["English", "Bengali"],
-        "areaServed": "BD"
-      },
-      "sameAs": [
-        "https://www.facebook.com/onedigitalspot",
-        "https://www.instagram.com/onedigitalspot",
-        "https://www.tiktok.com/@onedigitalspot"
-      ],
-      "currenciesAccepted": "BDT",
-      "paymentAccepted": ["bKash", "Nagad", "Rocket"],
-      "priceRange": "$$",
-      "areaServed": {
-        "@type": "Country",
-        "name": "Bangladesh"
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "OneDigitalSpot",
+        "alternateName": "One Digital Spot",
+        "url": "https://onedigitalspot.com",
+        "logo": "https://onedigitalspot.com/assets/logo.svg",
+        "description": "Bangladesh's premier digital products platform offering game top-ups, AI tools, gift cards and digital services with instant delivery.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "BD",
+          "addressRegion": "Dhaka"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+880-XXX-XXXXXX",
+          "contactType": "customer service",
+          "availableLanguage": ["English", "Bengali"],
+          "areaServed": "BD"
+        },
+        "sameAs": [
+          "https://www.facebook.com/onedigitalspot",
+          "https://www.instagram.com/onedigitalspot",
+          "https://www.tiktok.com/@onedigitalspot"
+        ],
+        "currenciesAccepted": "BDT",
+        "paymentAccepted": ["bKash", "Nagad", "Rocket"],
+        "priceRange": "$$",
+        "areaServed": {
+          "@type": "Country",
+          "name": "Bangladesh"
+        }
       }
-    }
     </script>
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "OneDigitalSpot",
-      "url": "https://onedigitalspot.com",
-      "description": "Best digital products platform in Bangladesh for game top-ups, AI tools, and digital services",
-      "inLanguage": "en-BD",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://onedigitalspot.com/search?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-    
 
-    
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "OneDigitalSpot",
+        "url": "https://onedigitalspot.com",
+        "description": "Best digital products platform in Bangladesh for game top-ups, AI tools, and digital services",
+        "inLanguage": "en-BD",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://onedigitalspot.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
 
   <body>

@@ -305,25 +305,26 @@ const UserMenu = ({
   );
 };
 
-const BroadcastTicker = () => (
-  <div className="sticky top-[64px] z-40 w-full bg-gradient-to-r from-primary to-primary/80 border-b border-primary/30 shadow-sm">
-    <div className="w-full max-w-[1440px] mx-auto flex items-center px-2 sm:px-4 lg:px-8 py-1 relative">
-      <div className="flex-1 overflow-hidden">
-        <div
-          className="marquee-loop flex whitespace-nowrap font-normal text-primary-foreground font-anekbangla tracking-wide"
-          style={{ fontFamily: "Hind Siliguri, sans-serif" }}
-        >
-          <span className="inline-block min-w-max pr-12">
-            🎮লুটবক্স-এ স্বাগতম! রোবলক্স টপ-আপে 70% ছাড় • 🎁 ৳1000+ কেনাকাটায় ফ্রি গিফট কার্ড • 🌟 নতুন ইউজারদের জন্য অতিরিক্ত 10% ছাড়• ⚡ সব টপ-আপে তাৎক্ষণিক ডেলিভারি •
-          </span>
-          <span className="inline-block min-w-max pr-12" aria-hidden="true">
-            🎮 লুটবক্স-এ স্বাগতম! রোবলক্স টপ-আপে 70% ছাড় • 🎁 ৳1000+ কেনাকাটায় ফ্রি গিফট কার্ড • 🌟 নতুন ইউজারদের জন্য অতিরিক্ত 10% ছাড় • ⚡ সব টপ-আপে তাৎক্ষণিক ডেলিভারি •
-          </span>
+const BroadcastTicker = () => {
+  const text = "⏰ ডেলিভারি সময় ৩০ মিনিট থেকে ৪ ঘণ্টা •  🕛 আমরা ২৪ ঘণ্টা খোলা • 💬 কেনার পর কাস্টমার সাপোর্টে অবশ্যই মেসেজ করুন • ✨ কোন সমস্যা বা অভিযোগ থাকলে কাস্টমার সাপোর্টে মেসেজ করুন •";
+
+  return (
+    <div className="sticky top-[64px] z-40 w-full bg-gradient-to-r from-primary to-primary/80 border-b border-primary/30 shadow-sm">
+      <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-8 py-1">
+        <div className="broadcast-ticker-container overflow-hidden">
+          <div className="broadcast-ticker-content"
+               style={{ fontFamily: "Hind Siliguri, sans-serif" }}>
+            {[...Array(3)].map((_, i) => (
+              <span key={i} className="inline-block px-4 whitespace-nowrap text-primary-foreground">
+                {text}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Main Component
 const Header = () => {

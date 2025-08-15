@@ -115,3 +115,46 @@ All colors MUST be HSL.
 }
 
 
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.33%);
+  }
+}
+
+.broadcast-ticker-container {
+  width: 100%;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+.broadcast-ticker-content {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: ticker 30s infinite linear;
+  will-change: transform;
+}
+
+.broadcast-ticker-content:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .broadcast-ticker-content {
+    animation-duration: 60s;
+  }
+}

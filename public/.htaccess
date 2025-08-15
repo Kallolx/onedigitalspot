@@ -119,7 +119,7 @@ RewriteRule . /index.html [L]
     Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
     
     # But allow caching for assets
-    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$"
         Header unset Cache-Control
         Header unset Pragma
         Header unset Expires
@@ -134,7 +134,7 @@ ErrorDocument 404 /404.html
 ErrorDocument 500 /500.html
 
 # Block access to sensitive files
-<FilesMatch "\.(env|git|htaccess|htpasswd|ini|log|sh|sql|inc|bak|backup|swp|tmp)$">
+<FilesMatch "\.(env|git|htaccess|htpasswd|ini|log|sh|sql|inc|bak|backup|swp|tmp)$"
     Order allow,deny
     Deny from all
 </FilesMatch>
