@@ -1,35 +1,45 @@
-import React from 'react';
+import React from "react";
 
 const Footer: React.FC = () => {
   const socials = [
-    { name: 'Facebook', icon: '📘', href: '#' },
-    { name: 'Twitter', icon: '🐦', href: '#' },
-    { name: 'Email', icon: '✉️', href: 'mailto:info@onedigitalspot.com' },
+    { name: "Facebook", icon: "📘", href: "#" },
+    { name: "Twitter", icon: "🐦", href: "#" },
+    { name: "Email", icon: "✉️", href: "mailto:info@onedigitalspot.com" },
   ];
 
-  const company = ['About Us', 'Careers', 'Blog', 'Contact'];
-  const support = ['Help Center', 'How to Buy', 'Refund Policy', 'Terms of Service'];
+  const company = ["About Us", "Careers", "Blog", "Contact"];
+  const support = [
+    "Help Center",
+    "How to Buy",
+    "Refund Policy",
+    "Terms of Service",
+  ];
   const payments = [
-    { name: 'Visa', src: '/assets/icons/visa.svg' },
-    { name: 'Mastercard', src: '/assets/icons/master.svg' },
-    { name: 'bKash', src: '/assets/icons/bKash.svg' },
-    { name: 'Nagad', src: '/assets/icons/nagad.svg' },
-    { name: 'Upay', src: '/assets/icons/upay.png' },
-    { name: 'Rocket', src: '/assets/icons/rocket.png' },
+    { name: "Visa", src: "/assets/icons/visa.svg" },
+    { name: "Mastercard", src: "/assets/icons/master.svg" },
+    { name: "bKash", src: "/assets/icons/bKash.svg" },
+    { name: "Nagad", src: "/assets/icons/nagad.svg" },
+    { name: "Upay", src: "/assets/icons/upay.png" },
+    { name: "Rocket", src: "/assets/icons/rocket.png" },
   ];
 
   return (
     <footer className=" mt-8 text-foreground">
       {/* ── Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <div className="grid grid-cols-1 md:grid-cols-4 gap-x-6 gap-y-10 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-6 gap-y-10 py-12">
           {/* Column 1 – Brand */}
           <div className="md:col-span-1 flex flex-col gap-5 items-center text-center md:items-start md:text-left">
             <div className="flex items-center gap-3">
-              <img src="/assets/logo-2.svg" alt="OneDigitalSpot" className="max-w-[180px] w-full h-auto object-contain" />
+              <img
+                src="/assets/logo-2.svg"
+                alt="OneDigitalSpot"
+                className="max-w-[180px] w-full h-auto object-contain"
+              />
             </div>
             <p className="text-slate-400 mt-0">
-              Bangladesh’s #1 trusted digital goods platform. Fast, secure, and always here for you.
+              Bangladesh’s #1 trusted digital goods platform. Fast, secure, and
+              always here for you.
             </p>
           </div>
 
@@ -39,7 +49,10 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {company.map((l) => (
                 <li key={l}>
-                  <a href="#" className="text-slate-400 hover:text-white transition">
+                  <a
+                    href="#"
+                    className="text-slate-400 hover:text-white transition"
+                  >
                     {l}
                   </a>
                 </li>
@@ -53,7 +66,10 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {support.map((l) => (
                 <li key={l}>
-                  <a href="#" className="text-slate-400 hover:text-white transition">
+                  <a
+                    href="#"
+                    className="text-slate-400 hover:text-white transition"
+                  >
                     {l}
                   </a>
                 </li>
@@ -100,9 +116,14 @@ const Footer: React.FC = () => {
           </div>
 
           <div className="text-sm text-slate-500 flex items-center gap-2 sm:justify-end w-full sm:w-auto">
-            <span>&copy; {new Date().getFullYear()} OneDigitalSpot. All rights reserved.</span>
+            <span>
+              &copy; {new Date().getFullYear()} OneDigitalSpot. All rights
+              reserved.
+            </span>
             <span className="hidden sm:inline">•</span>
-            <a href="#" className="hover:text-white transition">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition">
+              Privacy Policy
+            </a>
           </div>
         </div>
       </div>

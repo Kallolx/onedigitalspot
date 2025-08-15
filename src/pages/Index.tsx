@@ -10,8 +10,6 @@ import Footer from "@/components/landing/Footer";
 const Index = () => {
   return (
     <div className="relative min-h-screen w-full flex flex-col">
-      
-      <BeamsBackground className="fixed inset-0 -z-10 min-h-screen w-full" intensity="subtle" />
       <Header />
       <main className="flex-1 w-full">
         <section className="w-full">

@@ -191,7 +191,6 @@ const HeroSection = () => {
                             src={slide.imageDesktop}
                             alt={slide.title}
                             className="w-full h-full object-cover"
-                            loading="lazy"
                           />
                           {/* Gradient overlay for better text contrast */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />

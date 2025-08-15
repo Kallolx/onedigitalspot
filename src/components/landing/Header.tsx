@@ -18,8 +18,6 @@ import {
 import { account } from "@/lib/appwrite";
 import { getUserOrders } from "@/lib/orders";
 import MobileMenu from "../MobileMenu";
-import SearchComponent from "../SearchComponent";
-import MobileSearch from "./MobileSearch";
 
 // Types
 interface DropdownItem {
