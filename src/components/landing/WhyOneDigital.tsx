@@ -49,8 +49,8 @@ const features = [
         </div>
 
         {/* Mobile Spinner */}
-        <div ref={ref} className="h-[40vh] flex items-center justify-center">
-         {inView && <SpinningLogos />}
+        <div className="h-[40vh] flex items-center justify-center">
+          <SpinningLogos />
         </div>
 
         {/* Mobile Features Grid */}
@@ -104,8 +104,8 @@ const features = [
           </div>
 
           {/* Center Spinner */}
-          <div ref={ref} className="w-2/4 h-[60vh] flex items-center justify-center">
-            {inView && <SpinningLogos />}
+          <div className="w-2/4 h-[60vh] flex items-center justify-center">
+            <SpinningLogos />
           </div>
 
           {/* Right Panel - 2 Cards */}

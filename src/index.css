@@ -114,29 +114,4 @@ All colors MUST be HSL.
   }
 }
 
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
-@keyframes spin-reverse {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-@layer utilities {
-  .animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
-  }
-  .animate-spin-reverse {
-    animation: spin-reverse 8s linear infinite;
-  }
-}
