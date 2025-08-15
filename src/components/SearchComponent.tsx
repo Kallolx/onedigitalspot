@@ -124,14 +124,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
             <span className="text-sm font-medium text-gray-700">
               {isLoading ? 'Searching...' : `${searchResults.length} results found`}
             </span>
-            {searchResults.length > 0 && (
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-xs text-gray-500 hover:text-gray-700"
-              >
-                Close
-              </button>
-            )}
           </div>
 
           {/* Results List */}
@@ -186,22 +178,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
               </div>
             )}
           </div>
-
-          {/* View All Results Footer */}
-          {searchResults.length > 0 && (
-            <div className="border-t border-gray-100 p-3">
-              <button
-                onClick={() => {
-                  // Navigate to full search results page
-                  console.log('View all results for:', searchQuery);
-                  setIsOpen(false);
-                }}
-                className="w-full text-center text-sm text-secondary hover:text-primary/80 font-medium transition-colors"
-              >
-                View all results for "{searchQuery}"
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>

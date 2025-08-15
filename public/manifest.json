@@ -1,0 +1,122 @@
+{
+  "name": "OneDigitalSpot - Digital Products Bangladesh",
+  "short_name": "OneDigitalSpot",
+  "description": "Bangladesh's #1 Platform for Digital Products, Mobile Top-up, Gift Cards, Game Credits & Premium Subscriptions",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-BD",
+  "dir": "ltr",
+  "categories": ["shopping", "entertainment", "games", "lifestyle"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/assets/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/apple-store.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/assets/icons/google-play.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "OneDigitalSpot Platform Homepage"
+    },
+    {
+      "src": "/assets/2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Digital Products Catalog"
+    },
+    {
+      "src": "/assets/3.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Mobile Games Top-up Service"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mobile Games",
+      "short_name": "Games",
+      "description": "Top-up mobile games like PUBG, Free Fire, Mobile Legends",
+      "url": "/mobile-games",
+      "icons": [
+        {
+          "src": "/assets/icons/mobile-games.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Gift Cards",
+      "short_name": "Cards",
+      "description": "Buy Steam, Google Play, Apple Store gift cards",
+      "url": "/gift-cards",
+      "icons": [
+        {
+          "src": "/assets/icons/voucher.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "AI Tools",
+      "short_name": "AI",
+      "description": "Access ChatGPT, Claude, Midjourney subscriptions",
+      "url": "/ai-tools",
+      "icons": [
+        {
+          "src": "/assets/icons/chatgpt.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "short_name": "Subs",
+      "description": "Netflix, YouTube Premium, Spotify subscriptions",
+      "url": "/subscriptions",
+      "icons": [
+        {
+          "src": "/assets/icons/netflix.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.onedigitalspot.app",
+      "id": "com.onedigitalspot.app"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+}

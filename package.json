@@ -1,14 +1,38 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "onedigitalspot",
+  "description": "OneDigitalSpot - Bangladesh's #1 Platform for Digital Products, Mobile Top-up, Gift Cards, Game Credits & Premium Subscriptions",
+  "keywords": [
+    "Bangladesh digital products",
+    "mobile top-up Bangladesh",
+    "gift cards Bangladesh",
+    "game credits BD",
+    "Netflix subscription BD",
+    "PUBG Mobile UC",
+    "Free Fire diamonds",
+    "Steam wallet Bangladesh",
+    "bKash payment",
+    "Nagad payment",
+    "OneDigitalSpot"
+  ],
+  "homepage": "https://onedigitalspot.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OneDigitalSpot/platform"
+  },
+  "license": "MIT",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seo:sitemap": "node scripts/generate-sitemap.js",
+    "seo:check": "node scripts/seo-audit.js",
+    "seo:optimize": "npm run seo:sitemap && npm run build",
+    "deploy:production": "npm run seo:optimize && npm run build && echo 'Ready for production deployment!'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

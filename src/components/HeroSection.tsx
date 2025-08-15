@@ -6,17 +6,15 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import * as React from "react";
-import {
-  ArrowRight,
-  Facebook,
-  Twitter,
-  Instagram,
-  SearchIcon,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
 import { Button } from "./ui/button";
-import { AvatarCircles } from "@/components/ui/AvatarCircles";
-import { Input } from "./ui/input";
-import { SearchCircleIcon } from "hugeicons-react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import SearchComponent from "./SearchComponent";
 
 const avatars = [
@@ -35,7 +33,7 @@ const avatars = [
   {
     imageUrl: "https://avatars.githubusercontent.com/u/59228569",
     profileUrl: "https://github.com/safethecode",
-  }
+  },
 ];
 
 const heroSlides = [
@@ -96,10 +94,78 @@ const HeroSection = () => {
                     Explore
                     <ArrowRight className="w-5 h-5 text-white" />
                   </Button>
+                  <TooltipProvider>
+                    <div className="flex items-center gap-4">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a
+                            href="https://facebook.com/oneditialspot"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src="/assets/facebook.svg"
+                              alt="Facebook"
+                              className="w-10 h-10"
+                            />
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent>@oneditialspot</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a
+                            href="https://instagram.com/oneditialspot"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src="/assets/instagram.svg"
+                              alt="Instagram"
+                              className="w-10 h-10"
+                            />
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent>@oneditialspot</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a
+                            href="https://tiktok.com/@oneditialspot"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src="/assets/tiktok.svg"
+                              alt="TikTok"
+                              className="w-10 h-10"
+                            />
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent>@oneditialspot</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a
+                            href="https://whatsapp.com/@oneditialspot"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src="/assets/whatsapp.svg"
+                              alt="WhatsApp"
+                              className="w-10 h-10"
+                            />
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent>@oneditialspot</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TooltipProvider>
                 </div>
                 {/* Add search input and button below */}
                 <div className="mt-2 w-full max-w-md">
-                  <SearchComponent 
+                  <SearchComponent
                     placeholder="Search any products..."
                     className="w-full"
                   />
