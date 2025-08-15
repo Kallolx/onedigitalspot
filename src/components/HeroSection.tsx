@@ -40,19 +40,16 @@ const avatars = [
 
 const heroSlides = [
   {
-    imageDesktop: "/assets/1.png",
-    title: "Roblox",
-    discount: "70% OFF",
+    imageDesktop: "/assets/banners/welcome.avif",
+    title: "Welcome",
   },
   {
-    imageDesktop: "/assets/2.png",
-    title: "PUBG Mobile",
-    discount: "50% OFF",
+    imageDesktop: "/assets/banners/ai-promo.avif",
+    title: "AI Promo",
   },
   {
-    imageDesktop: "/assets/3.png",
-    title: "Mobile Legends",
-    discount: "30% OFF",
+    imageDesktop: "/assets/banners/tools-promo.avif",
+    title: "Tools Promo",
   },
 ];
 
@@ -63,7 +60,7 @@ const HeroSection = () => {
     if (!api) return;
     const interval = setInterval(() => {
       api.scrollNext();
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [api]);
 
@@ -99,12 +96,6 @@ const HeroSection = () => {
                     Explore
                     <ArrowRight className="w-5 h-5 text-white" />
                   </Button>
-                  <div className="flex items-center mt-2 gap-2">
-                    <AvatarCircles numPeople={99} avatarUrls={avatars} />
-                    <h1 className="text-sm font-medium text-muted-foreground hover:underline cursor-pointer">
-                      Join <br /> Community
-                    </h1>
-                  </div>
                 </div>
                 {/* Add search input and button below */}
                 <div className="mt-2 w-full max-w-md">
@@ -133,13 +124,8 @@ const HeroSection = () => {
                           <img
                             src={slide.imageDesktop}
                             alt={slide.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full object-cover"
                           />
-                          {slide.discount && (
-                            <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full font-pixel text-xs md:text-sm animate-pulse">
-                              {slide.discount}
-                            </div>
-                          )}
                           {/* Gradient overlay for better text contrast */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                         </Card>
