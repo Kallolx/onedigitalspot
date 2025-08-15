@@ -1,13 +1,8 @@
 import React from "react";
 import { SpinningLogos } from "@/components/spinning-logo";
-import { useInView } from 'react-intersection-observer';
 
 const WhyOneDigital: React.FC = () => {
 
-    const { ref, inView } = useInView({
-    triggerOnce: true, // load only once
-    rootMargin: '0px 0px 200px 0px',
-  });
 
 const features = [
   {
