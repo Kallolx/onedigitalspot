@@ -1,7 +1,13 @@
 import React from "react";
 import { SpinningLogos } from "@/components/spinning-logo";
+import { useInView } from 'react-intersection-observer';
 
 const WhyOneDigital: React.FC = () => {
+
+    const { ref, inView } = useInView({
+    triggerOnce: true, // load only once
+    rootMargin: '0px 0px 200px 0px',
+  });
 
 const features = [
   {
@@ -43,8 +49,8 @@ const features = [
         </div>
 
         {/* Mobile Spinner */}
-        <div className="h-[40vh] flex items-center justify-center">
-          <SpinningLogos />
+        <div ref={ref} className="h-[40vh] flex items-center justify-center">
+         {inView && <SpinningLogos />}
         </div>
 
         {/* Mobile Features Grid */}
@@ -98,8 +104,8 @@ const features = [
           </div>
 
           {/* Center Spinner */}
-          <div className="w-2/4 h-[60vh] flex items-center justify-center">
-            <SpinningLogos />
+          <div ref={ref} className="w-2/4 h-[60vh] flex items-center justify-center">
+            {inView && <SpinningLogos />}
           </div>
 
           {/* Right Panel - 2 Cards */}

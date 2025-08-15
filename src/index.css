@@ -134,9 +134,9 @@ All colors MUST be HSL.
 
 @layer utilities {
   .animate-spin-slow {
-    animation: spin-slow 16s linear infinite;
+    animation: spin-slow 8s linear infinite;
   }
   .animate-spin-reverse {
-    animation: spin-reverse 16s linear infinite;
+    animation: spin-reverse 8s linear infinite;
   }
 }
