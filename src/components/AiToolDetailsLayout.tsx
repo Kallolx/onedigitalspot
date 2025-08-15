@@ -621,18 +621,22 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                       {!isSubscription && personalType === "existing" && (
                         <div className="flex flex-col gap-3">
                           <label className="font-pixel text-base text-foreground">
-                            Provide your {(title.split(" ")[0] || "")} details
+                            Provide your {title.split(" ")[0] || ""} details
                           </label>
                           <input
                             className="w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-background focus:border-foreground focus:outline-none transition"
-                            placeholder={`Enter your ${(title.split(" ")[0] || "").toLowerCase()} email`}
+                            placeholder={`Enter your ${(
+                              title.split(" ")[0] || ""
+                            ).toLowerCase()} email`}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                           />
                           <input
                             className="w-full border-2 border-border rounded-lg px-4 py-3 text-base bg-background focus:border-foreground focus:outline-none transition"
-                            placeholder={`Enter your ${(title.split(" ")[0] || "").toLowerCase()} password`}
+                            placeholder={`Enter your ${(
+                              title.split(" ")[0] || ""
+                            ).toLowerCase()} password`}
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -761,51 +765,66 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                       </span>
                     </span>
                   </div>
-                  <Button
-                    className="w-full font-pixel text-lg mt-2 flex items-center justify-center gap-2"
-                    type="button"
-                    disabled={
-                      !selected ||
-                      (!isSubscription &&
-                        purchaseType === "personal" &&
-                        personalType === "existing" &&
-                        (!email || !password))
-                    }
-                    onClick={() => {
-                      if (!isSignedIn) {
-                        localStorage.setItem(
-                          "aiToolOrderInputs",
-                          JSON.stringify({
-                            selected,
-                            purchaseType,
-                            personalType,
-                            email,
-                            quantity,
-                            pathname: location.pathname,
-                          })
-                        );
-                        navigate(
-                          `/auth/login?redirect=${encodeURIComponent(
-                            location.pathname
-                          )}`
-                        );
-                      } else {
-                        setShowPayment(true);
+
+                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                    <Button
+                      className="w-full font-pixel text-lg mt-2 flex items-center justify-center gap-2"
+                      type="button"
+                      disabled={
+                        !selected ||
+                        (!isSubscription &&
+                          purchaseType === "personal" &&
+                          personalType === "existing" &&
+                          (!email || !password))
                       }
-                    }}
-                  >
-                    {!isSignedIn ? (
-                      <>
-                        <Lock className="w-7 h-7 mr-2" strokeWidth={3} />
-                        <span>Please Login to Continue</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-7 h-7 ml-2" strokeWidth={3} />
-                        Proceed to Payment
-                      </>
-                    )}
-                  </Button>
+                      onClick={() => {
+                        if (!isSignedIn) {
+                          localStorage.setItem(
+                            "aiToolOrderInputs",
+                            JSON.stringify({
+                              selected,
+                              purchaseType,
+                              personalType,
+                              email,
+                              quantity,
+                              pathname: location.pathname,
+                            })
+                          );
+                          navigate(
+                            `/auth/login?redirect=${encodeURIComponent(
+                              location.pathname
+                            )}`
+                          );
+                        } else {
+                          setShowPayment(true);
+                        }
+                      }}
+                    >
+                      {!isSignedIn ? (
+                        <>
+                          <Lock className="w-7 h-7 mr-2" strokeWidth={3} />
+                          <span>Please Login to Continue</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-7 h-7 ml-2" strokeWidth={3} />
+                          Proceed to Payment
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full sm:w-36 font-pixel text-base sm:text-lg flex items-center justify-center gap-2 py-3 sm:py-4"
+                      disabled={selectedItem === null}
+                      onClick={() => {
+                        // TODO: Implement add to cart logic
+                        alert("Added to cart!");
+                      }}
+                    >
+                      Add to Cart
+                    </Button>
+                  </div>
                 </>
               )}
             </Card>
