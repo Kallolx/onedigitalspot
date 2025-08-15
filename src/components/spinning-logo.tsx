@@ -58,7 +58,7 @@ export const SpinningLogos: React.FC = () => {
                   height: iconWrapperWidth.mobile,
                 }}
                 className={cn(
-                  "absolute flex items-center justify-center rounded-full shadow-md border-2 border-white dark:border-gray-800 bg-white animate-spin-reverse"
+                  "absolute flex items-center justify-center rounded-full  border"
                 )}
                 aria-label={icon.alt}
               >
@@ -68,7 +68,7 @@ export const SpinningLogos: React.FC = () => {
           })}
         </div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-background rounded-full w-24 h-24 flex items-center justify-center shadow-inner border-4 border-border">
+          <div className="bg-background rounded-full w-24 h-24 flex items-center justify-center border-2">
             <img src="/assets/only-icon.svg" alt="OneDigitalSpot Logo" className="w-16 h-16 object-contain" />
           </div>
         </div>
@@ -95,7 +95,7 @@ export const SpinningLogos: React.FC = () => {
                   height: iconWrapperWidth.desktop,
                 }}
                 className={cn(
-                  "absolute flex items-center justify-center rounded-full shadow-md border-2 border-white dark:border-gray-800 bg-white animate-spin-reverse"
+                  "absolute flex items-center justify-center rounded-full border"
                 )}
                 aria-label={icon.alt}
               >
@@ -105,7 +105,7 @@ export const SpinningLogos: React.FC = () => {
           })}
         </div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-background rounded-full w-40 h-40 md:w-56 md:h-56 flex items-center justify-center shadow-inner border-4 border-border">
+          <div className="bg-background rounded-full w-40 h-40 md:w-56 md:h-56 flex items-center justify-center  border-2">
             <img src="/assets/only-icon.svg" alt="OneDigitalSpot Logo" className="w-28 h-28 md:w-40 md:h-40 object-contain" />
           </div>
         </div>

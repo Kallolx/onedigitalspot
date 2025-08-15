@@ -1,12 +1,6 @@
 import React from "react";
 
 const Footer: React.FC = () => {
-  const socials = [
-    { name: "Facebook", icon: "📘", href: "#" },
-    { name: "Twitter", icon: "🐦", href: "#" },
-    { name: "Email", icon: "✉️", href: "mailto:info@onedigitalspot.com" },
-  ];
-
   const company = ["About Us", "Careers", "Blog", "Contact"];
   const support = [
     "Help Center",
@@ -19,83 +13,86 @@ const Footer: React.FC = () => {
     { name: "Mastercard", src: "/assets/icons/master.svg" },
     { name: "bKash", src: "/assets/icons/bKash.svg" },
     { name: "Nagad", src: "/assets/icons/nagad.svg" },
-    { name: "Upay", src: "/assets/icons/upay.png" },
     { name: "Rocket", src: "/assets/icons/rocket.png" },
   ];
 
   return (
-    <footer className=" mt-8 text-foreground">
+    <footer className="text-foreground">
       {/* ── Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-x-6 gap-y-10 py-12">
-          {/* Column 1 – Brand */}
-          <div className="md:col-span-1 flex flex-col gap-5 items-center text-center md:items-start md:text-left">
-            <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center justify-center gap-6 py-12">
+          {/* Logo at top center */}
+          <img
+            src="/assets/logo-av.avif"
+            alt="OneDigitalSpot"
+            className="max-w-[180px] w-full h-auto object-contain mx-auto"
+          />
+          {/* Description centered */}
+          <p className="text-muted-foreground font-anekbangla md:text-2xl mt-0 max-w-lg sm:max-w-lg text-center">
+            আপনার সব ধরনের ডিজিটাল প্রোডাক্ট এবং সেবার সহজ সমাধান। আমরা দ্রুত
+            ডেলিভারি, নিরাপদ লেনদেন এবং ঝামেলামুক্ত অভিজ্ঞতার মাধ্যমে আপনাকে
+            ডিজিটাল সেবা দেওয়ার জন্য কাজ করি
+          </p>
+          {/* Social media icons centered under description */}
+          <div className="flex gap-4 justify-center">
+            <a
+              href="https://facebook.com/onedigitalspot"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <img
-                src="/assets/logo-2.svg"
-                alt="OneDigitalSpot"
-                className="max-w-[180px] w-full h-auto object-contain"
+                src="/assets/facebook.svg"
+                alt="Facebook"
+                className="w-12 h-12 hover:opacity-80 transition"
               />
-            </div>
-            <p className="text-slate-400 mt-0">
-              Bangladesh’s #1 trusted digital goods platform. Fast, secure, and
-              always here for you.
-            </p>
+            </a>
+            <a
+              href="https://instagram.com/onedigitalspot"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="/assets/instagram.svg"
+                alt="Instagram"
+                className="w-12 h-12 hover:opacity-80 transition"
+              />
+            </a>
+            <a
+              href="https://tiktok.com/onedigitalspot"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="/assets/tiktok.svg"
+                alt="TikTok"
+                className="w-12 h-12 hover:opacity-80 transition"
+              />
+            </a>
+            <a href="https://wa.me/8801234567890">
+              <img
+                src="/assets/whatsapp.svg"
+                alt="WhatsApp"
+                className="w-12 h-12 hover:opacity-80 transition"
+              />
+            </a>
+            {/* Add more socials as needed */}
           </div>
-
-          {/* Column 2 – Company */}
-          <div className="md:col-start-2 flex flex-col gap-2 items-center text-center md:items-start md:text-left">
-            <h3 className="text-lg font-semibold mb-2">Company</h3>
-            <ul className="space-y-2">
-              {company.map((l) => (
-                <li key={l}>
-                  <a
-                    href="#"
-                    className="text-slate-400 hover:text-white transition"
-                  >
-                    {l}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3 – Support */}
-          <div className="flex flex-col gap-2 items-center text-center md:items-start md:text-left">
-            <h3 className="text-lg font-semibold mb-2">Support</h3>
-            <ul className="space-y-2">
-              {support.map((l) => (
-                <li key={l}>
-                  <a
-                    href="#"
-                    className="text-slate-400 hover:text-white transition"
-                  >
-                    {l}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 4 – Download */}
-          <div className="md:col-start-4 flex flex-col gap-2 items-center text-center md:items-start md:text-left">
-            <h3 className="text-lg font-semibold mb-5">Download App</h3>
-            <div className="flex flex-col gap-4">
-              <a href="#">
-                <img
-                  src="/assets/icons/google-badge.svg"
-                  alt="Google Play"
-                  className="h-14 object-contain"
-                />
-              </a>
-              <a href="#">
-                <img
-                  src="/assets/icons/apple-badge.svg"
-                  alt="App Store"
-                  className="h-14 object-contain"
-                />
-              </a>
-            </div>
+          {/* Download badges under social icons */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <a href="#">
+              <img
+                src="/assets/icons/google-badge.svg"
+                alt="Google Play"
+                className="h-14 object-contain"
+              />
+            </a>
+            <a href="#">
+              <img
+                src="/assets/icons/apple-badge.svg"
+                alt="App Store"
+                className="h-14 object-contain"
+              />
+            </a>
           </div>
         </div>
 
@@ -104,7 +101,23 @@ const Footer: React.FC = () => {
 
         {/* ── Bottom bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-8">
-          <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start w-full sm:w-auto">
+          {/* Left: Developed by Kallol */}
+          <div className="w-full sm:w-auto flex justify-center sm:justify-start mb-2 sm:mb-0">
+            <span className="text-sm text-slate-500">
+              Developed by{" "}|{" "}
+              <a
+                href="https://kallol.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-secondary underline hover:text-foreground"
+              >
+                Kamrul Hasan
+              </a>
+            </span>
+          </div>
+
+          {/* Center: Payment icons */}
+          <div className="w-full sm:w-auto flex items-center gap-3 flex-wrap justify-center">
             {payments.map((p) => (
               <img
                 key={p.name}
@@ -115,15 +128,12 @@ const Footer: React.FC = () => {
             ))}
           </div>
 
-          <div className="text-sm text-slate-500 flex items-center gap-2 sm:justify-end w-full sm:w-auto">
+          {/* Right: Copyright & Privacy */}
+          <div className="w-full sm:w-auto text-sm text-slate-500 flex items-center gap-2 justify-center sm:justify-end">
             <span>
               &copy; {new Date().getFullYear()} OneDigitalSpot. All rights
               reserved.
             </span>
-            <span className="hidden sm:inline">•</span>
-            <a href="#" className="hover:text-white transition">
-              Privacy Policy
-            </a>
           </div>
         </div>
       </div>

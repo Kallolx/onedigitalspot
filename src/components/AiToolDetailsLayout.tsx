@@ -265,8 +265,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
       qr: "/assets/qr/bkash.png",
       instructions: [
         'Open up the bKash app & Choose "Send Money" Its a Personal Account',
-        'Enter the bKash Account Number: <span class="font-bold text-foreground">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold text-foreground\">${totalAmount}৳</span>`,
+        'Enter the bKash Account Number: <span class="font-bold text-secondary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(totalAmount)}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a bKash Transaction ID (TRX ID)",
       ],
@@ -280,8 +280,10 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
       type: "Send Money",
       instructions: [
         'Open up the Nagad app & Choose "Send Money"',
-        "Enter the Nagad Account Number: 01831624571",
-        `Enter the exact amount: ${totalAmount}৳`,
+        'Enter the Nagad Account Number: <span class="font-bold text-secondary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
+          totalAmount
+        )}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Nagad Transaction ID",
       ],
@@ -295,8 +297,10 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
       type: "Send Money",
       instructions: [
         'Open up the Rocket app & Choose "Send Money"',
-        "Enter the Rocket Account Number: 01831624571",
-        `Enter the exact amount: ${totalAmount}৳`,
+        'Enter the Rocket Account Number:  <span class="font-bold text-secondary">01831624571</span>',
+        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
+          totalAmount
+        )}৳</span>`,
         "Confirm the Transaction",
         "After sending money, you'll receive a Rocket Transaction ID",
       ],
@@ -906,11 +910,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                   <h6 className="font-pixel text-sm text-foreground">
                                     Transaction Details
                                   </h6>
-
                                   <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                                      Your {method.name} Account
-                                    </label>
                                     <Input
                                       placeholder={`Enter your ${method.name} number`}
                                       value={userAccount}
@@ -921,11 +921,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                   </div>
 
                                   <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-2">
-                                      Transaction ID (TRX ID)
-                                    </label>
                                     <Input
-                                      placeholder="Enter transaction ID"
+                                      placeholder="Enter Transaction ID (TRX ID)"
                                       value={trxId}
                                       onChange={(e) => setTrxId(e.target.value)}
                                     />
@@ -945,8 +942,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                     onClick={handleCompletePayment}
                                   >
                                     {isProcessingOrder
-                                      ? "Placing..."
-                                      : "Place Order"}
+                                      ? "Processing..."
+                                      : "Complete Payment"}
                                   </Button>
                                 </div>
                               </div>
@@ -964,7 +961,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                         {method.name} Number:
                                       </span>
                                       <div className="flex items-center gap-2">
-                                        <span className="font-mono font-semibold text-md">
+                                        <span className="font-sans font-semibold text-md">
                                           {method.account}
                                         </span>
                                         <button
@@ -989,8 +986,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                         Total:
                                       </span>
                                       <div className="flex items-center gap-2">
-                                        <span className="font-sans text-xl font-bold">
-                                          = {totalAmount} BDT
+                                        <span className="text-2xl font-bold font-anekbangla text-secondary">
+                                          {toBanglaNumber(totalAmount)} BDT
                                         </span>
                                         <button
                                           onClick={() =>
@@ -1070,7 +1067,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
 
             {/* Info Section */}
             {infoSections.map((section, i) => (
-              <Card key={i} className="mb-8 p-4">
+              <Card key={i} className="mb-8 p-4 bg-background">
                 <h2 className="font-semibold text-lg mb-2 font-pixel text-foreground">
                   {section.title}
                 </h2>

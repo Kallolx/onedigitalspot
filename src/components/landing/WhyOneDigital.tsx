@@ -76,9 +76,9 @@ const features = [
         </div>
 
         {/* Desktop Cards Layout */}
-        <div className="flex items-stretch justify-center gap-6">
-          {/* Left Panel - 2 Cards */}
-          <div className="w-1/4 h-[60vh] flex flex-col gap-6">
+        <div className="flex flex-col lg:flex-row items-start justify-center gap-6">
+          {/* Left Panel */}
+          <div className="w-full lg:w-1/4 flex flex-col gap-6 mb-6 lg:mb-0">
               {/* Lightning Fast Card */}
               <div className="rounded-2xl p-8 border flex-1 flex flex-col justify-between bg-white/80 dark:bg-gray-900/80">
                 <div className="mb-4">
@@ -99,12 +99,12 @@ const features = [
           </div>
 
           {/* Center Spinner */}
-          <div className="w-2/4 h-[60vh] flex items-center justify-center">
+          <div className="w-full lg:w-2/4 flex items-center justify-center mt-16 mb-16" style={{maxHeight: 400}}>
             <SpinningLogos />
           </div>
 
-          {/* Right Panel - 2 Cards */}
-          <div className="w-1/4 h-[60vh] flex flex-col gap-6">
+          {/* Right Panel */}
+          <div className="w-full lg:w-1/4 flex flex-col gap-6">
               {/* 24/7 Support Card */}
               <div className="rounded-2xl p-8 border flex-1 flex flex-col justify-between bg-white/80 dark:bg-gray-900/80">
                 <div className="mb-4">
