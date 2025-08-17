@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
-import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
+import AiToolDetailsLayout from "@/components/custom/AiToolDetailsLayout";
 import { subscriptions } from "@/lib/products";
 
 const infoSections = [

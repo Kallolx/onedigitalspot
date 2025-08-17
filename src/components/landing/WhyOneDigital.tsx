@@ -1,5 +1,5 @@
 import React from "react";
-import { SpinningLogos } from "@/components/spinning-logo";
+import { SpinningLogos } from "@/components/custom/spinning-logo";
 
 const WhyOneDigital: React.FC = () => {
 

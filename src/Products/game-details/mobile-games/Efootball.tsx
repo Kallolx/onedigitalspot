@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { mobileGames } from "@/lib/products";
-import GameDetailsLayout from "@/components/GameDetailsLayout";
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 interface SelectedItem {
   categoryIdx: number;

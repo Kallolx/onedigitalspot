@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { aiTools } from "@/lib/products";
-import AiToolDetailsLayout from "@/components/AiToolDetailsLayout";
+import AiToolDetailsLayout from "@/components/custom/AiToolDetailsLayout";
 
 const categoryIcons = {
   Individual: "/assets/icons/ai-tools/github.svg",

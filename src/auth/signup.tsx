@@ -99,7 +99,7 @@ export default function SignupPage() {
         <div className="w-full lg:w-1/2 flex flex-col justify-center">
           <Card className="bg-white border border-border hover:shadow-retro transition-shadow duration-300">
             <CardHeader className="items-center md:items-start pb-4">
-              <h1 className="text-2xl font-semibold tracking-tighter text-primary font-pixel">
+              <h1 className="text-2xl font-semibold tracking-tighter text-foreground font-pixel">
                 Create Account
               </h1>
             </CardHeader>
@@ -279,7 +279,7 @@ export default function SignupPage() {
                   Already have an account?{" "}
                   <a
                     href="/auth/login"
-                    className="text-primary hover:text-primary/80 font-medium transition-colors"
+                    className="text-secondary hover:text-foreground/80 font-medium transition-colors"
                   >
                     Sign in here
                   </a>

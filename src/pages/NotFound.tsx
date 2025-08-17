@@ -23,10 +23,10 @@ const NotFound = () => {
           className="mx-auto mb-6 w-32 h-32 object-contain drop-shadow-lg"
           onError={(e) => (e.currentTarget.style.display = "none")}
         />
-        <h1 className="text-6xl md:text-7xl font-pixel text-primary mb-2 tracking-tighter">
+        <h1 className="text-6xl md:text-7xl font-pixel text-foreground mb-2 tracking-tighter">
           404
         </h1>
-        <p className="text-lg md:text-xl font-pixel text-primary mb-4">
+        <p className="text-lg md:text-xl font-pixel text-foreground mb-4">
           Page Not Found
         </p>
         <p className="text-base text-muted-foreground mb-8">

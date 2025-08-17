@@ -2,7 +2,7 @@ import Header from "@/components/landing/Header";
 import { useState } from "react";
 import { productivity as ProductivityData } from "../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import ServiceCard from "@/components/ServiceCard";
+import ServiceCard from "@/components/custom/ServiceCard";
 
 const categories = Array.from(new Set(ProductivityData.map(g => String(g.category))));
 
@@ -27,13 +27,12 @@ const Productivity = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <h1 className="font-pixel text-3xl md:text-4xl text-primary">Design & Productivity</h1>
+          <h1 className="font-pixel text-3xl md:text-4xl font-medium tracking-tighter text-foreground">Design & Productivity</h1>
           <div className="flex flex-row gap-2 md:gap-4 w-full md:w-auto">
             <div className="flex flex-col">
-              <label className="font-pixel text-base mb-1 text-primary">Category</label>
+              <label className="font-pixel text-base mb-1 text-foreground">Category</label>
               <Select value={selectedCategory ?? "all"} onValueChange={val => setSelectedCategory(val === "all" ? null : val)}>
                 <SelectTrigger className="w-40 bg-white/80 border border-border rounded-lg shadow-card text-xs md:text-sm">
                   <SelectValue>{selectedCategory ?? "All"}</SelectValue>

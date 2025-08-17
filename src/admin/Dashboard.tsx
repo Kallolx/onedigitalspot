@@ -21,7 +21,7 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
-import NotificationDropdown from '../components/NotificationDropdown';
+import NotificationDropdown from '../components/custom/NotificationDropdown';
 
 
 const Dashboard = () => {

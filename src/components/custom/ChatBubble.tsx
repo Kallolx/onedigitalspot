@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Send, MessageCircle } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);

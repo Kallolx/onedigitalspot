@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { Button } from './ui/button';
-import { OrderData } from '../lib/orders';
+import { Button } from '../ui/button';
+import { OrderData } from '../../lib/orders';
 import { 
   Download, 
   Printer

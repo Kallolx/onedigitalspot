@@ -15,7 +15,7 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
-import SearchComponent from "../SearchComponent";
+import SearchComponent from "../custom/SearchComponent";
 
 const avatars = [
   {

@@ -1,6 +1,6 @@
-import CategorySwiper from "@/components/CategorySwiper";
+import CategorySwiper from "@/components/custom/CategorySwiper";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowDown01Icon, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   mobileGames,
   pcGames,
@@ -18,6 +18,7 @@ import giftAnimation from "../assets/animated/gift.json";
 import mobileAnimation from "../assets/animated/mobile.json";
 import pcAnimation from "../assets/animated/pc.json";
 import netflixAnimation from "../assets/animated/netflix.json";
+import { Folder02Icon } from "hugeicons-react";
 
 // Collect all products from all categories
 const allProducts = [
@@ -386,6 +387,19 @@ const GameCategories = () => (
           navigationNextClass=".swiper-pc-next"
         />
       </div>
+    </div>
+    {/* See All Button at the bottom */}
+    <div className="flex justify-center mt-4 md:mt-8 mb-4">
+      <a href="/all-products">
+        <Button
+          variant="outline"
+          size="sm"
+          className="font-pixel"
+        >
+          See All Products
+          <Folder02Icon className="w-4 h-4" />
+        </Button>
+      </a>
     </div>
   </section>
 );

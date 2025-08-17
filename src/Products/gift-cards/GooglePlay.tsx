@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { giftCards } from "@/lib/products";
-import GameDetailsLayout from "@/components/GameDetailsLayout";
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 // Define SelectedItem interface again if needed
 interface SelectedItem {

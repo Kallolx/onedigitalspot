@@ -17,7 +17,7 @@ import {
 } from "hugeicons-react";
 import { account } from "@/lib/appwrite";
 import { getUserOrders } from "@/lib/orders";
-import MobileMenu from "../MobileMenu";
+import MobileMenu from "../custom/MobileMenu";
 
 // Types
 interface DropdownItem {

@@ -2,14 +2,14 @@ import Header from "@/components/landing/Header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import ServiceCard from "@/components/ServiceCard";
-import OrderStatusModal from "@/components/OrderStatusModal";
+import ServiceCard from "@/components/custom/ServiceCard";
+import OrderStatusModal from "@/components/custom/OrderStatusModal";
 import React, { useState, useEffect, useRef } from "react";
 import { Info, X, Copy, Check } from "lucide-react";
 import { LockKeyIcon, SentIcon } from "hugeicons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RotateLoader } from "react-spinners";
-import { createOrder, getCurrentUser, OrderData } from "../lib/orders";
+import { createOrder, getCurrentUser, OrderData } from "../../lib/orders";
 
 interface PriceItem {
   label: string;

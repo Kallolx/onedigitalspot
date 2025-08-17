@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { mobileGames } from "@/lib/products";
-import GameDetailsLayout from "@/components/GameDetailsLayout";
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 // Define the SelectedItem interface here since it's needed by the component
 interface SelectedItem {

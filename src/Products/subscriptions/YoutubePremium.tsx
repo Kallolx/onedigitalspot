@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
-import GameDetailsLayout from "@/components/GameDetailsLayout";
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 import { subscriptions } from "@/lib/products";
 
 const infoSections = [

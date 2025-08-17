@@ -5,7 +5,7 @@ import { adminNavConfig } from "../lib/adminNavConfig";
 import { Home, ShoppingCart, Package,Users, Settings, Menu } from "lucide-react";
 import { ShopSignIcon } from "hugeicons-react";
 import { NotificationProvider } from "../contexts/NotificationContext";
-import NotificationDropdown from "../components/NotificationDropdown";
+import NotificationDropdown from "../components/custom/NotificationDropdown";
 import { useOrderNotifications } from "../hooks/useOrderNotifications";
 
 const iconMap = {

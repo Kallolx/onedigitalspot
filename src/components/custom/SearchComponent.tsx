@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { Search, X, Star, Loader2 } from 'lucide-react';
-import { Input } from './ui/input';
-import { useSearch } from '../hooks/useSearch';
-import { cn } from '../lib/utils';
+import { Input } from '../ui/input';
+import { useSearch } from '../../hooks/useSearch';
+import { cn } from '../../lib/utils';
 
 interface SearchComponentProps {
   className?: string;

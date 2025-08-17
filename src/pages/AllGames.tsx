@@ -2,7 +2,7 @@ import Header from "@/components/landing/Header";
 import { useState } from "react";
 import { pcGames, mobileGames } from "../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import ServiceCard from "@/components/ServiceCard";
+import ServiceCard from "@/components/custom/ServiceCard";
 import PcGames from "./PcGames";
 
 const categories = Array.from(new Set(pcGames.map(g => g.category)));
@@ -32,13 +32,12 @@ const AllGames = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <h1 className="font-pixel text-3xl md:text-4xl text-primary">PC & Mobile Games</h1>
+          <h1 className="font-pixel text-3xl md:text-4xl font-medium tracking-tighter text-foreground">PC & Mobile Games</h1>
           <div className="flex flex-row gap-2 md:gap-4 w-full md:w-auto">
             <div className="flex flex-col">
-              <label className="font-pixel text-base mb-1 text-primary">Category</label>
+              <label className="font-pixel text-base mb-1 text-foreground">Category</label>
               <Select value={selectedCategory ?? "all"} onValueChange={val => setSelectedCategory(val === "all" ? null : val)}>
                 <SelectTrigger className="w-40 bg-white/80 border border-border rounded-lg shadow-card text-xs md:text-sm">
                   <SelectValue>{selectedCategory ?? "All"}</SelectValue>
@@ -52,7 +51,7 @@ const AllGames = () => {
               </Select>
             </div>
             <div className="flex flex-col">
-              <label className="font-pixel text-base mb-1 text-primary">Price</label>
+              <label className="font-pixel text-base mb-1 text-foreground">Price</label>
               <Select value={selectedPrice.label} onValueChange={label => setSelectedPrice(priceRanges.find(r => r.label === label) || priceRanges[0])}>
                 <SelectTrigger className="w-40 bg-white/80 border border-border rounded-lg shadow-card text-xs md:text-sm">
                   <SelectValue>{selectedPrice.label}</SelectValue>
@@ -68,8 +67,8 @@ const AllGames = () => {
         </div>
         {/* Mobile Games Section */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-pixel text-2xl md:text-3xl text-primary">Mobile Games</h2>
-          <a href="/mobile-games" className="font-pixel text-sm md:text-base text-primary underline hover:text-primary/80">Show More</a>
+          <h2 className="font-pixel text-2xl font-medium tracking-tighter md:text-3xl text-foreground">Mobile Games</h2>
+          <a href="/mobile-games" className="font-pixel text-sm md:text-base text-foreground underline hover:text-foreground/80">Show More</a>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4 mb-8">
           {filteredMobile.length === 0 ? (
@@ -80,8 +79,8 @@ const AllGames = () => {
         </div>
         {/* PC Games Section */}
         <div className="flex items-center justify-between mb-4 mt-8">
-          <h2 className="font-pixel text-2xl md:text-3xl text-primary">PC Games</h2>
-          <a href="/pc-games" className="font-pixel text-sm md:text-base text-primary underline hover:text-primary/80">Show More</a>
+          <h2 className="font-pixel text-2xl font-medium tracking-tighter md:text-3xl text-foreground">PC Games</h2>
+          <a href="/pc-games" className="font-pixel text-sm md:text-base text-foreground underline hover:text-foreground/80">Show More</a>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
           {filteredPc.length === 0 ? (

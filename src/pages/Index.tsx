@@ -9,7 +9,6 @@ import Footer from "@/components/landing/Footer";
 const Index = () => {
   return (
     <div className="relative min-h-screen w-full flex flex-col">
-      <Header />
       <main className="flex-1 bg-background w-full">
         <section className="w-full">
           <div className="w-full max-w-7xl mx-auto px-0 md:px-8">

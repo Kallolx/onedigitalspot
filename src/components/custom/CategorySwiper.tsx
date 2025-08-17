@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import ServiceCard from "@/components/ServiceCard";
+import ServiceCard from "@/components/custom/ServiceCard";
 import { ChevronRight } from "lucide-react";
 
 interface CategorySwiperProps {
