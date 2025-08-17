@@ -87,13 +87,15 @@ const HeroSection = () => {
                   using bKash, Nagad, Rocket & more Fast, Easy & Reliable!
                 </p>
                 <div className="flex items-center gap-8 mb-4">
-                  <Button
-                    variant="default"
-                    className="px-6 py-3 text-white text-md font-bold"
-                  >
-                    Explore
-                    <ArrowRight className="w-5 h-5 text-white" />
-                  </Button>
+                  <a href="/all-products">
+                    <Button
+                      variant="default"
+                      className="px-6 py-3 text-white text-md font-bold"
+                    >
+                      Explore
+                      <ArrowRight className="w-5 h-5 text-white" />
+                    </Button>
+                  </a>
                   <TooltipProvider>
                     <div className="flex items-center gap-4">
                       <Tooltip>
@@ -187,7 +189,7 @@ const HeroSection = () => {
                     {heroSlides.map((slide, index) => (
                       <CarouselItem key={index} className="pl-4 h-full">
                         <Card className="relative overflow-hidden rounded-lg md:rounded-xl  h-full">
-                          <img 
+                          <img
                             src={slide.imageDesktop}
                             alt={slide.title}
                             className="w-full h-full object-cover"

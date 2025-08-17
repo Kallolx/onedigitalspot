@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { aiTools, subscriptions, giftCards, mobileGames, pcGames } from "../lib/products";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { aiTools, subscriptions, giftCards, mobileGames, pcGames, productivity } from "../../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/custom/ServiceCard";
 import Footer from "@/components/landing/Footer";
@@ -14,6 +15,7 @@ const priceRanges = [
 const categoryOptions = [
   { label: "All", value: "all" },
   { label: "AI Tools", value: "AI Tools" },
+  { label: "Productivity", value: "Productivity" },
   { label: "Subscriptions", value: "Subscriptions" },
   { label: "Gift Cards", value: "Gift Cards" },
   { label: "Mobile Games", value: "Mobile Games" },
@@ -21,8 +23,13 @@ const categoryOptions = [
 ];
 
 const AllProducts = () => {
-  const [selectedPrice, setSelectedPrice] = useState(priceRanges[0]);
-  const [selectedCategory, setSelectedCategory] = useState(categoryOptions[0]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initCategoryLabel = searchParams.get("category") || "All";
+  const initPriceLabel = searchParams.get("price") || "All";
+
+  const [selectedPrice, setSelectedPrice] = useState(() => priceRanges.find(p => p.label === initPriceLabel) || priceRanges[0]);
+  const [selectedCategory, setSelectedCategory] = useState(() => categoryOptions.find(c => c.label === initCategoryLabel) || categoryOptions[0]);
 
   // Helper to filter by price
   const filterByPrice = (arr) => {
@@ -44,6 +51,10 @@ const AllProducts = () => {
       items: filterByPrice(subscriptions),
     },
     {
+      title: "Productivity",
+      items: filterByPrice(productivity),
+    },
+    {
       title: "Gift Cards",
       items: filterByPrice(giftCards),
     },
@@ -60,6 +71,15 @@ const AllProducts = () => {
   const sections = selectedCategory.value === "all"
     ? allSections
     : allSections.filter((section) => section.title === selectedCategory.value);
+
+  // Keep URL in sync with selected filters so state persists when navigating
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (selectedCategory?.label) params.category = selectedCategory.label;
+    if (selectedPrice?.label) params.price = selectedPrice.label;
+    setSearchParams(params);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, selectedPrice]);
 
   return (
     <div className="min-h-screen bg-background">

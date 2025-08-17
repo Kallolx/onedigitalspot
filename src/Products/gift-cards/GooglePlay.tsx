@@ -38,7 +38,7 @@ export default function GooglePlayGiftCard() {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   // Use image from subscriptions array
-  const googlePlayGiftCardProduct = giftCards.find(p => p.title === "Google-Play Gift Card");
+  const googlePlayGiftCardProduct = giftCards.find(p => p.title === "Google Play");
   const infoImage = googlePlayGiftCardProduct?.image;
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function GooglePlayGiftCard() {
 
         // Find Google Play Gift Card (case-insensitive)
         const googlePlayGiftCard = products.find(
-          (g) => g.title && g.title.toLowerCase() === "google play gift card"
+          (g) => g.title && g.title.toLowerCase() === "google play"
         );
         setGpgc(googlePlayGiftCard);
 

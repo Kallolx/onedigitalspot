@@ -1,6 +1,5 @@
-import Header from "@/components/landing/Header";
 import { useState } from "react";
-import { productivity as ProductivityData } from "../lib/products";
+import { productivity as ProductivityData } from "../../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/custom/ServiceCard";
 

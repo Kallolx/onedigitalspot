@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
     <footer className="text-foreground">
       {/* ── Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center justify-center gap-6 py-12">
+        <div className="flex flex-col items-center justify-center gap-6 py-8">
           {/* Logo at top center */}
           <img
             src="/assets/logo-av.avif"
@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
             className="max-w-[180px] w-full h-auto object-contain mx-auto"
           />
           {/* Description centered */}
-          <p className="text-muted-foreground font-anekbangla md:text-2xl mt-0 max-w-lg sm:max-w-lg text-center">
+          <p className="text-muted-foreground font-anekbangla text-xl md:text-2xl mt-0 max-w-lg sm:max-w-lg text-center">
             আপনার সব ধরনের ডিজিটাল প্রোডাক্ট এবং সেবার সহজ সমাধান। আমরা দ্রুত
             ডেলিভারি, নিরাপদ লেনদেন এবং ঝামেলামুক্ত অভিজ্ঞতার মাধ্যমে আপনাকে
             ডিজিটাল সেবা দেওয়ার জন্য কাজ করি
@@ -94,13 +94,19 @@ const Footer: React.FC = () => {
               />
             </a>
           </div>
+            {/* Quick links under badges */}
+            <div className="flex flex-col-3 gap-2 text-center sm:text-left text-sm text-foreground">
+              <a href="/contact-us" className="hover:underline hover:text-secondary  ">Contact Us</a>
+              <a href="/refund-policy" className="hover:underline hover:text-secondary ">Refund Policy</a>
+              <a href="/product-delivery" className="hover:underline hover:text-secondary ">Product Delivery</a>
+            </div>
         </div>
 
         {/* ── Divider */}
         <hr className="border-slate-700" />
 
         {/* ── Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-6">
           {/* Left: Developed by Kallol */}
           <div className="w-full sm:w-auto flex justify-center sm:justify-start mb-2 sm:mb-0">
             <span className="text-sm text-slate-500">

@@ -1,10 +1,10 @@
-import Header from "@/components/landing/Header";
+
 import { useState } from "react";
-import { subscriptions } from "../lib/products";
+import { aiTools } from "../../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/custom/ServiceCard";
 
-const categories = Array.from(new Set(subscriptions.map(g => String(g.category))));
+const categories = Array.from(new Set(aiTools.map(g => String(g.category))));
 
 const priceRanges = [
   { label: "All", min: 0, max: Infinity },
@@ -13,11 +13,11 @@ const priceRanges = [
   { label: "৳500+", min: 500, max: Infinity },
 ];
 
-const Subscriptions = () => {
+const AiTools = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState(priceRanges[0]);
 
-  let filtered = subscriptions;
+  let filtered = aiTools;
 
   if (selectedCategory) filtered = filtered.filter(g => g.category === selectedCategory);
   if (selectedPrice.label !== "All") filtered = filtered.filter(g => {
@@ -29,7 +29,7 @@ const Subscriptions = () => {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <h1 className="font-pixel text-3xl md:text-4xl font-medium tracking-tighter text-foreground">Popular Subscriptions</h1>
+          <h1 className="font-pixel text-3xl md:text-4xl font-medium tracking-tighter text-foreground">AI Tools</h1>
           <div className="flex flex-row gap-2 md:gap-4 w-full md:w-auto">
             <div className="flex flex-col">
               <label className="font-pixel text-base mb-1 text-foreground">Category</label>
@@ -63,7 +63,7 @@ const Subscriptions = () => {
         {/* Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
           {filtered.length === 0 ? (
-            <div className="col-span-full text-center text-muted-foreground font-pixel text-xl">No subscriptions found.</div>
+            <div className="col-span-full text-center text-muted-foreground font-pixel text-xl">No AI tools found.</div>
           ) : (
             filtered.map((card, idx) => <ServiceCard key={idx} {...card} isSubscription={true} />)
           )}
@@ -73,4 +73,4 @@ const Subscriptions = () => {
   );
 };
 
-export default Subscriptions;
+export default AiTools;

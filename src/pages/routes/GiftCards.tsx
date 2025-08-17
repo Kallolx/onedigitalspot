@@ -1,10 +1,10 @@
 import Header from "@/components/landing/Header";
 import { useState } from "react";
-import { mobileGames } from "../lib/products";
+import { giftCards, pcGames } from "../../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/custom/ServiceCard";
 
-const categories = Array.from(new Set(mobileGames.map(g => g.category)));
+const categories = Array.from(new Set(giftCards.map(g => String(g.category))));
 
 const priceRanges = [
   { label: "All", min: 0, max: Infinity },
@@ -13,14 +13,11 @@ const priceRanges = [
   { label: "৳500+", min: 500, max: Infinity },
 ];
 
-
-
-const MobileGames = () => {
+const GiftCards = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState(priceRanges[0]);
-  const [showBest, setShowBest] = useState(false);
 
-  let filtered = mobileGames;
+  let filtered = giftCards;
 
   if (selectedCategory) filtered = filtered.filter(g => g.category === selectedCategory);
   if (selectedPrice.label !== "All") filtered = filtered.filter(g => {
@@ -32,7 +29,7 @@ const MobileGames = () => {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <h1 className="font-pixel text-3xl md:text-4xl font-medium tracking-tighter text-foreground">Mobile Games</h1>
+          <h1 className="font-pixel text-3xl md:text-4xl font-medium tracking-tighter text-foreground">Gift Cards</h1>
           <div className="flex flex-row gap-2 md:gap-4 w-full md:w-auto">
             <div className="flex flex-col">
               <label className="font-pixel text-base mb-1 text-foreground">Category</label>
@@ -63,12 +60,12 @@ const MobileGames = () => {
             </div>
           </div>
         </div>
-        {/* Games Grid */}
+        {/* Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
           {filtered.length === 0 ? (
-            <div className="col-span-full text-center text-muted-foreground font-pixel text-xl">No games found.</div>
+            <div className="col-span-full text-center text-muted-foreground font-pixel text-xl">No gift cards found.</div>
           ) : (
-            filtered.map((game, idx) => <ServiceCard key={idx} {...game} />)
+            filtered.map((card, idx) => <ServiceCard key={idx} {...card} />)
           )}
         </div>
       </main>
@@ -76,4 +73,4 @@ const MobileGames = () => {
   );
 };
 
-export default MobileGames;
+export default GiftCards;

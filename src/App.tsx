@@ -6,10 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import MainLayout from "./layouts/MainLayout";
 import NotFound from "./pages/NotFound";
-import MobileGames from "./pages/MobileGames";
-import PCGames from "./pages/PcGames";
-import GiftCards from "./pages/GiftCards";
-import AiTools from "./pages/AiTools";
+import MobileGames from "./pages/routes/MobileGames";
+import PCGames from "./pages/routes/PcGames";
+import GiftCards from "./pages/routes/GiftCards";
+import AiTools from "./pages/routes/AiTools";
 import MyOrders from "./pages/MyOrders";
 import EmailTest from "./pages/EmailTest";
 import MobileLegends from "./Products/game-details/mobile-games/MobileLegends";
@@ -38,7 +38,7 @@ import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
 import Products from "./admin/Products";
 import Users from "./admin/Users";
-import Subscriptions from "./pages/Subscriptions";
+import Subscriptions from "./pages/routes/Subscriptions";
 import Settings from "./admin/Settings";
 import GenshinImpact from "./Products/game-details/mobile-games/GenshinImpact";
 import CodMobile from "./Products/game-details/mobile-games/CodMobile";
@@ -66,12 +66,13 @@ import Hulu from "./Products/subscriptions/Hulu";
 import LinkedIn from "./Products/design/LinkedIn";
 import Office365 from "./Products/design/Office365";
 import Photoshop from "./Products/design/Photoshop";
-import Shopify from "./Products/subscriptions/Shopify";
+import Shopify from "./Products/subscriptions/Spotify";
 import YoutubePremium from "./Products/subscriptions/YoutubePremium";
 import ZoomPro from "./Products/design/ZoomPro";
-import Productivity from "./pages/Productivity";
-import AllGames from "./pages/AllGames";
+import Productivity from "./pages/routes/Productivity";
+import AllGames from "./pages/routes/AllGames";
 import TawkToWidget from "./components/custom/TawkToWidget";
+import CookieConsent from "@/components/consent/CookieConsent";
 import DeltaForce from "./Products/game-details/mobile-games/DeltaForce";
 import BloodStrike from "./Products/game-details/mobile-games/BloodStrike";
 import ClashOfClans from "./Products/game-details/mobile-games/ClashOfClans";
@@ -83,7 +84,15 @@ import Efootball from "./Products/game-details/mobile-games/Efootball";
 import FifaMobile from "./Products/game-details/mobile-games/FifaMobile";
 import RobloxGame from "./Products/game-details/mobile-games/RobloxGame";
 import { PerformanceOptimization } from "@/components/custom/PerformanceOptimization";
-import AllProducts from "./pages/AllProducts";
+import AllProducts from "./pages/routes/AllProducts";
+import ContactUs from "./pages/ContactUs";
+import RefundPolicy from "./pages/RefundPolicy";
+import ProductDelivery from "./pages/ProductDelivery";
+import AltBalaji from "./Products/subscriptions/AltBalaji";
+import HboMax from "./Products/subscriptions/HboMax";
+import Crunchyroll from "./Products/subscriptions/Crunchyroll";
+import UbisoftPlus from "./Products/subscriptions/Ubisoft";
+import XboxGamePass from "./Products/subscriptions/Xbox";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +125,9 @@ const App = () => {
               <Route path="/productivity" element={<Productivity />} />
               <Route path="/all-games" element={<AllGames />} />
               <Route path="/all-products" element={<AllProducts />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/product-delivery" element={<ProductDelivery />} />
 
               {/* Mobile Games Routes */}
               <Route
@@ -217,7 +229,9 @@ const App = () => {
               />
               <Route path="/subscriptions/duolingo" element={<Duolingo />} />
               <Route path="/subscriptions/zee5" element={<Zee5 />} />
+              <Route path="/subscriptions/hbo-max" element={<HboMax />} />
               <Route path="/subscriptions/ullu" element={<Ullu />} />
+              <Route path="/subscriptions/alt-balaji" element={<AltBalaji />} />
               <Route path="/subscriptions/sonyliv" element={<SonyLiv />} />
               <Route path="/subscriptions/capcut-pro" element={<CapCut />} />
               <Route path="/subscriptions/google-one" element={<GoogleOne />} />
@@ -226,7 +240,10 @@ const App = () => {
               <Route path="/subscriptions/linkedin" element={<LinkedIn />} />
               <Route path="/subscriptions/office-365" element={<Office365 />} />
               <Route path="/subscriptions/photoshop" element={<Photoshop />} />
-              <Route path="/subscriptions/shopify" element={<Shopify />} />
+              <Route path="/subscriptions/spotify" element={<Spotify />} />
+              <Route path="/subscriptions/crunchyroll" element={<Crunchyroll />} />
+              <Route path="/subscriptions/xbox-game-pass" element={<XboxGamePass />} />
+              <Route path="/subscriptions/ubisoft-plus" element={<UbisoftPlus />} />
               <Route
                 path="/subscriptions/youtube-premium"
                 element={<YoutubePremium />}
@@ -248,6 +265,7 @@ const App = () => {
             {/* 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <CookieConsent />
           <TawkToWidget />
         </BrowserRouter>
       </TooltipProvider>
