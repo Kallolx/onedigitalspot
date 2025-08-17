@@ -68,47 +68,50 @@ const HeroSection = () => {
         <div className="flex flex-col md:flex-row gap-8 items-stretch">
           {/* Aspect ratio wrapper for both columns */}
           <div className="w-full flex aspect-[2/1] max-h-[400px]">
+
             <div className="hide-1250 hidden md:flex p-2 w-2/5 h-full">
-              <div className="w-full h-full rounded-xl flex flex-col -ml-8 justify-center items-start px-8">
-                <h1 className="flex gap-2 text-5xl font-semibold tracking-tighter text-black mb-2 text-left">
+              <div className="w-full h-full rounded-xl flex flex-col -ml-8 justify-center items-start px-4 lg:px-8">
+                <h1 className="flex flex-wrap gap-2 text-3xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-black mb-2 text-left leading-tight">
                   <img
                     src="/assets/only-icon.svg"
                     alt="onedigitalspot"
-                    className="h-10 mt-2"
+                    className="h-8 lg:h-10 mt-1 lg:mt-2 flex-shrink-0"
                   />
-                  Stop Platform for
+                  <span className="whitespace-nowrap">Platform for all</span>{" "}
                 </h1>
-                <h1 className="flex gap-2 text-5xl font-semibold tracking-tighter text-black mb-2 text-left">
-                  <span className="text-secondary">All Digital</span> Products
+                <h1 className="flex flex-wrap gap-2 text-3xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-black mb-2 text-left leading-tight">
+                  <span className="text-secondary whitespace-nowrap">Digital</span>{" "}
+                  <span className="whitespace-nowrap">Products</span>
                 </h1>
-                <p className="text-base tracking-tight leading-tighter md:text-lg text-muted-foreground mb-5 text-left max-w-md mt-2">
+                <p className="text-sm lg:text-base tracking-tight leading-tight text-muted-foreground mb-4 lg:mb-5 text-left max-w-sm lg:max-w-md mt-2">
                   Buy digital products in{" "}
                   <span className="text-secondary underline">Bangladesh</span>{" "}
                   using bKash, Nagad, Rocket & more Fast, Easy & Reliable!
                 </p>
-                <div className="flex items-center gap-8 mb-4">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-8 mb-3 lg:mb-4 w-full">
                   <a href="/all-products">
                     <Button
                       variant="default"
-                      className="px-6 py-3 text-white text-md font-bold"
+                      className="px-4 lg:px-6 py-2 lg:py-3 text-white text-sm lg:text-md font-bold"
                     >
                       Explore
-                      <ArrowRight className="w-5 h-5 text-white" />
+                      <ArrowRight className="w-4 lg:w-5 h-4 lg:h-5 text-white ml-1" />
                     </Button>
                   </a>
                   <TooltipProvider>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 lg:gap-4">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <a
                             href="https://facebook.com/oneditialspot"
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="hover:scale-110 transition-transform"
                           >
                             <img
                               src="/assets/facebook.svg"
                               alt="Facebook"
-                              className="w-10 h-10"
+                              className="w-8 lg:w-10 h-8 lg:h-10"
                             />
                           </a>
                         </TooltipTrigger>
@@ -120,11 +123,12 @@ const HeroSection = () => {
                             href="https://instagram.com/oneditialspot"
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="hover:scale-110 transition-transform"
                           >
                             <img
                               src="/assets/instagram.svg"
                               alt="Instagram"
-                              className="w-10 h-10"
+                              className="w-8 lg:w-10 h-8 lg:h-10"
                             />
                           </a>
                         </TooltipTrigger>
@@ -136,11 +140,12 @@ const HeroSection = () => {
                             href="https://tiktok.com/@oneditialspot"
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="hover:scale-110 transition-transform"
                           >
                             <img
                               src="/assets/tiktok.svg"
                               alt="TikTok"
-                              className="w-10 h-10"
+                              className="w-8 lg:w-10 h-8 lg:h-10"
                             />
                           </a>
                         </TooltipTrigger>
@@ -152,11 +157,12 @@ const HeroSection = () => {
                             href="https://whatsapp.com/@oneditialspot"
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="hover:scale-110 transition-transform"
                           >
                             <img
                               src="/assets/whatsapp.svg"
                               alt="WhatsApp"
-                              className="w-10 h-10"
+                              className="w-8 lg:w-10 h-8 lg:h-10"
                             />
                           </a>
                         </TooltipTrigger>
@@ -166,7 +172,7 @@ const HeroSection = () => {
                   </TooltipProvider>
                 </div>
                 {/* Add search input and button below */}
-                <div className="mt-2 w-full max-w-md">
+                <div className="mt-1 lg:mt-2 w-full max-w-sm lg:max-w-md">
                   <SearchComponent
                     placeholder="Search any products..."
                     className="w-full"
