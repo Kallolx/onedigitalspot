@@ -460,7 +460,7 @@ const Header = () => {
 
               {/* Mobile Menu Toggle - Changed from xl:hidden to lg:hidden */}
               <Button
-                variant="ghost"
+                variant="default"
                 size="icon"
                 className="lg:hidden h-10 w-10 mobile-menu-container"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
