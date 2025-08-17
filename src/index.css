@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
 :root {
   
---background: 220 50% 6%;
+--background: 220 50% 4%;
 --foreground: 0 0% 98%;
 
 /* Cards and Popovers */
@@ -158,3 +158,4 @@ All colors MUST be HSL.
     animation-duration: 60s;
   }
 }
+

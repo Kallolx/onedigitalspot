@@ -73,11 +73,12 @@ const HeroSection = () => {
               <div className="w-full h-full rounded-xl flex flex-col -ml-8 justify-center items-start px-4 lg:px-8">
                 <h1 className="flex flex-wrap gap-2 text-3xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-black mb-2 text-left leading-tight">
                   <img
-                    src="/assets/only-icon.svg"
+                    src="/assets/only-icon-green.svg"
                     alt="onedigitalspot"
                     className="h-8 lg:h-10 mt-1 lg:mt-2 flex-shrink-0"
                   />
-                  <span className="whitespace-nowrap">Platform for all</span>{" "}
+                  <span className="whitespace-nowrap">Platform for</span>
+                  <span className="whitespace-nowrap text-secondary">all</span>
                 </h1>
                 <h1 className="flex flex-wrap gap-2 text-3xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-black mb-2 text-left leading-tight">
                   <span className="text-secondary whitespace-nowrap">Digital</span>{" "}
@@ -173,8 +174,7 @@ const HeroSection = () => {
                 </div>
                 {/* Add search input and button below */}
                 <div className="mt-1 lg:mt-2 w-full max-w-sm lg:max-w-md">
-                  <SearchComponent
-                    placeholder="Search any products..."
+                  <SearchComponent                   
                     className="w-full"
                   />
                 </div>

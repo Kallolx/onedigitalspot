@@ -279,7 +279,6 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
           <div className="w-full mt-2 mb-4 flex items-center gap-2">
             <div className="flex-1">
               <SearchComponent
-                placeholder="Search products..."
                 className="w-full"
                 showFullResults={true}
               />

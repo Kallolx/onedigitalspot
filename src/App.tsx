@@ -93,6 +93,16 @@ import HboMax from "./Products/subscriptions/HboMax";
 import Crunchyroll from "./Products/subscriptions/Crunchyroll";
 import UbisoftPlus from "./Products/subscriptions/Ubisoft";
 import XboxGamePass from "./Products/subscriptions/Xbox";
+import Quillbot from "./Products/design/Quillbot";
+import Figma from "./Products/design/Figma";
+import Notion from "./Products/design/Notion";
+import Icloud from "./Products/design/Icloud";
+import CodePen from "./Products/design/CodePen";
+import NordVPN from "./Products/design/NordVPN";
+import ExpressVPN from "./Products/design/ExpressVPN";
+import TinderPlus from "./Products/design/Tinder";
+import Bumble from "./Products/design/Bumble";
+import TelegramStars from "./Products/design/Telegram";
 
 const queryClient = new QueryClient();
 
@@ -244,6 +254,17 @@ const App = () => {
               <Route path="/subscriptions/crunchyroll" element={<Crunchyroll />} />
               <Route path="/subscriptions/xbox-game-pass" element={<XboxGamePass />} />
               <Route path="/subscriptions/ubisoft-plus" element={<UbisoftPlus />} />
+              <Route path="/subscriptions/quillbot" element={<Quillbot />} />
+              <Route path="/subscriptions/figma-pro" element={<Figma />} />
+              <Route path="/subscriptions/notion-pro" element={<Notion />} />
+              <Route path="/subscriptions/icloud-plus" element={<Icloud />} />
+              <Route path="/subscriptions/codepen-pro" element={<CodePen />} />
+              <Route path="/subscriptions/nordvpn" element={<NordVPN />} />
+              <Route path="/subscriptions/expressvpn" element={<ExpressVPN />} />
+              <Route path="/subscriptions/tinder-plus" element={<TinderPlus />} />
+              <Route path="/subscriptions/bumble-plus" element={<Bumble />} />
+              <Route path="/subscriptions/telegram-stars" element={<TelegramStars />} />
+              
               <Route
                 path="/subscriptions/youtube-premium"
                 element={<YoutubePremium />}

@@ -450,7 +450,7 @@ const Header = () => {
                   pendingOrdersCount={pendingOrdersCount}
                 />
               ) : (
-                <Button asChild variant="pixel" size="default" className="h-10 px-4">
+                <Button asChild variant="default" size="default" className="h-10 px-4">
                   <a href="/auth/login" className="flex items-center gap-2">
                     <Logout03Icon className="w-5 h-5" />
                     <span className="text-sm font-medium">LOG IN</span>
@@ -460,7 +460,7 @@ const Header = () => {
 
               {/* Mobile Menu Toggle - Changed from xl:hidden to lg:hidden */}
               <Button
-                variant="default"
+                variant="ghost"
                 size="icon"
                 className="lg:hidden h-10 w-10 mobile-menu-container"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
