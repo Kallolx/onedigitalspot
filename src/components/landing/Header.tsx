@@ -276,6 +276,15 @@ const UserMenu = ({
               </a>
             )}
 
+            {/* My Profile */}
+            <a
+              href="/my-profile"
+              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+            >
+              <UserIcon className="w-4 h-4" />
+              My Profile
+            </a>
+
             {/* My Orders */}
             <a
               href="/my-orders"

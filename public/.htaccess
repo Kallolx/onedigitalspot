@@ -1,159 +1,82 @@
-# OneDigitalSpot .htaccess - SEO & Performance Optimization
+# Cleaned .htaccess - Apache 2.4+ compatible
+# - Keeps SPA routing
+# - Uses modern access controls (no Order/Deny)
+# - Adds conservative CSP that explicitly allows tawk.to widget
 
-# Enable mod_rewrite
 RewriteEngine On
 
-# Force HTTPS redirect
+# Redirect to HTTPS if not already (optional on hosts that manage SSL)
 RewriteCond %{HTTPS} !=on
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Remove www redirect (choose one)
-RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
-
-# Remove trailing slash from URLs
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{THE_REQUEST} /+[^?\s]*?/[\s?]
-RewriteRule ^(.*)/ /$1 [R=301,L]
-
-# Add trailing slash to directories
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteCond %{REQUEST_URI} !.*/$
-RewriteRule ^(.*)$ /$1/ [R=301,L]
-
-# Single Page Application routing
+# Serve index.html for SPA routes
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.html [L]
 
-# Security Headers
+# Essential security headers (adds tawk.to where needed)
 <IfModule mod_headers.c>
-    # Prevent clickjacking
-    Header always append X-Frame-Options SAMEORIGIN
-    
-    # Prevent MIME type sniffing
-    Header always set X-Content-Type-Options nosniff
-    
-    # XSS Protection
-    Header always set X-XSS-Protection "1; mode=block"
-    
-    # Referrer Policy
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    
-    # Content Security Policy
-    Header always set Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; connect-src 'self' https:; media-src 'self' https: data: blob:;"
-    
-    # Permissions Policy
-    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(self), usb=(), magnetometer=(), gyroscope=(), fullscreen=(self)"
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Content-Security-Policy: allow tawk.to scripts, frames and websockets
+    Header always set Content-Security-Policy "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://embed.tawk.to https://*.tawk.to https://cdn.tawk.to https:; connect-src 'self' https: wss://*.tawk.to https://*.tawk.to https://cdn.tawk.to; frame-src https://embed.tawk.to https://*.tawk.to; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:;"
+
+    # Keep Permissions-Policy minimal (adjust if needed)
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
 </IfModule>
 
-# Browser Caching
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType image/jpg "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-    ExpiresByType image/webp "access plus 1 month"
-    ExpiresByType image/x-icon "access plus 1 year"
-    ExpiresByType video/mp4 "access plus 1 month"
-    ExpiresByType audio/mpeg "access plus 1 month"
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType text/javascript "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType application/pdf "access plus 1 month"
-    ExpiresByType application/x-javascript "access plus 1 month"
-    ExpiresByType application/x-shockwave-flash "access plus 1 month"
-    ExpiresByType text/xml "access plus 1 week"
-    ExpiresByType text/html "access plus 1 hour"
-    ExpiresByType application/json "access plus 1 hour"
-    ExpiresByType application/xml "access plus 1 week"
-    ExpiresByType application/rss+xml "access plus 1 week"
-    ExpiresByType application/atom+xml "access plus 1 week"
-    ExpiresByType font/ttf "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-    ExpiresByType application/font-woff "access plus 1 year"
-    ExpiresByType application/font-woff2 "access plus 1 year"
-</IfModule>
+# Deny access to sensitive file types (Apache 2.4+)
+<FilesMatch "\.(env|git|htaccess|htpasswd|ini|log|sh|sql|inc|bak|backup|swp|tmp)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        # Fallback for very old Apache versions
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
 
-# Compression
+# Disable directory listing
+Options -Indexes
+
+# Basic compression (if available)
 <IfModule mod_deflate.c>
-    # Compress HTML, CSS, JavaScript, Text, XML and fonts
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
-    AddOutputFilterByType DEFLATE application/x-font
-    AddOutputFilterByType DEFLATE application/x-font-opentype
-    AddOutputFilterByType DEFLATE application/x-font-otf
-    AddOutputFilterByType DEFLATE application/x-font-truetype
-    AddOutputFilterByType DEFLATE application/x-font-ttf
-    AddOutputFilterByType DEFLATE application/x-javascript
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE font/opentype
-    AddOutputFilterByType DEFLATE font/otf
-    AddOutputFilterByType DEFLATE font/ttf
-    AddOutputFilterByType DEFLATE image/svg+xml
-    AddOutputFilterByType DEFLATE image/x-icon
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/javascript
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE application/json
-    
-    # Remove browser bugs (only needed for really old browsers)
-    BrowserMatch ^Mozilla/4 gzip-only-text/html
-    BrowserMatch ^Mozilla/4\.0[678] no-gzip
-    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json
     Header append Vary User-Agent
 </IfModule>
 
-# ETag Removal
+# Asset caching (keep short for HTML/JSON)
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType application/json "access plus 1 hour"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/* "access plus 1 month"
+    ExpiresByType font/* "access plus 1 year"
+</IfModule>
+
+# Cache control for static assets
 <IfModule mod_headers.c>
-    Header unset ETag
-    Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
-    Header set Pragma "no-cache"
-    Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
-    
-    # But allow caching for assets
-    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$"
-        Header unset Cache-Control
-        Header unset Pragma
-        Header unset Expires
-        Header set Cache-Control "public, max-age=31536000"
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
 </IfModule>
 
-FileETag None
-
-# Custom Error Pages (create these files)
+# Custom error pages (optional)
 ErrorDocument 404 /404.html
 ErrorDocument 500 /500.html
 
-# Block access to sensitive files
-<FilesMatch "\.(env|git|htaccess|htpasswd|ini|log|sh|sql|inc|bak|backup|swp|tmp)$"
-    Order allow,deny
-    Deny from all
-</FilesMatch>
+FileETag None
 
-# Block access to directories
-Options -Indexes
-
-# Custom MIME types
-AddType application/x-font-woff .woff
-AddType application/x-font-woff2 .woff2
-AddType application/font-woff .woff
-AddType application/font-woff2 .woff2
-AddType application/vnd.ms-fontobject .eot
-AddType application/x-font-ttf .ttf
-AddType font/opentype .otf
-AddType image/svg+xml .svg
-
-# Language preference (Bangladesh English)
+# Language preference (optional)
 <IfModule mod_rewrite.c>
     RewriteCond %{HTTP:Accept-Language} ^bn [NC]
     RewriteRule ^$ /bn/ [R=302,L]
 </IfModule>
+
+# End of cleaned .htaccess

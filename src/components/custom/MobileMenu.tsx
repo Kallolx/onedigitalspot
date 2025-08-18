@@ -259,7 +259,7 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
       {/* Blurred overlay */}
       {isOpen && (
         <div
-          className="fixed inset-x-0 top-[64px] bottom-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300"
+          className="fixed inset-x-0 top-[64px] bottom-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           aria-hidden="true"
         />
       )}

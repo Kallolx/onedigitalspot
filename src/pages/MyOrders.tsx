@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/landing/Header";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
-import { getUserOrders, getCurrentUser, OrderData } from "../lib/orders";
+import {
+  getUserOrders,
+  getCurrentUser,
+  OrderData,
+  updateOrderReview,
+} from "../lib/orders";
 import {
   mobileGames,
   pcGames,
@@ -14,7 +18,7 @@ import {
   subscriptions,
   productivity,
 } from "../lib/products";
-import ReceiptGenerator from "../components/custom/ReceiptGenerator";
+import ReviewModal from "../components/custom/ReviewModal";
 import {
   ClockIcon,
   CheckCircleIcon,
@@ -22,15 +26,16 @@ import {
   TruckIcon,
   ShoppingBagIcon,
   SearchIcon,
-  FilterIcon,
   EyeIcon,
-  CalendarIcon,
-  CreditCardIcon,
   PackageIcon,
-  PhoneIcon,
   Coins,
+  X,
 } from "lucide-react";
 import { RotateLoader } from "react-spinners";
+import { Copy01Icon, Message01Icon } from "hugeicons-react";
+import { useToast } from "../hooks/use-toast";
+import Footer from "@/components/landing/Footer";
+import CompactStat from "../components/ui/compact-stat";
 
 // Utility function to get local image path from product name
 const getProductImage = (productName: string): string => {
@@ -44,10 +49,22 @@ const getProductImage = (productName: string): string => {
     ...productivity,
   ];
 
-  // Find the product by name (case-insensitive)
-  const product = allProducts.find(
-    (p) => p.title.toLowerCase() === productName.toLowerCase()
-  );
+  const name = (productName || "").toString().trim().toLowerCase();
+
+  // Try exact match, then fuzzy includes (both directions)
+  const product = allProducts.find((p) => {
+    const title = p.title.toLowerCase();
+    return (
+      title === name ||
+      title.includes(name) ||
+      name.includes(title)
+    );
+  });
+
+  if (!product) {
+    // Helpful dev-time warning when an order's productName isn't mapped
+    if (name) console.warn(`[MyOrders] no product mapping found for "${name}"`);
+  }
 
   // Return the local image path or fallback to placeholder
   return product?.image || "/assets/placeholder.svg";
@@ -106,6 +123,17 @@ const DeliveryTimer = ({
     return `${mins}:${secs}`;
   };
 
+    // Utility to convert English digits to Bangla digits
+  const toBanglaNumber = (num: string | number) => {
+    const en = "0123456789";
+    const bn = "০১২৩৪৫৬৭৮৯";
+    const formatted = Number(num).toLocaleString("en-IN");
+    return formatted
+      .split("")
+      .map((c) => (en.includes(c) ? bn[en.indexOf(c)] : c))
+      .join("");
+  };
+
   return (
     <div className="flex items-center gap-2 text-sm font-bold text-green-600">
       <ClockIcon className="w-4 h-4" />
@@ -126,7 +154,20 @@ const MyOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
+  const [reviewOrder, setReviewOrder] = useState<OrderData | null>(null);
+  const [completedOrdersToReview, setCompletedOrdersToReview] = useState<
+    OrderData[]
+  >([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [processedOrderIds, setProcessedOrderIds] = useState<Set<string>>(
+    new Set()
+  );
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const receiptRef = useRef<{ download: () => Promise<void> } | null>(null);
+  // local copied state for inline label
+  const [copied, setCopied] = useState(false);
 
   // Enhanced timer component for order details modal
   const DetailedDeliveryTimer = ({
@@ -207,6 +248,79 @@ const MyOrders = () => {
       </span>
     );
   };
+
+  // Handle review submission
+  const handleReviewSubmit = async (
+    orderId: string,
+    rating: number,
+    comment: string
+  ) => {
+    try {
+      await updateOrderReview(orderId, { rating, comment });
+
+      // Update the local orders state to reflect the review
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          (order.$id || order.id) === orderId
+            ? {
+                ...order,
+                reviews: JSON.stringify({
+                  rating,
+                  comment,
+                  submittedAt: new Date().toISOString(),
+                }),
+              }
+            : order
+        )
+      );
+
+      // Remove from completed orders to review
+      setCompletedOrdersToReview((prev) =>
+        prev.filter((order) => (order.$id || order.id) !== orderId)
+      );
+
+      setReviewOrder(null);
+
+      // Show next review modal if there are more
+      if (completedOrdersToReview.length > 1) {
+        const nextOrder = completedOrdersToReview.find(
+          (order) => (order.$id || order.id) !== orderId
+        );
+        if (nextOrder) {
+          setTimeout(() => setReviewOrder(nextOrder), 500);
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      throw error;
+    }
+  };
+
+  // Check for completed orders that need reviews
+  useEffect(() => {
+    if (orders.length > 0) {
+      const completedWithoutReviews = orders.filter(
+        (order) =>
+          order.status.toLowerCase() === "completed" &&
+          !order.reviews &&
+          !processedOrderIds.has(order.$id || order.id || "")
+      );
+
+      if (completedWithoutReviews.length > 0) {
+        setCompletedOrdersToReview(completedWithoutReviews);
+        setReviewOrder(completedWithoutReviews[0]);
+
+        // Mark these orders as processed so modal doesn't show again
+        setProcessedOrderIds((prev) => {
+          const newSet = new Set(prev);
+          completedWithoutReviews.forEach((order) => {
+            newSet.add(order.$id || order.id || "");
+          });
+          return newSet;
+        });
+      }
+    }
+  }, [orders, processedOrderIds]);
 
   useEffect(() => {
     const fetchOrdersAndUser = async () => {
@@ -364,8 +478,31 @@ const MyOrders = () => {
 
   const summary = getOrderSummary();
 
+  // Pagination for desktop table
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
+  const paginatedOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize);
+
+  // Ensure current page is valid when filters/pageSize change
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [filteredOrders.length, pageSize, totalPages]);
+
+  function toBanglaNumber(totalAmount: number): import("react").ReactNode {
+    const en = "0123456789";
+    const bn = "০১২৩৪৫৬৭৮৯";
+    // format with grouping to match other usages (e.g., 1,234)
+    const formatted = Number(totalAmount).toLocaleString("en-IN");
+    return formatted
+      .split("")
+      .map((c) => (en.includes(c) ? bn[en.indexOf(c)] : c))
+      .join("");
+  }
+
+  // normalize selected order status to avoid casing/whitespace issues
+  const selectedStatus = selectedOrder?.status?.toLowerCase().trim() ?? "";
+
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 min-h-screen">
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header + Search/Filter Section */}
@@ -374,7 +511,6 @@ const MyOrders = () => {
               <h1 className="text-3xl md:text-4xl tracking-tighter font-bold text-gray-900 font-pixel">
                 My Orders
               </h1>
-
             </div>
             {/* Search and Filter Bar */}
             {!loading && !error && orders.length > 0 && (
@@ -405,67 +541,94 @@ const MyOrders = () => {
             )}
           </div>
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-            {/* Total Orders */}
-            <Card className="flex items-center p-4 bg-background rounded-2xl justify-center sm:justify-start">
-              <div className="p-4 flex items-center justify-center hidden sm:flex">
-                <PackageIcon className="w-8 h-8 text-foreground" />
-              </div>
-              <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
-                <p className="text-sm font-medium text-foreground/70">
-                  Total Orders
-                </p>
-                <p className="text-2xl font-bold font-pixel text-foreground">
-                  {summary.total}
-                </p>
-              </div>
-            </Card>
+          {/* Summary Cards - desktop grid and compact mobile row */}
+          <div className="mb-8">
+            {/* Desktop / larger screens */}
+            <div className="hidden lg:grid grid-cols-4 gap-4 md:gap-6">
+              {/* Total Orders */}
+              <Card className="flex items-center p-3 sm:p-4 bg-background rounded-2xl justify-center sm:justify-start">
+                <div className="p-3 sm:p-4 flex items-center justify-center hidden sm:flex">
+                  <PackageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-foreground" />
+                </div>
+                <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
+                  <p className="text-sm font-medium text-foreground/70">
+                    Total Orders
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold font-pixel text-foreground">
+                    {summary.total}
+                  </p>
+                </div>
+              </Card>
 
-            {/* Pending */}
-            <Card className="flex items-center p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
-              <div className="p-4 flex items-center justify-center hidden sm:flex">
-                <ClockIcon className="w-8 h-8 text-foreground" />
-              </div>
-              <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
-                <p className="text-sm font-medium text-foreground/70">
-                  Pending
-                </p>
-                <p className="text-2xl font-bold font-pixel text-foreground">
-                  {summary.pending}
-                </p>
-              </div>
-            </Card>
+              {/* Pending */}
+              <Card className="flex items-center p-3 sm:p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
+                <div className="p-3 sm:p-4 flex items-center justify-center hidden sm:flex">
+                  <ClockIcon className="w-6 h-6 sm:w-8 sm:h-8 text-foreground" />
+                </div>
+                <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
+                  <p className="text-sm font-medium text-foreground/70">
+                    Pending
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold font-pixel text-foreground">
+                    {summary.pending}
+                  </p>
+                </div>
+              </Card>
 
-            {/* Completed */}
-            <Card className="flex items-center p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
-              <div className="p-4 flex items-center justify-center hidden sm:flex">
-                <CheckCircleIcon className="w-8 h-8 text-foreground" />
-              </div>
-              <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
-                <p className="text-sm font-medium text-foreground/70">
-                  Completed
-                </p>
-                <p className="text-2xl font-bold font-pixel text-foreground">
-                  {summary.completed}
-                </p>
-              </div>
-            </Card>
+              {/* Completed */}
+              <Card className="flex items-center p-3 sm:p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
+                <div className="p-3 sm:p-4 flex items-center justify-center hidden sm:flex">
+                  <CheckCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-foreground" />
+                </div>
+                <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
+                  <p className="text-sm font-medium text-foreground/70">
+                    Completed
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold font-pixel text-foreground">
+                    {summary.completed}
+                  </p>
+                </div>
+              </Card>
 
-            {/* Total Spent */}
-            <Card className="flex items-center p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
-              <div className="p-4 bg-yellow-500/20 rounded-full flex items-center justify-center hidden sm:flex">
-                <Coins className="w-8 h-8 text-yellow-400" />
-              </div>
-              <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
-                <p className="text-sm font-medium text-foreground/70">
-                  Total Spent
-                </p>
-                <p className="text-2xl font-bold font-pixel text-foreground">
-                  {summary.totalAmount}৳
-                </p>
-              </div>
-            </Card>
+              {/* Total Spent */}
+              <Card className="flex items-center p-3 sm:p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
+                <div className="p-3 sm:p-4 bg-yellow-500/20 rounded-full flex items-center justify-center hidden sm:flex">
+                  <Coins className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
+                </div>
+                <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
+                  <p className="text-sm font-medium text-foreground/70">
+                    Total Spent
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold font-pixel text-foreground">
+                    {summary.totalAmount}৳
+                  </p>
+                </div>
+              </Card>
+            </div>
+
+            {/* Compact row for mobile */}
+            <div className="lg:hidden grid grid-cols-2 gap-3">
+              <CompactStat
+                title="Orders"
+                value={summary.total}
+                icon={<PackageIcon className="w-5 h-5" />}
+              />
+              <CompactStat
+                title="Pending"
+                value={summary.pending}
+                icon={<ClockIcon className="w-5 h-5" />}
+              />
+              <CompactStat
+                title="Completed"
+                value={summary.completed}
+                icon={<CheckCircleIcon className="w-5 h-5" />}
+              />
+              <CompactStat
+                title="Spent"
+                value={<>{summary.totalAmount}৳</>}
+                icon={<Coins className="w-5 h-5 text-yellow-400" />}
+              />
+            </div>
           </div>
 
           {/* Loading State */}
@@ -525,7 +688,7 @@ const MyOrders = () => {
                           Order
                         </th>
                         <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wide">
-                          Game Info
+                          Order ID
                         </th>
                         <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wide">
                           Payment
@@ -542,7 +705,7 @@ const MyOrders = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredOrders.map((order) => (
+                      {paginatedOrders.map((order) => (
                         <tr
                           key={order.id}
                           className="hover:bg-gray-50 transition-colors"
@@ -552,7 +715,7 @@ const MyOrders = () => {
                             <div className="flex items-center gap-4">
                               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                 <img
-                                  src={getProductImage(order.productName)}
+                                  src={order.productImage || getProductImage(order.productName)}
                                   alt={order.productName}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
@@ -575,24 +738,44 @@ const MyOrders = () => {
                             </div>
                           </td>
 
-                          {/* Game Info */}
-                          <td className="px-6 py-4 space-y-1">
-                            {order.playerId && (
-                              <p className="text-gray-900">
-                                <span className="font-medium">Player ID:</span>{" "}
-                                {order.playerId}
-                              </p>
-                            )}
-                            {order.zoneId && (
-                              <p className="text-gray-900">
-                                <span className="font-medium">Zone ID:</span>{" "}
-                                {order.zoneId}
-                              </p>
-                            )}
-                            <p className="text-gray-400 text-xs flex items-center gap-1 mt-1">
-                              <CalendarIcon className="w-3 h-3" />{" "}
-                              {formatDate(order.createdAt, "date")}
-                            </p>
+                          {/* Order ID (with copy) */}
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-between">
+                              <div className="min-w-0">
+                                <p className="text-md  font-semibold text-secondary truncate">
+                                  {order.orderID || "N/A"}
+                                </p>
+                              </div>
+
+                              <div className="ml-4 flex-shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const text = order.orderID || "";
+                                    try {
+                                      if (navigator.clipboard && navigator.clipboard.writeText) {
+                                        await navigator.clipboard.writeText(text);
+                                      } else {
+                                        const ta = document.createElement("textarea");
+                                        ta.value = text;
+                                        document.body.appendChild(ta);
+                                        ta.select();
+                                        document.execCommand("copy");
+                                        document.body.removeChild(ta);
+                                      }
+                                      toast({ title: "Order ID copied to clipboard." });
+                                    } catch (err) {
+                                      console.error("Copy failed", err);
+                                      toast({ title: "Copy failed", description: "Unable to copy order ID." });
+                                    }
+                                  }}
+                                  className="p-2 rounded-md hover:bg-gray-100"
+                                  aria-label="Copy order ID"
+                                >
+                                  <Copy01Icon className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
                           </td>
 
                           {/* Payment */}
@@ -633,21 +816,26 @@ const MyOrders = () => {
                                 View
                               </Button>
                               {order.status.toLowerCase() === "completed" && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    navigate(
-                                      `/${order.productType
-                                        .toLowerCase()
-                                        .replace(" ", "-")}/${order.productName
-                                        .toLowerCase()
-                                        .replace(" ", "-")}`
-                                    )
-                                  }
-                                >
-                                  Reorder
-                                </Button>
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      navigate(
+                                        `/${order.productType
+                                          .toLowerCase()
+                                          .replace(
+                                            " ",
+                                            "-"
+                                          )}/${order.productName
+                                          .toLowerCase()
+                                          .replace(" ", "-")}`
+                                      )
+                                    }
+                                  >
+                                    Reorder
+                                  </Button>
+                                </>
                               )}
                             </div>
                           </td>
@@ -658,91 +846,141 @@ const MyOrders = () => {
                 </div>
               </Card>
 
-{/* Orders Cards - Mobile */}
-<div className="lg:hidden space-y-4">
-  {filteredOrders.map((order) => (
-    <Card
-      key={order.id}
-      className="p-4 hover:shadow-lg transition-shadow rounded-2xl"
-    >
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-3">
-        <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-          <img
-            src={getProductImage(order.productName)}
-            alt={order.productName}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "/assets/placeholder.svg";
-            }}
-          />
-        </div>
-        <div>
-          <h3 className="font-pixel font-semibold text-gray-900">
-            {order.productName}
-          </h3>
-          <p className="text-gray-500 text-sm">
-            {order.itemLabel} × {order.quantity}
-          </p>
-        </div>
-      </div>
+              {/* Pagination Footer for Desktop Table */}
+              <div className="hidden lg:flex flex-col md:flex-row md:items-center md:justify-between bg-background gap-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-pixel text-sm text-gray-600">
+                    Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, filteredOrders.length)} of {filteredOrders.length} orders
+                  </span>
+                  {filteredOrders.length !== orders.length && (
+                    <span className="text-xs text-gray-500">
+                      (filtered from {orders.length} total)
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="px-3 py-1 rounded-lg bg-white border border-gray-300 font-pixel text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    Previous
+                  </button>
+                  <span className="font-pixel text-sm text-gray-600">
+                    Page {page} of {totalPages}
+                  </span>
+                  <button
+                    className="px-3 py-1 rounded-lg bg-white border border-gray-300 font-pixel text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    Next
+                  </button>
+                  <select 
+                    value={pageSize} 
+                    onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }} 
+                    className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value={5}>5 per page</option>
+                    <option value={10}>10 per page</option>
+                    <option value={25}>25 per page</option>
+                    <option value={50}>50 per page</option>
+                  </select>
+                </div>
+              </div>
 
-      {/* Body Grid with vertical divider */}
-      <div className="grid grid-cols-2 gap-3 border-t border-b border-gray-200 py-2">
-        {/* Left Column */}
-        <div className="border-r border-gray-200 pr-3">
-          <p className="text-gray-500 font-medium">Amount</p>
-          <p className="text-secondary font-pixel font-bold">৳{order.totalAmount}</p>
+              {/* Orders Cards - Mobile */}
+              <div className="lg:hidden space-y-4">
+                {filteredOrders.map((order) => (
+                  <Card
+                    key={order.id}
+                    className="p-4 hover:shadow-lg transition-shadow rounded-2xl"
+                  >
+                    {/* Header */}
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                        <img
+                          src={order.productImage || getProductImage(order.productName)}
+                          alt={order.productName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/assets/placeholder.svg";
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-pixel font-semibold text-gray-900">
+                          {order.productName}
+                        </h3>
+                        <p className="text-gray-500 text-sm">
+                          {order.itemLabel} × {order.quantity}
+                        </p>
+                      </div>
+                    </div>
 
-          <p className="text-gray-500 font-medium mt-2">Date</p>
-          <p className="text-gray-900">{formatDate(order.createdAt, "date")}</p>
-        </div>
+                    {/* Body Grid with vertical divider */}
+                    <div className="grid grid-cols-2 gap-3 border-t border-b border-gray-200 py-2">
+                      {/* Left Column */}
+                      <div className="border-r border-gray-200 pr-3">
+                        <p className="text-gray-500 font-medium">Amount</p>
+                        <p className="text-secondary font-pixel font-bold">
+                          ৳{order.totalAmount}
+                        </p>
 
-        {/* Right Column */}
-        <div className="pl-3">
-          <p className="text-gray-500 font-medium">Payment</p>
-          <p className="text-gray-900">{order.paymentMethod}</p>
+                        <p className="text-gray-500 font-medium mt-2">Date</p>
+                        <p className="text-gray-900">
+                          {formatDate(order.createdAt, "date")}
+                        </p>
+                      </div>
 
-          <p className="text-gray-500 font-medium mt-2">Product</p>
-          <p className="text-gray-900">{order.productName}</p>
-        </div>
-      </div>
+                      {/* Right Column */}
+                      <div className="pl-3">
+                        <p className="text-gray-500 font-medium">Payment</p>
+                        <p className="text-gray-900">{order.paymentMethod}</p>
 
-      {/* Game Details / Player ID */}
-      {(order.playerId || order.zoneId) && (
-        <div className="mt-3 text-sm text-gray-700">
-          {order.playerId && (
-            <p>
-              <span className="font-medium">Player ID:</span> {order.playerId}
-            </p>
-          )}
-          {order.zoneId && (
-            <p>
-              <span className="font-medium">Zone ID:</span> {order.zoneId}
-            </p>
-          )}
-        </div>
-      )}
+                        <p className="text-gray-500 font-medium mt-2">
+                          Product
+                        </p>
+                        <p className="text-gray-900">{order.productName}</p>
+                      </div>
+                    </div>
 
-      {/* Status and View Button */}
-      <div className="flex items-center justify-between mt-3">
-        <div className="bg-gray-100 rounded-lg text-left font-semibold text-lg">
-          {getStatusDisplay(order)}
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setSelectedOrder(order)}
-          className="flex items-center gap-1"
-        >
-          <EyeIcon className="w-4 h-4" /> View
-        </Button>
-      </div>
-    </Card>
-  ))}
-</div>
+                    {/* Game Details / Player ID */}
+                    {(order.playerId || order.zoneId) && (
+                      <div className="mt-3 text-sm text-gray-700">
+                        {order.playerId && (
+                          <p>
+                            <span className="font-medium">Player ID:</span>{" "}
+                            {order.playerId}
+                          </p>
+                        )}
+                        {order.zoneId && (
+                          <p>
+                            <span className="font-medium">Zone ID:</span>{" "}
+                            {order.zoneId}
+                          </p>
+                        )}
+                      </div>
+                    )}
 
+                    {/* Status and View Button */}
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="bg-gray-100 rounded-lg text-left font-semibold text-lg">
+                        {getStatusDisplay(order)}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedOrder(order)}
+                        className="flex items-center gap-1"
+                      >
+                        <EyeIcon className="w-4 h-4" /> View
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </>
           )}
 
@@ -777,16 +1015,11 @@ const MyOrders = () => {
 
       {/* Compact Mobile-First Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4">
-          <Card className="w-full sm:max-w-lg max-h-[90vh] sm:max-h-[85vh] flex flex-col sm:rounded-xl rounded-t-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <Card className="w-full sm:max-w-lg max-h-[90vh] sm:max-h-[85vh] flex flex-col sm:rounded-xl rounded-lg">
             {/* Compact Header */}
             <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
-              <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">
-                    #{selectedOrder.orderID?.slice(-3) || "000"}
-                  </span>
-                </div>
+              <div className="items-center">
                 <h2 className="text-lg font-bold text-gray-900">
                   Order Details
                 </h2>
@@ -797,15 +1030,15 @@ const MyOrders = () => {
                 onClick={() => setSelectedOrder(null)}
                 className="h-8 w-8 p-0"
               >
-                <XCircleIcon className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </Button>
             </div>
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto">
-              {/* Status Strip */}
+              {/* Status Strip - single status on left, order id (copy) on right */}
               <div
-                className={`p-3 border-b flex items-center justify-between ${
+                className={`border-b flex items-center justify-between text-foreground ${
                   selectedOrder.status.toLowerCase() === "completed"
                     ? "bg-green-50"
                     : selectedOrder.status.toLowerCase() === "pending"
@@ -823,14 +1056,53 @@ const MyOrders = () => {
                         : "bg-gray-400"
                     }`}
                   />
-                  <span className="text-sm font-medium capitalize">
+                  <span className="text-sm font-medium capitalize text-secondary">
                     {selectedOrder.status}
                   </span>
                 </div>
-                <DetailedDeliveryTimer
-                  createdAt={selectedOrder.createdAt}
-                  status={selectedOrder.status}
-                />
+
+                <div className="flex items-center gap-2 text-sm text-foreground">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-lg font-anekbangla text-gray-600 flex items-center gap-3">
+                      <span>অর্ডার নম্বর :</span>
+                      <span className="font-bold font-mono text-secondary">{selectedOrder.orderID}</span>
+                      {copied && (
+                        <span className="text-sm text-green-600">Copied</span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const text = selectedOrder.orderID || "";
+                        try {
+                          if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(text);
+                          } else {
+                            const ta = document.createElement("textarea");
+                            ta.value = text;
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(ta);
+                          }
+                          setCopied(true);
+                          toast({ title: "Order ID copied to clipboard." });
+                          setTimeout(() => setCopied(false), 1500);
+                        } catch (err) {
+                          console.error("Copy failed", err);
+                          toast({ title: "Copy failed", description: "Unable to copy order ID." });
+                        }
+                      }}
+                      className="text-xs text-foreground/80 hover:text-foreground p-2 rounded-full"
+                      aria-label="Copy order ID"
+                    >
+                      <Copy01Icon className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Compact Product Info */}
@@ -838,7 +1110,7 @@ const MyOrders = () => {
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                     <img
-                      src={getProductImage(selectedOrder.productName)}
+                      src={selectedOrder.productImage || getProductImage(selectedOrder.productName)}
                       alt={selectedOrder.productName}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -848,39 +1120,53 @@ const MyOrders = () => {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-sm truncate">
+                    <h3 className="font-semibold text-gray-900 text-md truncate">
                       {selectedOrder.productName}
                     </h3>
                     <p className="text-xs text-gray-600 truncate">
                       {selectedOrder.itemLabel}
                     </p>
-                    <div className="flex items-center mt-1 space-x-2 text-xs">
-                      <span className="bg-gray-100 px-2 py-0.5 rounded">
-                        Qty: {selectedOrder.quantity}
-                      </span>
-                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-gray-900">
-                      ৳{selectedOrder.totalAmount}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      ৳{selectedOrder.unitPrice} each
-                    </p>
+                  <div className="text-right flex items-center gap-3">
+                    <p className="text-xl font-bold font-anekbangla text-secondary">৳{toBanglaNumber(selectedOrder.totalAmount)} টাকা</p>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const r = receiptRef.current;
+                          if (r && typeof r.download === 'function') {
+                            await r.download();
+                          } else {
+                            const btn = document.querySelector('button[title="Download Receipt"]') as HTMLButtonElement | null;
+                            if (btn) btn.click();
+                          }
+                        } catch (err) {
+                          console.error('Receipt download failed', err);
+                          toast({ title: 'Download failed', description: 'Could not download receipt.' });
+                        }
+                      }}
+                      className="h-8 w-8 flex items-center justify-center rounded-full border border-transparent hover:bg-gray-100"
+                      aria-label="Download receipt"
+                      title="Download Receipt"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v12m0 0l4-4m-4 4l-4-4M21 21H3" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
 
               {/* Compact Information Sections */}
-              <div className="p-4 space-y-4">
+              <div className="p-4 space-y-6">
                 {/* Order Info */}
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                  <h4 className="text-md font-semibold text-gray-900 mb-2">
                     Order Info
                   </h4>
-                  <div className="space-y-1.5 text-xs">
+                  <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Date:</span>
+                      <span className=" text-foreground">Date:</span>
                       <span className="font-medium">
                         {formatDate(selectedOrder.createdAt, "date")}
                       </span>
@@ -896,25 +1182,25 @@ const MyOrders = () => {
 
                 {/* Payment Info */}
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                  <h4 className="text-sm font-semibold text-foreground mb-2">
                     Payment
                   </h4>
-                  <div className="space-y-1.5 text-xs">
+                  <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Method:</span>
-                      <span className="font-medium">
+                      <span className="text-foreground">Method:</span>
+                      <span className="font-medium text-md">
                         {selectedOrder.paymentMethod}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Account:</span>
-                      <code className="text-xs bg-gray-100 px-1 rounded font-mono">
+                      <span className="text-foreground">Account:</span>
+                      <code className="text-md bg-secondary text-primary font-bold px-1 rounded">
                         {selectedOrder.paymentAccountNumber}
                       </code>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Transaction:</span>
-                      <code className="text-xs bg-gray-100 px-1 rounded font-mono">
+                      <code className="text-md bg-secondary text-primary font-bold px-1 rounded">
                         {selectedOrder.transactionId}
                       </code>
                     </div>
@@ -927,11 +1213,11 @@ const MyOrders = () => {
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">
                       Game Account
                     </h4>
-                    <div className="space-y-1.5 text-xs">
+                    <div className="space-y-1.5 text-sm">
                       {selectedOrder.playerId && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Player ID:</span>
-                          <code className="text-xs bg-gray-100 px-1 rounded font-mono">
+                          <code className="text-md bg-secondary text-primary font-bold px-1 rounded">
                             {selectedOrder.playerId}
                           </code>
                         </div>
@@ -939,7 +1225,7 @@ const MyOrders = () => {
                       {selectedOrder.zoneId && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Zone ID:</span>
-                          <code className="text-xs bg-gray-100 px-1 rounded font-mono">
+                          <code className="text-md bg-secondary text-primary font-bold px-1 rounded">
                             {selectedOrder.zoneId}
                           </code>
                         </div>
@@ -948,71 +1234,93 @@ const MyOrders = () => {
                   </div>
                 )}
 
-                {/* Compact Receipt Section */}
-                <div className="pt-2 border-t">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-semibold text-gray-900">
-                      Receipt
-                    </h4>
+                {/* Message us for statuses other than 'confirmed' or 'completed' */}
+                {!(
+                  selectedOrder.status.toLowerCase() === "confirmed" ||
+                  selectedOrder.status.toLowerCase() === "completed"
+                ) && (
+                  <div className="mt-3">
+                    <Button
+                      variant="ghost"
+                      className="w-full text-md justify-center"
+                      aria-label="Message us"
+                      onClick={() => {
+                        const api = (window as any).Tawk_API;
+                        if (!api) return;
+                        if (typeof api.maximize === "function") api.maximize();
+                        else if (typeof api.toggle === "function") api.toggle();
+                        else if (typeof api.showWidget === "function") api.showWidget();
+                        else if (typeof api.popup === "function") api.popup();
+                      }}
+                    >
+                      <Message01Icon className="w-6 h-6" />
+                      Message us
+                    </Button>
                   </div>
-                  <ReceiptGenerator
-                    order={selectedOrder}
-                    userName={user?.name || "Guest User"}
-                    userEmail={user?.email || "guest@example.com"}
-                  />
+                )}
+              </div>
+            </div>
+
+            {/* Compact Action Footer (only when completed: Review + Order Again) */}
+            {selectedOrder.status.toLowerCase() === "completed" && (
+              <div className="border-t bg-gray-50 p-3 sticky bottom-0 z-10">
+                <div className="flex gap-2">
+                  <div className="flex-1 flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1 text-xs h-9"
+                      onClick={() => setReviewOrder(selectedOrder)}
+                    >
+                      {selectedOrder.reviews ? "Edit Review" : "Write Review"}
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1 text-xs h-9"
+                      onClick={() => {
+                        navigate(
+                          `/${selectedOrder.productType
+                            .toLowerCase()
+                            .replace(" ", "-")}/${selectedOrder.productName
+                            .toLowerCase()
+                            .replace(" ", "-")}`
+                        );
+                        setSelectedOrder(null);
+                      }}
+                    >
+                      Order Again
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Compact Action Footer */}
-            <div className="border-t bg-gray-50 p-3 sticky bottom-0 z-10">
-              <div className="flex gap-2">
-                {selectedOrder.status.toLowerCase() === "pending" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 text-xs h-9"
-                    onClick={() => {
-                      alert("Contact support to cancel this order.");
-                    }}
-                  >
-                    <PhoneIcon className="w-3 h-3 mr-1" />
-                    Support
-                  </Button>
-                )}
-
-                {selectedOrder.status.toLowerCase() === "completed" && (
-                  <Button
-                    size="sm"
-                    className="flex-1 text-xs h-9"
-                    onClick={() => {
-                      navigate(
-                        `/${selectedOrder.productType
-                          .toLowerCase()
-                          .replace(" ", "-")}/${selectedOrder.productName
-                          .toLowerCase()
-                          .replace(" ", "-")}`
-                      );
-                      setSelectedOrder(null);
-                    }}
-                  >
-                    Order Again
-                  </Button>
-                )}
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedOrder(null)}
-                  className="px-4 text-xs h-9"
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
+            )}
           </Card>
         </div>
       )}
+
+      {/* Review Modal */}
+      {reviewOrder && (
+        <ReviewModal
+          order={reviewOrder}
+          isOpen={true}
+          onClose={() => {
+            setReviewOrder(null);
+            // If there are more reviews in queue, show next one
+            const remainingReviews = completedOrdersToReview.filter(
+              (order) =>
+                (order.$id || order.id) !== (reviewOrder.$id || reviewOrder.id)
+            );
+            if (remainingReviews.length > 0) {
+              setTimeout(() => setReviewOrder(remainingReviews[0]), 500);
+            }
+          }}
+          onSubmit={handleReviewSubmit}
+        />
+      )}
+
+     <Footer />
     </div>
   );
 };

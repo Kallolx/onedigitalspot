@@ -11,6 +11,7 @@ import PCGames from "./pages/routes/PcGames";
 import GiftCards from "./pages/routes/GiftCards";
 import AiTools from "./pages/routes/AiTools";
 import MyOrders from "./pages/MyOrders";
+import MyProfile from "./pages/MyProfile";
 import EmailTest from "./pages/EmailTest";
 import MobileLegends from "./Products/game-details/mobile-games/MobileLegends";
 import PUBGMobile from "./Products/game-details/mobile-games/PUBGMobile";
@@ -119,11 +120,15 @@ const App = () => {
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/signup" element={<Signup />} />
             <Route path="/auth/forgot" element={<ForgotPasswordPage />} />
-            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+            <Route
+              path="/auth/reset-password"
+              element={<ResetPasswordPage />}
+            />
 
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/my-profile" element={<MyProfile />} />
               <Route path="/email-test" element={<EmailTest />} />
 
               {/* Category Pages */}
@@ -251,20 +256,38 @@ const App = () => {
               <Route path="/subscriptions/office-365" element={<Office365 />} />
               <Route path="/subscriptions/photoshop" element={<Photoshop />} />
               <Route path="/subscriptions/spotify" element={<Spotify />} />
-              <Route path="/subscriptions/crunchyroll" element={<Crunchyroll />} />
-              <Route path="/subscriptions/xbox-game-pass" element={<XboxGamePass />} />
-              <Route path="/subscriptions/ubisoft-plus" element={<UbisoftPlus />} />
+              <Route
+                path="/subscriptions/crunchyroll"
+                element={<Crunchyroll />}
+              />
+              <Route
+                path="/subscriptions/xbox-game-pass"
+                element={<XboxGamePass />}
+              />
+              <Route
+                path="/subscriptions/ubisoft-plus"
+                element={<UbisoftPlus />}
+              />
               <Route path="/subscriptions/quillbot" element={<Quillbot />} />
               <Route path="/subscriptions/figma-pro" element={<Figma />} />
               <Route path="/subscriptions/notion-pro" element={<Notion />} />
               <Route path="/subscriptions/icloud-plus" element={<Icloud />} />
               <Route path="/subscriptions/codepen-pro" element={<CodePen />} />
               <Route path="/subscriptions/nordvpn" element={<NordVPN />} />
-              <Route path="/subscriptions/expressvpn" element={<ExpressVPN />} />
-              <Route path="/subscriptions/tinder-plus" element={<TinderPlus />} />
+              <Route
+                path="/subscriptions/expressvpn"
+                element={<ExpressVPN />}
+              />
+              <Route
+                path="/subscriptions/tinder-plus"
+                element={<TinderPlus />}
+              />
               <Route path="/subscriptions/bumble-plus" element={<Bumble />} />
-              <Route path="/subscriptions/telegram-stars" element={<TelegramStars />} />
-              
+              <Route
+                path="/subscriptions/telegram-stars"
+                element={<TelegramStars />}
+              />
+
               <Route
                 path="/subscriptions/youtube-premium"
                 element={<YoutubePremium />}
@@ -282,8 +305,6 @@ const App = () => {
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>
-
-            {/* 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
           <CookieConsent />

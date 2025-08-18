@@ -39,7 +39,7 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
     : "There was an issue processing your order. Please try again.";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-lg p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <Card className="w-full max-w-md bg-background rounded-2xl shadow-retro border-2 border-primary/20 overflow-hidden">
       {/* Close Icon */}
           <button

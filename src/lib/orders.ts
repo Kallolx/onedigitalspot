@@ -22,6 +22,7 @@ export interface OrderData {
   paymentAccountNumber: string;
   transactionId: string;
   status: string;
+  reviews?: string; // JSON string containing review data
   createdAt: string;
   updatedAt: string;
 }
@@ -164,6 +165,55 @@ export const updateOrderStatus = async (orderId: string, status: string) => {
       orderId,
       status
     });
+    throw error;
+  }
+};
+
+export const updateOrderReview = async (orderId: string, reviewData: { rating: number; comment: string }) => {
+  try {
+    const reviewJson = JSON.stringify({
+      ...reviewData,
+      submittedAt: new Date().toISOString()
+    });
+
+    const updatedOrder = await databases.updateDocument(
+      DATABASE_ID,
+      ORDERS_COLLECTION_ID,
+      orderId.trim(),
+      {
+        reviews: reviewJson,
+        updatedAt: new Date().toISOString(),
+      }
+    );
+    
+    return updatedOrder;
+  } catch (error: any) {
+    console.error("Error updating order review:", error);
+    throw error;
+  }
+};
+
+export const deleteOrder = async (orderId: string) => {
+  try {
+    if (!DATABASE_ID) {
+      throw new Error('DATABASE_ID is not configured.');
+    }
+    if (!ORDERS_COLLECTION_ID) {
+      throw new Error('ORDERS_COLLECTION_ID is not configured.');
+    }
+    if (!orderId || orderId.trim() === '') {
+      throw new Error('Order ID is required for deletion.');
+    }
+
+    const deleted = await databases.deleteDocument(
+      DATABASE_ID,
+      ORDERS_COLLECTION_ID,
+      orderId.trim()
+    );
+
+    return deleted;
+  } catch (error: any) {
+    console.error('Error deleting order:', error);
     throw error;
   }
 };

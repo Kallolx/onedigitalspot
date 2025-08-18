@@ -18,5 +18,5 @@ export default function TawkToWidget() {
     s1.setAttribute('crossorigin', '*');
     document.body.appendChild(s1);
   }, []);
-  return null; // Tawk.to handles its own UI
+  return null; 
 }

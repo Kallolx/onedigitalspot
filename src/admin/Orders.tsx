@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {  Download, Trash2,  CheckCircle, XCircle, Clock, Package, ShieldCheck, Search, Eye, Edit, RefreshCw } from "lucide-react";
-import { getAllOrders, updateOrderStatus, OrderData } from "../lib/orders";
+import { getAllOrders, updateOrderStatus, OrderData, deleteOrder } from "../lib/orders";
 import { mobileGames, pcGames, giftCards, aiTools, subscriptions, productivity } from "../lib/products";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
@@ -9,7 +9,7 @@ import { Badge } from "../components/ui/badge";
 import { Textarea } from "../components/ui/textarea";
 import { RotateLoader } from "react-spinners";
 
-// Add this utility function to get product images
+// Add this utility function to get product images (fuzzy matching)
 const getProductImage = (productName: string): string => {
   // Combine all products from all categories
   const allProducts = [
@@ -18,13 +18,25 @@ const getProductImage = (productName: string): string => {
     ...giftCards,
     ...aiTools,
     ...subscriptions,
-    ...productivity
+    ...productivity,
   ];
 
-  // Find the product by name (case-insensitive)
-  const product = allProducts.find(p => 
-    p.title.toLowerCase() === productName.toLowerCase()
-  );
+  const name = (productName || "").toString().trim().toLowerCase();
+
+  // Try exact match, then fuzzy includes (both directions)
+  const product = allProducts.find((p) => {
+    const title = (p.title || "").toLowerCase();
+    return (
+      title === name ||
+      title.includes(name) ||
+      name.includes(title)
+    );
+  });
+
+  if (!product && name) {
+    // dev-time hint
+    console.warn(`[Admin Orders] no product mapping found for "${name}"`);
+  }
 
   // Return the local image path or fallback to placeholder
   return product?.image || "/assets/placeholder.svg";
@@ -49,6 +61,12 @@ const Orders = () => {
   // Modal states for Dialog components
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  // Custom status change confirmation dialog
+  const [showStatusConfirm, setShowStatusConfirm] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  // Custom delete confirmation
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Fetch orders from database
   useEffect(() => {
@@ -264,10 +282,10 @@ const Orders = () => {
   };
 
   const handleBulkDelete = () => {
-    if (confirm(`Are you sure you want to delete ${selected.length} orders?`)) {
-      // Implement bulk delete functionality
-      alert("Bulk delete functionality would be implemented here");
-    }
+  // open custom bulk delete dialog
+  if (selected.length === 0) return;
+  setDeleteTargetId('BULK:' + selected.join(','));
+  setShowDeleteConfirm(true);
   };
 
   const handleBulkExport = () => {
@@ -543,7 +561,7 @@ const Orders = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                           <img
-                            src={getProductImage(order.productName)}
+                            src={order.productImage || getProductImage(order.productName)}
                             alt={order.productName}
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -598,10 +616,9 @@ const Orders = () => {
                           className="p-1 rounded-lg hover:bg-red-100 transition-colors" 
                           title="Delete Order"
                           onClick={() => {
-                            if (confirm("Are you sure you want to delete this order?")) {
-                              // Implement delete functionality
-                              alert("Delete functionality would be implemented here");
-                            }
+                            const id = order.$id || order.id || '';
+                            setDeleteTargetId(id);
+                            setShowDeleteConfirm(true);
                           }}
                         >
                           <Trash2 className="w-4 h-4 text-red-500" />
@@ -673,7 +690,7 @@ const Orders = () => {
               <div className="space-y-4">
                 <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
                   <img
-                    src={getProductImage(viewOrder.productName)}
+                    src={viewOrder.productImage || getProductImage(viewOrder.productName)}
                     alt={viewOrder.productName}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -787,6 +804,42 @@ const Orders = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={(open) => !open && setShowDeleteConfirm(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-pixel text-lg text-foreground">Confirm Delete</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-700">Do you really want to delete {deleteTargetId?.startsWith('BULK:') ? `${selected.length} selected orders` : `this order`}? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { setShowDeleteConfirm(false); setDeleteTargetId(null); }}>No</Button>
+              <Button variant="destructive" onClick={async () => {
+                try {
+                  // If bulk
+                  if (deleteTargetId?.startsWith('BULK:')) {
+                    const ids = deleteTargetId.replace('BULK:', '').split(',').map(s => s.trim()).filter(Boolean);
+                    for (const id of ids) {
+                      await deleteOrder(id);
+                    }
+                    setOrders(orders.filter(o => !ids.includes(o.$id || o.id || '')));
+                    setSelected([]);
+                  } else if (deleteTargetId) {
+                    await deleteOrder(deleteTargetId);
+                    setOrders(orders.filter(o => (o.$id || o.id || '') !== deleteTargetId));
+                  }
+                  setShowDeleteConfirm(false);
+                  setDeleteTargetId(null);
+                } catch (err: any) {
+                  console.error('Delete failed', err);
+                  alert('Delete failed: ' + (err?.message || 'Unknown error'));
+                }
+              }}>Delete</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Order Status Modal */}
       <Dialog open={!!editOrder} onOpenChange={(open) => !open && setEditOrder(null)}>
         <DialogContent className="max-w-md">
@@ -799,17 +852,17 @@ const Orders = () => {
             <div className="space-y-4">
               <div>
                 <label className="font-pixel text-xs text-muted-foreground mb-2 block">Order ID</label>
-                <div className="px-3 py-2 bg-muted rounded-lg font-mono text-foreground font-bold">
+                <div className="px-3 py-2 bg-background border border-border rounded-lg font-mono text-foreground font-bold">
                   {editOrder.orderID}
                 </div>
               </div>
 
               <div>
                 <label className="font-pixel text-xs text-muted-foreground mb-2 block">Product</label>
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                <div className="flex items-center gap-3 p-3 bg-background border border-border rounded-lg">
                   <div className="w-10 h-10 rounded-lg overflow-hidden bg-background flex-shrink-0">
                     <img
-                      src={getProductImage(editOrder.productName)}
+                      src={editOrder.productImage || getProductImage(editOrder.productName)}
                       alt={editOrder.productName}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -827,7 +880,7 @@ const Orders = () => {
 
               <div>
                 <label className="font-pixel text-xs text-muted-foreground mb-2 block">Customer</label>
-                <div className="px-3 py-2 bg-muted rounded-lg">
+                <div className="px-3 py-2 bg-background border border-border rounded-lg">
                   <div className="font-medium text-foreground">{editOrder.userName}</div>
                   <div className="text-sm text-muted-foreground">{editOrder.userEmail}</div>
                 </div>
@@ -835,7 +888,7 @@ const Orders = () => {
 
               <div>
                 <label className="font-pixel text-xs text-muted-foreground mb-2 block">Current Status</label>
-                <div className="px-3 py-2 bg-muted rounded-lg">
+                <div className="px-3 py-2 bg-background border border-border rounded-lg">
                   <StatusBadge status={editOrder.status} />
                 </div>
               </div>
@@ -848,9 +901,9 @@ const Orders = () => {
                   onChange={(e) => {
                     const newStatus = e.target.value;
                     if (newStatus && newStatus !== editOrder.status) {
-                      if (confirm(`Change order status from "${editOrder.status}" to "${newStatus}"?`)) {
-                        handleSaveStatus(newStatus);
-                      }
+                      // open custom confirmation dialog instead of browser confirm
+                      setPendingStatus(newStatus);
+                      setShowStatusConfirm(true);
                     }
                   }}
                 >
@@ -872,6 +925,28 @@ const Orders = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Custom Confirm Dialog for Status Change */}
+      <Dialog open={showStatusConfirm} onOpenChange={(open) => !open && setShowStatusConfirm(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-pixel text-lg text-foreground">Confirm Status Change</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-700">Are you sure you want to change the order status{editOrder ? ` for ${editOrder.orderID}` : ''} to <strong className="capitalize">{pendingStatus}</strong>?</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { setShowStatusConfirm(false); setPendingStatus(null); }}>No</Button>
+              <Button variant="default" onClick={async () => {
+                if (pendingStatus) {
+                  await handleSaveStatus(pendingStatus);
+                }
+                setShowStatusConfirm(false);
+                setPendingStatus(null);
+              }}>Yes, change</Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

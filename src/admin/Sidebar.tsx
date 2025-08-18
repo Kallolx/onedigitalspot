@@ -8,7 +8,7 @@ import {
   Settings,
   X,
   LogOut,
-  Menu
+  MessageCircle
 } from "lucide-react";
 
 const Sidebar = ({ adminNav, activeRoute, setActiveRoute, sidebarOpen, onClose }) => {
@@ -19,6 +19,7 @@ const Sidebar = ({ adminNav, activeRoute, setActiveRoute, sidebarOpen, onClose }
     orders: ShoppingCart,
     products: Package,
     users: Users,
+    messages: MessageCircle,
     settings: Settings,
     main: Package,
   };
@@ -54,7 +55,7 @@ const Sidebar = ({ adminNav, activeRoute, setActiveRoute, sidebarOpen, onClose }
       {/* Mobile Backdrop Overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/99 backdrop-blur-xl z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
           onClick={onClose}
           aria-hidden="true"
         />

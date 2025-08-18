@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Button } from '../ui/button';
@@ -14,11 +14,12 @@ interface ReceiptGeneratorProps {
   userEmail?: string;
 }
 
-const ReceiptGenerator: React.FC<ReceiptGeneratorProps> = ({ 
-  order, 
-  userName = "Guest User", 
-  userEmail = "guest@example.com" 
-}) => {
+interface DownloadRef {
+  download: () => Promise<void>;
+}
+
+const ReceiptGenerator = forwardRef<DownloadRef, ReceiptGeneratorProps>(
+  ({ order, userName = "Guest User", userEmail = "guest@example.com" }, ref) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const receiptRef = useRef<HTMLDivElement>(null);
 
@@ -73,9 +74,33 @@ const ReceiptGenerator: React.FC<ReceiptGeneratorProps> = ({
       pdf.text('Generated from onedigitalspot.com', margin, pdfHeight - 10);
       pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, margin, pdfHeight - 6);
       
-      // Save the PDF
+      // Save the PDF using a blob download to avoid internal document.write fallbacks
       const fileName = `Receipt-${order.orderID || order.transactionId?.slice(-8) || 'Order'}.pdf`;
-      pdf.save(fileName);
+      try {
+        // preferred: get blob and download via object URL
+        const blob = pdf.output && typeof pdf.output === 'function' ? (pdf.output('blob') as Blob) : null;
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        } else {
+          // fallback to library save
+          (pdf as any).save(fileName);
+        }
+      } catch (err) {
+        // fallback to library save if any error occurs
+        try {
+          (pdf as any).save(fileName);
+        } catch (e) {
+          console.error('Failed to download PDF:', e);
+          throw e;
+        }
+      }
       
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -84,6 +109,11 @@ const ReceiptGenerator: React.FC<ReceiptGeneratorProps> = ({
       setIsGenerating(false);
     }
   };
+
+  // expose download method to parent via ref
+  useImperativeHandle(ref, () => ({
+    download: handleDownloadPDF,
+  }));
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -399,21 +429,8 @@ const ReceiptGenerator: React.FC<ReceiptGeneratorProps> = ({
         <ReceiptContent />
       </div>
       
-      {/* Action Buttons */}
-      <div className="w-full">
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleDownloadPDF}
-          disabled={isGenerating}
-          className="flex items-center justify-center gap-2 w-full text-sm px-3 py-2"
-        >
-          <Download className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate">{isGenerating ? 'Downloading...' : 'Receipt'}</span>
-        </Button>
-      </div>
     </>
   );
-};
+  });
 
 export default ReceiptGenerator;

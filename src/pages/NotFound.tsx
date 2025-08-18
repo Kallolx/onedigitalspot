@@ -14,7 +14,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (   
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-primary/10 px-4">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="text-center max-w-md w-full">
         {/* Optional: Themed illustration */}
         <img
