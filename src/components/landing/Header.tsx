@@ -93,9 +93,9 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     path: "/productivity",
     icon: AiMagicIcon,
     dropdown: [
-      { name: "Canva Pro", path: "/design-tools/canva" },
-      { name: "CapCut Pro", path: "/design-tools/capcut" },
-      { name: "Figma Pro", path: "/design-tools/figma" },
+      { name: "Canva Pro", path: "/subscriptions/canva-pro" },
+      { name: "CapCut Pro", path: "/subscriptions/capcut-pro" },
+      { name: "Figma Pro", path: "/subscriptions/figma-pro" },
       { name: "More", path: "/productivity" },
       { name: "--- AI Tools ---", path: "#", isHeader: true },
       { name: "ChatGPT Pro", path: "/ai-tools/chatgpt" },
@@ -276,15 +276,6 @@ const UserMenu = ({
               </a>
             )}
 
-            {/* My Profile */}
-            <a
-              href="/my-profile"
-              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
-            >
-              <UserIcon className="w-4 h-4" />
-              My Profile
-            </a>
-
             {/* My Orders */}
             <a
               href="/my-orders"
@@ -297,6 +288,15 @@ const UserMenu = ({
                   {pendingOrdersCount > 9 ? "9+" : pendingOrdersCount}
                 </span>
               )}
+            </a>
+
+            {/* My Profile */}
+            <a
+              href="/my-profile"
+              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+            >
+              <UserIcon className="w-4 h-4" />
+              Profile
             </a>
 
             {/* Logout */}

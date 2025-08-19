@@ -39,6 +39,7 @@ import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
 import Products from "./admin/Products";
 import Users from "./admin/Users";
+import DeliveryMethods from "./admin/DeliveryMethods";
 import Subscriptions from "./pages/routes/Subscriptions";
 import Settings from "./admin/Settings";
 import GenshinImpact from "./Products/game-details/mobile-games/GenshinImpact";
@@ -104,6 +105,7 @@ import ExpressVPN from "./Products/design/ExpressVPN";
 import TinderPlus from "./Products/design/Tinder";
 import Bumble from "./Products/design/Bumble";
 import TelegramStars from "./Products/design/Telegram";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -127,6 +129,7 @@ const App = () => {
 
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/my-orders" element={<MyOrders />} />
               <Route path="/my-profile" element={<MyProfile />} />
               <Route path="/email-test" element={<EmailTest />} />
@@ -302,6 +305,7 @@ const App = () => {
                 <Route path="orders" element={<Orders />} />
                 <Route path="products" element={<Products />} />
                 <Route path="users" element={<Users />} />
+                <Route path="delivery" element={<DeliveryMethods />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>

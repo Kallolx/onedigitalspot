@@ -1,15 +1,21 @@
-import Header from "@/components/landing/Header";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ServiceCard from "@/components/custom/ServiceCard";
 import OrderStatusModal from "@/components/custom/OrderStatusModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import React, { useState, useEffect, useRef } from "react";
-import { Info, X, Copy, Check } from "lucide-react";
-import { LockKeyIcon, SentIcon } from "hugeicons-react";
+import { Info, X } from "lucide-react";
+import { LockKeyIcon, SentIcon, ShoppingCart02Icon } from "hugeicons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RotateLoader } from "react-spinners";
-import { createOrder, getCurrentUser, OrderData } from "../../lib/orders";
+import { getCurrentUser, OrderData } from "../../lib/orders";
+import { account } from "../../lib/appwrite";
 
 interface PriceItem {
   label: string;
@@ -77,16 +83,8 @@ const GameDetailsLayout: React.FC<
   const [showInfo, setShowInfo] = useState<null | "player" | "zone" | "uuid">(
     null
   );
-  const [showPayment, setShowPayment] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<
-    "bkash" | "nagad" | "Rocket" | null
-  >(null);
-  const [userAccount, setUserAccount] = useState("");
-  const [trxId, setTrxId] = useState("");
-  const [copiedText, setCopiedText] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [orderModal, setOrderModal] = useState<{
     isOpen: boolean;
     status: "success" | "error";
@@ -97,9 +95,43 @@ const GameDetailsLayout: React.FC<
     isOpen: false,
     status: "success",
   });
+
+  // Delivery method states
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
+    string | null
+  >(null);
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [deliveryEmail, setDeliveryEmail] = useState("");
+  const [deliveryPhone, setDeliveryPhone] = useState("");
+  // country code and local part for input UI; default to Bangladesh +88
+  const [countryCode, setCountryCode] = useState("+88");
+  const [phoneLocal, setPhoneLocal] = useState("");
+  const [isEditingDelivery, setIsEditingDelivery] = useState(false);
+  const [availableDeliveryMethods, setAvailableDeliveryMethods] = useState<
+    any[]
+  >([]);
+
   const imgRef = useRef<HTMLImageElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Fetch available delivery methods
+  const fetchDeliveryMethods = async () => {
+    try {
+      const response = await fetch("/api/delivery/methods");
+      const data = await response.json();
+      if (data.success) {
+        setAvailableDeliveryMethods(data.methods);
+      }
+    } catch (error) {
+      console.error("Failed to fetch delivery methods:", error);
+      // Fallback to default methods if API fails
+      setAvailableDeliveryMethods([
+        { id: "email", name: "Email", icon: "email", active: true },
+        { id: "whatsapp", name: "WhatsApp", icon: "whatsapp", active: true },
+      ]);
+    }
+  };
 
   // Calculate total amount from all selected items
   const totalAmount = selectedItems.reduce((total, item) => {
@@ -110,13 +142,6 @@ const GameDetailsLayout: React.FC<
       typeof selectedItem.price === "number" ? selectedItem.price : 0;
     return total + itemPrice * item.quantity;
   }, 0);
-
-  // Copy to clipboard function
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedText(label);
-    setTimeout(() => setCopiedText(""), 2000);
-  };
 
   // Utility to convert English digits to Bangla digits
   const toBanglaNumber = (num: string | number) => {
@@ -131,169 +156,73 @@ const GameDetailsLayout: React.FC<
       .join("");
   };
 
-  // Handle order creation
-  const handleCompletePayment = async () => {
-    if (
-      !paymentMethod ||
-      !userAccount ||
-      !trxId ||
-      selectedItems.length === 0
-    ) {
-      setOrderModal({
-        isOpen: true,
-        status: "error",
-        title: "Missing Information",
-        message:
-          "Please fill in all payment details and select at least one item before proceeding.",
-      });
-      return;
-    }
+  // Handle delivery method selection
+  const handleDeliveryMethodSelect = async (methodId: string) => {
+    const user = await getCurrentUser();
 
-    setIsProcessingOrder(true);
-
-    try {
-      // Get current user details
-      const user = await getCurrentUser();
-
-      // Determine product type from URL
-      let productType = "Unknown";
-      if (location.pathname.includes("/mobile-games/")) {
-        productType = "Mobile Games";
-      } else if (location.pathname.includes("/pc-games/")) {
-        productType = "PC Games";
-      } else if (location.pathname.includes("/gift-cards/")) {
-        productType = "Gift Cards";
-      } else if (location.pathname.includes("/ai-tools/")) {
-        productType = "AI Tools";
-      } else if (location.pathname.includes("/subscriptions/")) {
-        productType = "Subscriptions";
+    if (methodId === "email") {
+      setDeliveryEmail(user.email || "");
+      setSelectedDeliveryMethod(methodId);
+      setShowDeliveryModal(true);
+    } else if (methodId === "whatsapp") {
+      // Read phone from account prefs (Appwrite account) or fallback to user.phone
+      try {
+        const full = (user?.prefs && user.prefs.phone) || user.phone || "";
+        // Parse into country code and local part for the UI
+        if (full && full.startsWith("+")) {
+          const match = full.match(/^\+(\d{1,3})(\d*)$/);
+          if (match) {
+            setCountryCode("+" + match[1]);
+            setPhoneLocal(match[2] || "");
+          } else {
+            setCountryCode("+88");
+            setPhoneLocal(full.replace(/[^0-9]/g, ""));
+          }
+        } else if (full && full.startsWith("00")) {
+          // convert 00xxxx to +xxxx
+          const converted = "+" + full.slice(2).replace(/[^0-9]/g, "");
+          const match = converted.match(/^\+(\d{1,3})(\d*)$/);
+          if (match) {
+            setCountryCode("+" + match[1]);
+            setPhoneLocal(match[2] || "");
+          } else {
+            setCountryCode("+88");
+            setPhoneLocal(converted.replace(/[^0-9]/g, ""));
+          }
+        } else {
+          // assume local BD number if plain digits
+          setCountryCode("+88");
+          setPhoneLocal(full.replace(/[^0-9]/g, ""));
+        }
+        setDeliveryPhone(full);
+      } catch (error) {
+        setDeliveryPhone("");
       }
-
-      // Create orders for each selected item
-      const orderPromises = selectedItems.map(async (selectedItem) => {
-        const item =
-          priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
-        if (!item) throw new Error("Invalid item selection");
-
-        const itemPrice = typeof item.price === "number" ? item.price : 0;
-        const itemTotal = itemPrice * selectedItem.quantity;
-
-        const orderData: Omit<
-          OrderData,
-          "id" | "orderID" | "createdAt" | "updatedAt"
-        > = {
-          userId: user.$id,
-          userName: user.name || "Guest User",
-          userEmail: user.email || "",
-          productType,
-          productName: title,
-          productImage: image,
-          itemLabel: item.label,
-          quantity: selectedItem.quantity,
-          unitPrice: itemPrice,
-          totalAmount: itemTotal,
-          playerId: playerId || "",
-          zoneId: zoneId || "",
-          paymentMethod: paymentMethod,
-          paymentAccountNumber: userAccount,
-          transactionId: trxId,
-          status: "Pending",
-          deliveryInfo: undefined,
-        };
-
-        return await createOrder(orderData);
-      });
-
-      // Wait for all orders to be created
-      const newOrders = await Promise.all(orderPromises);
-
-      // Show success modal
-      setOrderModal({
-        isOpen: true,
-        status: "success",
-        title: "Orders Placed Successfully!",
-        message: `${newOrders.length} order(s) have been successfully placed and are being processed. You will receive updates via email.`,
-        orderData: {
-          orderId: newOrders.map((order) => order.orderID).join(", "), // Show all order IDs
-          amount: totalAmount,
-          productName: title,
-          transactionId: trxId,
-        },
-      });
-
-      // Reset form
-      setShowPayment(false);
-      setPaymentMethod(null);
-      setUserAccount("");
-      setTrxId("");
-      if (setSelectedItems) setSelectedItems([]);
-    } catch (error) {
-      console.error("Error creating orders:", error);
-      setOrderModal({
-        isOpen: true,
-        status: "error",
-        title: "Order Failed",
-        message:
-          "Failed to create orders. Please check your details and try again. If the problem persists, contact support.",
-      });
-    } finally {
-      setIsProcessingOrder(false);
+      setSelectedDeliveryMethod(methodId);
+      setShowDeliveryModal(true);
+    } else {
+      // For other delivery methods, just select them directly for now
+      setSelectedDeliveryMethod(methodId);
     }
   };
 
-  // Payment methods configuration
-  const paymentMethods = [
-    {
-      id: "bkash" as const,
-      name: "bKash",
-      icon: "/assets/icons/bKash.svg",
-      color: "from-pink-500 to-pink-600",
-      account: "01831624571",
-      type: "Send Money",
-      qr: "/assets/qr/bkash.png",
-      instructions: [
-        'Open up the bKash app & Choose "Send Money" Its a Personal Account',
-        'Enter the bKash Account Number: <span class="font-bold text-secondary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(totalAmount)}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a bKash Transaction ID (TRX ID)",
-      ],
-    },
-    {
-      id: "nagad" as const,
-      name: "Nagad",
-      icon: "/assets/icons/nagad.svg",
-      color: "from-orange-500 to-red-500",
-      account: "01831624571",
-      type: "Send Money",
-      instructions: [
-        'Open up the Nagad app & Choose "Send Money"',
-        'Enter the Nagad Account Number: <span class="font-bold text-secondary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
-          totalAmount
-        )}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a Nagad Transaction ID",
-      ],
-    },
-    {
-      id: "Rocket" as const,
-      name: "Rocket",
-      icon: "/assets/icons/rocket.png",
-      color: "from-blue-500 to-purple-600",
-      account: "01831624571",
-      type: "Send Money",
-      instructions: [
-        'Open up the Rocket app & Choose "Send Money"',
-        'Enter the Rocket Account Number:  <span class="font-bold text-secondary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
-          totalAmount
-        )}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a Rocket Transaction ID",
-      ],
-    },
-  ];
+  // Confirm delivery details
+  const confirmDeliveryDetails = async () => {
+    if (selectedDeliveryMethod === "whatsapp" && deliveryPhone) {
+      // Save phone number exactly as user entered it for WhatsApp messaging
+      try {
+        const user = await getCurrentUser();
+        // Save the phone exactly as entered - no normalization
+        setDeliveryPhone(deliveryPhone);
+        const prefs = { ...(user?.prefs || {}), phone: deliveryPhone };
+        await (account as any).updatePrefs(prefs);
+      } catch (error) {
+        console.warn("Could not save phone number to account prefs:", error);
+      }
+    }
+    setShowDeliveryModal(false);
+    setIsEditingDelivery(false);
+  };
 
   // Helper functions for multiple selection
   const isItemSelected = (categoryIdx: number, itemIdx: number) => {
@@ -366,6 +295,7 @@ const GameDetailsLayout: React.FC<
   // Always scroll to top when this layout mounts
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    fetchDeliveryMethods();
   }, []);
 
   useEffect(() => {
@@ -655,90 +585,151 @@ const GameDetailsLayout: React.FC<
                   </div>
                 )}
 
-                {/* Multiple Items Display - replaces old quantity selector */}
+                {/* Order Summary */}
                 {selectedItems.length > 0 && (
-                  <div className="mb-4">
-                    <span className="font-pixel text-xl text-foreground font-semibold">
-                      Order Summary
-                    </span>
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
-                      {selectedItems.map((selectedItem, index) => {
-                        const item =
-                          priceList[selectedItem.categoryIdx]?.items[
-                            selectedItem.itemIdx
-                          ];
-                        if (!item) return null;
+                <div className="mb-4">
+                  <span className="font-sans text-lg text-foreground font-medium">
+                    Order Summary
+                  </span>
+                  <div className="space-y-2 max-h-40 mt-2 overflow-y-auto">
+                    {selectedItems.map((selectedItem, index) => {
+                      const item =
+                        priceList[selectedItem.categoryIdx]?.items[
+                          selectedItem.itemIdx
+                        ];
+                      if (!item) return null;
 
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between border border-gray-200 bg-gray-50 rounded-lg p-3"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <span className="font-medium text-gray-900 truncate">
-                                {item.label}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1 ml-2">
-                              <button
-                                type="button"
-                                className="w-6 h-6 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100 transition-colors text-sm"
-                                onClick={() =>
-                                  updateItemQuantity(
-                                    selectedItem.categoryIdx,
-                                    selectedItem.itemIdx,
-                                    selectedItem.quantity - 1
-                                  )
-                                }
-                              >
-                                -
-                              </button>
-                              <span className="w-8 text-center font-medium text-sm">
-                                {selectedItem.quantity}
-                              </span>
-                              <button
-                                type="button"
-                                className="w-6 h-6 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100 transition-colors text-sm"
-                                onClick={() =>
-                                  updateItemQuantity(
-                                    selectedItem.categoryIdx,
-                                    selectedItem.itemIdx,
-                                    selectedItem.quantity + 1
-                                  )
-                                }
-                              >
-                                +
-                              </button>
-                              <span className="ml-1 font-semibold text-foreground text-sm">
-                                {typeof item.price === "number"
-                                  ? item.price * selectedItem.quantity
-                                  : item.price}
-                                ৳
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center border justify-between rounded-lg p-2"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-gray-900 ml-2 whitespace-normal">
+                                <span className="w-auto" title={item.label}>
+                                  {item.label}
+                                </span>
                               </span>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
+                              onClick={() =>
+                                updateItemQuantity(
+                                  selectedItem.categoryIdx,
+                                  selectedItem.itemIdx,
+                                  selectedItem.quantity - 1
+                                )
+                              }
+                            >
+                              -
+                            </button>
+                            <span className="w-8 text-center font-medium text-sm">
+                              {selectedItem.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
+                              onClick={() =>
+                                updateItemQuantity(
+                                  selectedItem.categoryIdx,
+                                  selectedItem.itemIdx,
+                                  selectedItem.quantity + 1
+                                )
+                              }
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
+                </div>
                 )}
 
-                {/* Order Summary */}
+                {/* Total */}
                 {selectedItems.length > 0 && (
-                  <div className="rounded-xl border border-primary/30 px-4 py-3 mb-3 shadow-sm">
+                  <div className="rounded-xl border bg-muted px-4 py-3 mb-3 shadow-sm">
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-between items-center">
                         <span className="font-pixel text-lg text-foreground font-bold">
                           Total
                         </span>
-                        <span className="font-pixel text-2xl text-foreground font-bold">
-                          {totalAmount}
-                          <span className="text-lg font-normal ml-1">৳</span>
+                        <span className="flex gap-2 font-anekbangla text-2xl text-foreground font-bold">
+                          ৳ {toBanglaNumber(totalAmount)} টাকা
                         </span>
                       </div>
                     </div>
                   </div>
                 )}
+
+                {/* Delivery Method Selection */}
+                {selectedItems.length > 0 &&
+                  isSignedIn &&
+                  (() => {
+                    const requiredFieldsFilled =
+                      (typeof playerId === "undefined" || playerId) &&
+                      (typeof zoneId === "undefined" || zoneId) &&
+                      (typeof uuid === "undefined" || uuid);
+
+                    if (!requiredFieldsFilled) {
+                      return null; // Don't show delivery methods if required fields are missing
+                    }
+
+                    return (
+                      <div className="mb-4">
+                        <span className="font-pixel text-lg text-foreground font-semibold mb-3 block">
+                          Choose Delivery Method
+                        </span>
+                        <div className="grid grid-cols-2 gap-3">
+                          {availableDeliveryMethods.map((method) => (
+                            <Button
+                              key={method.id}
+                              type="button"
+                              variant={
+                                selectedDeliveryMethod === method.id
+                                  ? "default"
+                                  : "ghost"
+                              }
+                              className="font-pixel text-sm px-3 py-2 flex items-center justify-center gap-2 w-full sm:w-auto"
+                              onClick={() =>
+                                handleDeliveryMethodSelect(method.id)
+                              }
+                            >
+                              {/* Use public svg icons located in public/assets/icons */}
+                              <img
+                                src={`/assets/icons/${
+                                  method.icon || method.id
+                                }.svg`}
+                                alt={method.name}
+                                className="w-5 h-5"
+                              />
+                              <span className="whitespace-nowrap">
+                                {method.name}
+                              </span>
+                            </Button>
+                          ))}
+                        </div>
+                        {selectedDeliveryMethod && (
+                          <div className="mt-4">
+                            <span className="text-sm text-green-700 font-medium">
+                              ✓{" "}
+                              {
+                                availableDeliveryMethods.find(
+                                  (m) => m.id === selectedDeliveryMethod
+                                )?.name
+                              }{" "}
+                              selected
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
@@ -749,7 +740,13 @@ const GameDetailsLayout: React.FC<
                     disabled={
                       selectedItems.length === 0 ||
                       (typeof playerId !== "undefined" && !playerId) ||
-                      (typeof zoneId !== "undefined" && !zoneId)
+                      (typeof zoneId !== "undefined" && !zoneId) ||
+                      (typeof uuid !== "undefined" && !uuid) ||
+                      (isSignedIn &&
+                        (typeof playerId === "undefined" || playerId) &&
+                        (typeof zoneId === "undefined" || zoneId) &&
+                        (typeof uuid === "undefined" || uuid) &&
+                        !selectedDeliveryMethod)
                     }
                     onClick={() => {
                       if (!isSignedIn) {
@@ -768,7 +765,58 @@ const GameDetailsLayout: React.FC<
                           )}`
                         );
                       } else {
-                        setShowPayment(true);
+                        // Prepare checkout data
+                        const checkoutItems = selectedItems.map(
+                          (selectedItem) => {
+                            const item =
+                              priceList[selectedItem.categoryIdx]?.items[
+                                selectedItem.itemIdx
+                              ];
+                            return {
+                              categoryIdx: selectedItem.categoryIdx,
+                              itemIdx: selectedItem.itemIdx,
+                              quantity: selectedItem.quantity,
+                              label: item?.label || "",
+                              price:
+                                typeof item?.price === "number"
+                                  ? item.price
+                                  : 0,
+                              productName: title,
+                              productImage: image,
+                              productType: "Games", // Adjust based on URL or product type
+                            };
+                          }
+                        );
+
+                        const checkoutData = {
+                          items: checkoutItems,
+                          deliveryInfo: selectedDeliveryMethod
+                            ? {
+                                method: selectedDeliveryMethod,
+                                email:
+                                  selectedDeliveryMethod === "email"
+                                    ? deliveryEmail
+                                    : undefined,
+                                phone:
+                                  selectedDeliveryMethod === "whatsapp"
+                                    ? deliveryPhone
+                                    : undefined,
+                              }
+                            : undefined,
+                          gameInfo: {
+                            playerId,
+                            zoneId,
+                            uuid,
+                          },
+                          productDetails: {
+                            name: title,
+                            image: image,
+                            type: "Games",
+                          },
+                        };
+
+                        // Navigate to checkout with data
+                        navigate("/checkout", { state: { checkoutData } });
                       }
                     }}
                   >
@@ -786,257 +834,25 @@ const GameDetailsLayout: React.FC<
                           className="w-6 h-6 sm:w-7 sm:h-7 ml-2"
                           strokeWidth={3}
                         />
-                        Proceed to Payment
+                        Proceed to Checkout
                       </>
                     )}
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full sm:w-36 font-pixel text-base sm:text-lg flex items-center justify-center gap-2 py-3 sm:py-4"
+                    className="w-full sm:w-44 font-pixel text-base sm:text-lg flex items-center justify-center"
                     disabled={selectedItems.length === 0}
                     onClick={() => {
-                      // TODO: Implement add to cart logic
                       alert("Added to cart!");
                     }}
                   >
+                    <ShoppingCart02Icon className="w-6 h-6 sm:w-7 sm:h-7" />
                     Add to Cart
                   </Button>
                 </div>
               </form>
             </Card>
-
-            {/* Enhanced Payment Method Selection */}
-            {showPayment && (
-              <div className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden mb-8">
-                {/* Header */}
-                <div className="p-4">
-                  <h3 className="font-pixel text-xl text-foreground tracking-tighter mt-2">
-                    Choose Payment Method
-                  </h3>
-                </div>
-
-                {/* Payment Methods Grid */}
-                <div className=" p-4">
-                  <div className="flex gap-4 mb-8 items-start justify-start">
-                    {paymentMethods.map((method) => (
-                      <Button
-                        key={method.id}
-                        type="button"
-                        variant={
-                          paymentMethod === method.id ? "default" : "outline"
-                        }
-                        className={`font-pixel text-base px-6 py-3 rounded-xl ${
-                          paymentMethod === method.id
-                            ? "bg-primary text-white"
-                            : ""
-                        }`}
-                        onClick={() => setPaymentMethod(method.id)}
-                      >
-                        <img
-                          src={method.icon}
-                          alt={method.name}
-                          className="w-18 h-10 inline-block align-middle"
-                        />
-                      </Button>
-                    ))}
-                  </div>
-
-                  {/* Payment Details */}
-                  {paymentMethod && (
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 ">
-                      {paymentMethods.map((method) => {
-                        if (method.id !== paymentMethod) return null;
-
-                        return (
-                          <div key={method.id} className="space-y-6">
-                            {/* Two Column Layout */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                              {/* Instructions */}
-                              <div className="space-y-4">
-                                <h5 className="font-pixel text-base text-foreground mb-4">
-                                  {method.name} Payment Instructions
-                                </h5>
-
-                                <ol className="space-y-3 text-sm">
-                                  {method.instructions.map(
-                                    (instruction, idx) => (
-                                      <li key={idx} className="flex gap-3">
-                                        <span
-                                          className={`flex-shrink-0 w-6 h-6 bg-gradient-to-br ${method.color} text-white rounded-full flex items-center justify-center text-xs font-bold`}
-                                        >
-                                          {idx + 1}
-                                        </span>
-                                        <span
-                                          className="text-base text-gray-500 font-pixel tracking-tight"
-                                          dangerouslySetInnerHTML={{
-                                            __html: instruction,
-                                          }}
-                                        />
-                                      </li>
-                                    )
-                                  )}
-                                </ol>
-
-                                {/* Form */}
-                                <div className="space-y-4">
-                                  <h6 className="font-pixel text-sm text-foreground">
-                                    Transaction Details
-                                  </h6>
-                                  <div>
-                                    <Input
-                                      placeholder={`Enter your ${method.name} number`}
-                                      value={userAccount}
-                                      onChange={(e) =>
-                                        setUserAccount(e.target.value)
-                                      }
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <Input
-                                      placeholder="Enter Transaction ID (TRX ID)"
-                                      value={trxId}
-                                      onChange={(e) => setTrxId(e.target.value)}
-                                    />
-                                  </div>
-
-                                  <Button
-                                    className={`w-full font-pixel ${
-                                      userAccount && trxId && !isProcessingOrder
-                                        ? `bg-gradient-to-r ${method.color} text-white hover:shadow-lg`
-                                        : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                    }`}
-                                    disabled={
-                                      !userAccount ||
-                                      !trxId ||
-                                      isProcessingOrder
-                                    }
-                                    onClick={handleCompletePayment}
-                                  >
-                                    {isProcessingOrder
-                                      ? "Processing..."
-                                      : "Complete Payment"}
-                                  </Button>
-                                </div>
-                              </div>
-
-                              {/* QR Code and Form */}
-                              <div className="">
-                                {/* Account Details */}
-                                <div className="bg-white rounded-xl p-4 border border-gray-200 mb-8">
-                                  <h6 className="font-pixel text-sm text-foreground mb-3">
-                                    Account Details
-                                  </h6>
-                                  <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-gray-600 text-sm">
-                                        {method.name} Number:
-                                      </span>
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-sans font-semibold text-md">
-                                          {method.account}
-                                        </span>
-                                        <button
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              method.account,
-                                              "account"
-                                            )
-                                          }
-                                          className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                        >
-                                          {copiedText === "account" ? (
-                                            <Check className="w-3 h-3 text-green-500" />
-                                          ) : (
-                                            <Copy className="w-3 h-3 text-gray-500" />
-                                          )}
-                                        </button>
-                                      </div>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-gray-600 text-sm">
-                                        Total:
-                                      </span>
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-2xl font-bold font-anekbangla text-secondary">
-                                          {toBanglaNumber(totalAmount)} BDT
-                                        </span>
-                                        <button
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              totalAmount?.toString() || "",
-                                              "amount"
-                                            )
-                                          }
-                                          className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                        >
-                                          {copiedText === "amount" ? (
-                                            <Check className="w-3 h-3 text-green-500" />
-                                          ) : (
-                                            <Copy className="w-3 h-3 text-gray-500" />
-                                          )}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {/* Apply Coupon Field (Mock) */}
-                                  <div className="mt-4 flex gap-2 items-center">
-                                    <Input
-                                      type="text"
-                                      placeholder="Enter coupon code"
-                                      className="font-pixel"
-                                      // You can add value/onChange if you want to handle state
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className="font-pixel"
-                                      size="sm"
-                                      // onClick={() => {/* mock apply logic */}}
-                                    >
-                                      Apply
-                                    </Button>
-                                  </div>
-                                  <span className="text-xs text-gray-400 mt-1 block">
-                                    Coupon is optional
-                                  </span>
-                                </div>
-                                {/* QR Code */}
-                                {method.qr && (
-                                  <div className="text-center mb-6">
-                                    <img
-                                      src={method.qr}
-                                      alt={`${method.name} QR`}
-                                      className="w-64 h-64 mx-auto rounded-xl"
-                                      onError={(e) => {
-                                        const target =
-                                          e.target as HTMLImageElement;
-                                        target.style.display = "none";
-                                        const fallback =
-                                          target.nextSibling as HTMLElement;
-                                        if (fallback)
-                                          fallback.style.display = "flex";
-                                      }}
-                                    />
-                                    <div className="w-56 h-56 bg-gray-100 rounded-lg items-center justify-center text-gray-400 text-sm hidden">
-                                      <img
-                                        src={method.qr}
-                                        alt={`${method.name} QR`}
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Info Section */}
             {infoSections.map((section, i) => (
@@ -1064,6 +880,175 @@ const GameDetailsLayout: React.FC<
         </div>
       </main>
 
+      {/* Delivery Confirmation Modal */}
+      <Dialog
+        open={showDeliveryModal}
+        onOpenChange={(open) => {
+          setShowDeliveryModal(open);
+          if (!open) setIsEditingDelivery(false);
+        }}
+      >
+        <DialogContent className="max-w-md w-full">
+          <DialogHeader>
+            <DialogTitle className="font-pixel text-xl text-foreground mb-2 text-center">
+              Confirm{" "}
+              {selectedDeliveryMethod === "email" ? "Email" : "WhatsApp"}{" "}
+              Delivery
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedDeliveryMethod === "email" ? (
+            <div>
+              <p className="text-gray-600 mb-4">
+                We'll send your order details and activation codes to this email
+                address:
+              </p>
+              <div className="space-y-3">
+                {isEditingDelivery ? (
+                  <div className="space-y-2">
+                    <input
+                      type="email"
+                      className="w-full border bg-background rounded-lg px-3 py-2"
+                      placeholder="Enter new email"
+                      value={deliveryEmail}
+                      onChange={(e) => setDeliveryEmail(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1 font-pixel"
+                        onClick={() => setIsEditingDelivery(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={() => {
+                          confirmDeliveryDetails();
+                          setIsEditingDelivery(false);
+                        }}
+                        disabled={!deliveryEmail}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="p-3 bg-gray-50 rounded-lg border">
+                      <span className="font-medium text-foreground">
+                        {deliveryEmail}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={confirmDeliveryDetails}
+                      >
+                        Confirm Email
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="font-pixel"
+                        onClick={() => setIsEditingDelivery(true)}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-gray-600 mb-4">
+                We'll send your order details and activation codes to this
+                WhatsApp number:
+              </p>
+              <div className="space-y-3">
+                {isEditingDelivery ? (
+                  <div className="space-y-2">
+                    <input
+                      type="tel"
+                      className="w-full bg-background border rounded-lg px-3 py-2"
+                      placeholder="Enter WhatsApp number"
+                      value={deliveryPhone}
+                      onChange={(e) => setDeliveryPhone(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1 font-pixel"
+                        onClick={() => setIsEditingDelivery(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={() => {
+                          confirmDeliveryDetails();
+                          setIsEditingDelivery(false);
+                        }}
+                        disabled={!deliveryPhone}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {deliveryPhone ? (
+                      <div className="p-3 bg-gray-50 rounded-lg border">
+                        <span className="font-medium text-foreground">
+                          {deliveryPhone}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <span className="text-yellow-700">
+                          No phone number found. Please add your WhatsApp
+                          number.
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={confirmDeliveryDetails}
+                        disabled={!deliveryPhone}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="font-pixel"
+                        onClick={() => setIsEditingDelivery(true)}
+                      >
+                        {deliveryPhone ? "Change" : "Add"}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="mt-4" />
+        </DialogContent>
+      </Dialog>
+
       {/* Order Status Modal */}
       <OrderStatusModal
         isOpen={orderModal.isOpen}
@@ -1078,10 +1063,7 @@ const GameDetailsLayout: React.FC<
         }}
         onRetry={() => {
           setOrderModal({ ...orderModal, isOpen: false });
-          // Reset form to allow retry
-          setPaymentMethod(null);
-          setUserAccount("");
-          setTrxId("");
+          // Reset is now handled in the checkout page
         }}
       />
     </div>

@@ -2,7 +2,7 @@ import { databases, account } from "./appwrite";
 import { ID, Query } from "appwrite";
 
 export interface OrderData {
-  deliveryInfo: any;
+  deliveryInfo: string; // JSON string of delivery information
   id?: string;
   $id?: string; // Appwrite document ID
   orderID: string; // Auto-generated 6-character order ID (matches Appwrite attribute name)
@@ -32,8 +32,8 @@ const ORDERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_ORDERS_ID;
 
 // Generate a unique 6-character order ID
 const generateOrderId = (productType: string, productName: string): string => {
-  // Company identifier: "OD" for OneDigital Spot
-  const companyCode = "OD";
+  // Company identifier: "1DS" for OneDigital Spot
+  const companyCode = "1DS";
   
   // Product type code mapping
   const productTypeCode = {

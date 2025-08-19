@@ -1,15 +1,30 @@
-import Header from "@/components/landing/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import React, { useEffect, useState, useRef } from "react";
 import ServiceCard from "@/components/custom/ServiceCard";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Info, X, Lock, Send, Check, Copy } from "lucide-react";
+import {
+  Lock,
+  Send,
+  Check,
+  Mail,
+  MessageCircle,
+  Plus,
+  Minus,
+  Trash2,
+} from "lucide-react";
 import { RotateLoader } from "react-spinners";
 import { account } from "@/lib/appwrite";
-import { createOrder, OrderData } from "@/lib/orders";
+import { getCurrentUser } from "@/lib/orders";
 import OrderStatusModal from "@/components/custom/OrderStatusModal";
-import { Input } from "../ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { ShoppingBag03Icon, ShoppingCart02Icon } from "hugeicons-react";
 
 interface PriceItem {
   label: string;
@@ -28,23 +43,20 @@ interface InfoSection {
   content: React.ReactNode;
 }
 
+interface SelectedItem {
+  categoryIdx: number;
+  itemIdx: number;
+  quantity: number;
+}
+
 interface AiToolDetailsLayoutProps {
   title: string;
   image: string;
   priceList: PriceCategory[];
   infoSections: InfoSection[];
   similarProducts: any[];
-  selected: { categoryIdx: number; itemIdx: number } | null;
-  setSelected: React.Dispatch<
-    React.SetStateAction<{ categoryIdx: number; itemIdx: number } | null>
-  >;
-  playerId: string;
-  setPlayerId: React.Dispatch<React.SetStateAction<string>>;
-  zoneId: string;
-  setZoneId: React.Dispatch<React.SetStateAction<string>>;
-  quantity: number;
-  setQuantity: React.Dispatch<React.SetStateAction<number>>;
-  infoImage: string;
+  selectedItems?: SelectedItem[];
+  setSelectedItems?: (v: SelectedItem[]) => void;
   children?: React.ReactNode;
   isSignedIn?: boolean;
 }
@@ -55,13 +67,20 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   priceList,
   infoSections,
   similarProducts,
-  selected,
-  setSelected,
-  quantity,
-  setQuantity,
+  selectedItems: propSelectedItems,
+  setSelectedItems: propSetSelectedItems,
   children,
   isSignedIn = false,
 }) => {
+  // Local state for selected items if not provided as props
+  const [localSelectedItems, setLocalSelectedItems] = useState<SelectedItem[]>(
+    []
+  );
+
+  // Use props if available, otherwise use local state
+  const selectedItems = propSelectedItems || localSelectedItems;
+  const setSelectedItems = propSetSelectedItems || setLocalSelectedItems;
+
   const [purchaseType, setPurchaseType] = useState<"shared" | "personal">(
     "shared"
   );
@@ -69,17 +88,24 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Payment and order states
-  const [showPayment, setShowPayment] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<
-    "bkash" | "nagad" | "Rocket" | null
+  // Delivery method states
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
+    string | null
   >(null);
-  const [userAccount, setUserAccount] = useState("");
-  const [trxId, setTrxId] = useState("");
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [deliveryEmail, setDeliveryEmail] = useState("");
+  const [deliveryPhone, setDeliveryPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+88");
+  const [phoneLocal, setPhoneLocal] = useState("");
+  const [isEditingDelivery, setIsEditingDelivery] = useState(false);
+  const [availableDeliveryMethods, setAvailableDeliveryMethods] = useState<
+    any[]
+  >([]);
+
+  // Order states
   const [copiedText, setCopiedText] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [orderModal, setOrderModal] = useState<{
     isOpen: boolean;
     status: "success" | "error";
@@ -95,6 +121,34 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Fetch available delivery methods
+  const fetchDeliveryMethods = async () => {
+    try {
+      const response = await fetch("/api/delivery/methods");
+      const data = await response.json();
+      if (data.success) {
+        setAvailableDeliveryMethods(data.methods);
+      }
+    } catch (error) {
+      console.error("Failed to fetch delivery methods:", error);
+      // Fallback to default methods if API fails
+      setAvailableDeliveryMethods([
+        { id: "email", name: "Email", icon: "email", active: true },
+        { id: "whatsapp", name: "WhatsApp", icon: "whatsapp", active: true },
+      ]);
+    }
+  };
+
+  // Calculate total amount from all selected items
+  const totalAmount = selectedItems.reduce((total, item) => {
+    const selectedItem = priceList[item.categoryIdx]?.items[item.itemIdx];
+    if (!selectedItem) return total;
+
+    const itemPrice =
+      typeof selectedItem.price === "number" ? selectedItem.price : 0;
+    return total + itemPrice * item.quantity;
+  }, 0);
+
   // Utility to convert English digits to Bangla digits
   const toBanglaNumber = (num: string | number) => {
     const en = "0123456789";
@@ -108,10 +162,148 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
       .join("");
   };
 
+  // Handle delivery method selection
+  const handleDeliveryMethodSelect = async (methodId: string) => {
+    const user = await getCurrentUser();
+
+    if (methodId === "email") {
+      setDeliveryEmail(user.email || "");
+      setSelectedDeliveryMethod(methodId);
+      setShowDeliveryModal(true);
+    } else if (methodId === "whatsapp") {
+      // Read phone from account prefs (Appwrite account) or fallback to user.phone
+      try {
+        const full = (user?.prefs && user.prefs.phone) || user.phone || "";
+        // Parse into country code and local part for the UI
+        if (full && full.startsWith("+")) {
+          const match = full.match(/^\+(\d{1,3})(\d*)$/);
+          if (match) {
+            setCountryCode("+" + match[1]);
+            setPhoneLocal(match[2] || "");
+          } else {
+            setCountryCode("+88");
+            setPhoneLocal(full.replace(/[^0-9]/g, ""));
+          }
+        } else if (full && full.startsWith("00")) {
+          // convert 00xxxx to +xxxx
+          const converted = "+" + full.slice(2).replace(/[^0-9]/g, "");
+          const match = converted.match(/^\+(\d{1,3})(\d*)$/);
+          if (match) {
+            setCountryCode("+" + match[1]);
+            setPhoneLocal(match[2] || "");
+          } else {
+            setCountryCode("+88");
+            setPhoneLocal(converted.replace(/[^0-9]/g, ""));
+          }
+        } else {
+          // assume local BD number if plain digits
+          setCountryCode("+88");
+          setPhoneLocal(full.replace(/[^0-9]/g, ""));
+        }
+        setDeliveryPhone(full);
+      } catch (error) {
+        setDeliveryPhone("");
+      }
+      setSelectedDeliveryMethod(methodId);
+      setShowDeliveryModal(true);
+    } else {
+      // For other delivery methods, just select them directly for now
+      setSelectedDeliveryMethod(methodId);
+    }
+  };
+
+  // Confirm delivery details
+  const confirmDeliveryDetails = async () => {
+    if (selectedDeliveryMethod === "whatsapp" && deliveryPhone) {
+      // Save phone number exactly as user entered it for WhatsApp messaging
+      try {
+        const user = await getCurrentUser();
+        // Save the phone exactly as entered - no normalization
+        setDeliveryPhone(deliveryPhone);
+        const prefs = { ...(user?.prefs || {}), phone: deliveryPhone };
+        await (account as any).updatePrefs(prefs);
+      } catch (error) {
+        console.warn("Could not save phone number to account prefs:", error);
+      }
+    }
+    setShowDeliveryModal(false);
+    setIsEditingDelivery(false);
+  };
+
+  // Helper functions for multiple selection
+  const isItemSelected = (categoryIdx: number, itemIdx: number) => {
+    return selectedItems.some(
+      (item) => item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    );
+  };
+
+  const getSelectedItemQuantity = (categoryIdx: number, itemIdx: number) => {
+    const found = selectedItems.find(
+      (item) => item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    );
+    return found ? found.quantity : 0;
+  };
+
+  const handleItemSelection = (categoryIdx: number, itemIdx: number) => {
+    const existingIndex = selectedItems.findIndex(
+      (item) => item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+    );
+
+    if (existingIndex >= 0) {
+      // Item already selected, remove it (unselect)
+      const newSelectedItems = selectedItems.filter(
+        (item) =>
+          !(item.categoryIdx === categoryIdx && item.itemIdx === itemIdx)
+      );
+      setSelectedItems(newSelectedItems);
+    } else {
+      // New item, add to selection with quantity 1
+      setSelectedItems([
+        ...selectedItems,
+        {
+          categoryIdx,
+          itemIdx,
+          quantity: 1,
+        },
+      ]);
+    }
+  };
+
+  const updateItemQuantity = (
+    categoryIdx: number,
+    itemIdx: number,
+    newQuantity: number
+  ) => {
+    if (newQuantity <= 0) {
+      // Remove item if quantity is 0 or less
+      setSelectedItems(
+        selectedItems.filter(
+          (item) =>
+            !(item.categoryIdx === categoryIdx && item.itemIdx === itemIdx)
+        )
+      );
+    } else {
+      // Update quantity
+      setSelectedItems(
+        selectedItems.map((item) =>
+          item.categoryIdx === categoryIdx && item.itemIdx === itemIdx
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
+    }
+  };
+
+  // Remove item completely
+  const removeItem = (index: number) => {
+    const updatedItems = selectedItems.filter((_, i) => i !== index);
+    setSelectedItems(updatedItems);
+  };
+
   // Determine if this is a subscription product based on URL
   const isSubscription = location.pathname.includes("/subscriptions/");
 
-  // Calculate selected item and total amount
+  // Calculate selected item and total amount - No longer needed with multiple selection
   const filteredList =
     priceList.length === 1
       ? priceList // For single category products like Cursor, use all categories
@@ -125,14 +317,6 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
             : category.title.toLowerCase().includes("personal")
         );
 
-  const selectedItem =
-    selected && filteredList[selected.categoryIdx]?.items[selected.itemIdx];
-
-  const totalAmount =
-    selectedItem && typeof selectedItem.price === "number"
-      ? selectedItem.price * quantity
-      : selectedItem?.price;
-
   // Copy to clipboard function
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -140,195 +324,78 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
     setTimeout(() => setCopiedText(""), 2000);
   };
 
-  // Get current user helper
-  const getCurrentUser = async () => {
-    try {
-      return await account.get();
-    } catch (error) {
-      throw new Error("User not authenticated");
-    }
-  };
-
-  // Handle order creation
+  // Handle order creation - updated to use checkout flow like game layout
   const handleCompletePayment = async () => {
-    if (!paymentMethod || !userAccount || !trxId || !selectedItem) {
+    if (selectedItems.length === 0) {
       setOrderModal({
         isOpen: true,
         status: "error",
-        title: "Missing Information",
-        message: "Please fill in all payment details before proceeding.",
+        title: "No Items Selected",
+        message: "Please select at least one item before proceeding.",
       });
       return;
     }
 
-    setIsProcessingOrder(true);
-
-    try {
-      // Get current user details
-      const user = await getCurrentUser();
-
-      // Determine product type from URL
-      let productType = "AI Tools";
-      if (location.pathname.includes("/ai-tools/")) {
-        productType = "AI Tools";
-      } else if (location.pathname.includes("/subscriptions/")) {
-        productType = "Subscriptions";
-      } else if (
-        location.pathname.includes("/mobile-games/") ||
-        location.pathname.includes("/pc-games/")
-      ) {
-        productType = "Games";
-      }
-
-      // Create order data
-      const orderData: Omit<
-        OrderData,
-        "id" | "orderID" | "createdAt" | "updatedAt"
-      > = {
-        userId: user.$id,
-        userName: user.name || "Guest User",
-        userEmail: user.email || "",
-        productType,
+    // Navigate to checkout with data like game layout
+    const checkoutItems = selectedItems.map((selectedItem) => {
+      const item =
+        priceList[selectedItem.categoryIdx]?.items[selectedItem.itemIdx];
+      return {
+        categoryIdx: selectedItem.categoryIdx,
+        itemIdx: selectedItem.itemIdx,
+        quantity: selectedItem.quantity,
+        label: item?.label || "",
+        price: typeof item?.price === "number" ? item.price : 0,
         productName: title,
         productImage: image,
-        itemLabel: selectedItem.label,
-        quantity: quantity,
-        unitPrice:
-          typeof selectedItem.price === "number" ? selectedItem.price : 0,
-        totalAmount: typeof totalAmount === "number" ? totalAmount : 0,
-        playerId:
-          !isSubscription &&
-          purchaseType === "personal" &&
-          personalType === "existing"
-            ? email
-            : "", // Store email in playerId for AI tools only
-        zoneId:
-          !isSubscription &&
-          purchaseType === "personal" &&
-          personalType === "existing"
-            ? password
-            : "", // Store password in zoneId for AI tools only
-        paymentMethod: paymentMethod,
-        paymentAccountNumber: userAccount,
-        transactionId: trxId,
-        status: "Pending",
-        deliveryInfo: undefined,
+        productType: isSubscription ? "Subscriptions" : "AI Tools",
       };
+    });
 
-      // Create the order
-      const newOrder = await createOrder(orderData);
+    const checkoutData = {
+      items: checkoutItems,
+      deliveryInfo: selectedDeliveryMethod
+        ? {
+            method: selectedDeliveryMethod,
+            email:
+              selectedDeliveryMethod === "email" ? deliveryEmail : undefined,
+            phone:
+              selectedDeliveryMethod === "whatsapp" ? deliveryPhone : undefined,
+          }
+        : undefined,
+      gameInfo: {
+        playerId: personalType === "existing" ? email : "",
+        zoneId: personalType === "existing" ? password : "",
+      },
+      productDetails: {
+        name: title,
+        image: image,
+        type: isSubscription ? "Subscriptions" : "AI Tools",
+      },
+    };
 
-      // Show success modal
-      setOrderModal({
-        isOpen: true,
-        status: "success",
-        title: "Order Placed Successfully!",
-        message: isSubscription
-          ? "Your subscription order has been successfully placed and is being processed. You will receive updates via email."
-          : "Your AI tool order has been successfully placed and is being processed. You will receive updates via email.",
-        orderData: {
-          orderId: newOrder.orderID,
-          amount: typeof totalAmount === "number" ? totalAmount : 0,
-          productName: title,
-          transactionId: trxId,
-        },
-      });
-
-      // Reset form
-      setShowPayment(false);
-      setPaymentMethod(null);
-      setUserAccount("");
-      setTrxId("");
-    } catch (error) {
-      console.error("Error creating order:", error);
-      setOrderModal({
-        isOpen: true,
-        status: "error",
-        title: "Order Failed",
-        message:
-          "Failed to create order. Please check your details and try again. If the problem persists, contact support.",
-      });
-    } finally {
-      setIsProcessingOrder(false);
-    }
+    // Navigate to checkout with data
+    navigate("/checkout", { state: { checkoutData } });
   };
 
-  // Payment methods configuration
-  const paymentMethods = [
-    {
-      id: "bkash" as const,
-      name: "bKash",
-      icon: "/assets/icons/bKash.svg",
-      color: "from-pink-500 to-pink-600",
-      account: "01831624571",
-      type: "Send Money",
-      qr: "/assets/qr/bkash.png",
-      instructions: [
-        'Open up the bKash app & Choose "Send Money" Its a Personal Account',
-        'Enter the bKash Account Number: <span class="font-bold text-secondary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(totalAmount)}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a bKash Transaction ID (TRX ID)",
-      ],
-    },
-    {
-      id: "nagad" as const,
-      name: "Nagad",
-      icon: "/assets/icons/nagad.svg",
-      color: "from-orange-500 to-red-500",
-      account: "01831624571",
-      type: "Send Money",
-      instructions: [
-        'Open up the Nagad app & Choose "Send Money"',
-        'Enter the Nagad Account Number: <span class="font-bold text-secondary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
-          totalAmount
-        )}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a Nagad Transaction ID",
-      ],
-    },
-    {
-      id: "Rocket" as const,
-      name: "Rocket",
-      icon: "/assets/icons/rocket.png",
-      color: "from-blue-500 to-purple-600",
-      account: "01831624571",
-      type: "Send Money",
-      instructions: [
-        'Open up the Rocket app & Choose "Send Money"',
-        'Enter the Rocket Account Number:  <span class="font-bold text-secondary">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-secondary\">${toBanglaNumber(
-          totalAmount
-        )}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a Rocket Transaction ID",
-      ],
-    },
-  ];
+  // Payment methods configuration - removed as we now use checkout flow
 
   // Always scroll to top when this layout mounts
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    fetchDeliveryMethods();
   }, []);
 
   // Load saved inputs from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("aiToolOrderInputs");
     if (saved) {
-      const {
-        selected,
-        purchaseType,
-        personalType,
-        email,
-        quantity,
-        pathname,
-      } = JSON.parse(saved);
-      if (selected) setSelected(selected);
+      const { selectedItems, purchaseType, personalType, email, pathname } =
+        JSON.parse(saved);
+      if (selectedItems) setSelectedItems(selectedItems);
       if (purchaseType) setPurchaseType(purchaseType);
       if (personalType) setPersonalType(personalType);
       if (email) setEmail(email);
-      if (quantity) setQuantity(quantity);
       localStorage.removeItem("aiToolOrderInputs");
     }
   }, []);
@@ -451,63 +518,67 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                           ? category.title.toLowerCase().includes("personal")
                           : category.title.toLowerCase().includes("shared")
                       )
-                      .map((category, catIdx) => (
-                        <div key={catIdx}>
-                          <h3 className="font-pixel text-base text-foreground mb-2 pl-1 opacity-80 flex items-center gap-2">
-                            {category.title}
-                          </h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {category.items.map((item, itemIdx) => (
-                              <Button
-                                key={itemIdx}
-                                type="button"
-                                variant={
-                                  selected &&
-                                  selected.categoryIdx === catIdx &&
-                                  selected.itemIdx === itemIdx
-                                    ? "default"
-                                    : "ghost"
-                                }
-                                className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
-                                onClick={() =>
-                                  setSelected({ categoryIdx: catIdx, itemIdx })
-                                }
-                              >
-                                <span className="flex items-center gap-2">
-                                  {category.categoryIcon && (
-                                    <img
-                                      src={category.categoryIcon}
-                                      alt="icon"
-                                      className="w-5 h-5 text-foreground"
-                                    />
-                                  )}
-                                  {item.label}
-                                  {item.hot && (
-                                    <span className="ml-1">
-                                      <img
-                                        src="/assets/icons/fire.svg"
-                                        alt="Popular"
-                                        className="inline-block mr-1 w-4 h-4"
-                                      />
-                                    </span>
-                                  )}
-                                </span>
-                                <span
-                                  className={`font-bold font-anekbangla transition-colors duration-150 ${
-                                    selected &&
-                                    selected.categoryIdx === catIdx &&
-                                    selected.itemIdx === itemIdx
-                                      ? "text-foreground"
-                                      : "text-secondary"
-                                  } group-hover:text-white`}
+                      .map((category, filteredIdx) => {
+                        // Find the original index in the full priceList
+                        const originalCatIdx = priceList.findIndex(
+                          (cat) => cat.title === category.title
+                        );
+                        return (
+                          <div key={filteredIdx}>
+                            <h3 className="font-pixel text-base text-foreground mb-2 pl-1 opacity-80 flex items-center gap-2">
+                              {category.title}
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {category.items.map((item, itemIdx) => (
+                                <Button
+                                  key={itemIdx}
+                                  type="button"
+                                  variant={
+                                    isItemSelected(originalCatIdx, itemIdx)
+                                      ? "default"
+                                      : "ghost"
+                                  }
+                                  className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
+                                  onClick={() =>
+                                    handleItemSelection(originalCatIdx, itemIdx)
+                                  }
                                 >
-                                  ৳{toBanglaNumber(item.price)}
-                                </span>
-                              </Button>
-                            ))}
+                                  <span className="flex items-center gap-2">
+                                    {category.categoryIcon && (
+                                      <img
+                                        src={category.categoryIcon}
+                                        alt="icon"
+                                        className="w-5 h-5 text-foreground"
+                                      />
+                                    )}
+                                    <span className="block whitespace-normal" title={item.label}>
+                                      {item.label}
+                                    </span>
+                                    {item.hot && (
+                                      <span className="ml-1">
+                                        <img
+                                          src="/assets/icons/fire.svg"
+                                          alt="Popular"
+                                          className="inline-block mr-1 w-4 h-4"
+                                        />
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span
+                                    className={`font-bold font-anekbangla transition-colors duration-150 ${
+                                      isItemSelected(originalCatIdx, itemIdx)
+                                        ? "text-foreground"
+                                        : "text-secondary"
+                                    }`}
+                                  >
+                                    ৳{toBanglaNumber(item.price)}
+                                  </span>
+                                </Button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                   </div>
                 )}
                 {/* Personal Account Options */}
@@ -523,8 +594,8 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                               personalType === "new" ? "default" : "outline"
                             }
                             onClick={() => {
-                              setPersonalType("new");
-                              setSelected(null);
+                              setPurchaseType("shared");
+                              setSelectedItems([]);
                             }}
                             className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[120px]"
                           >
@@ -539,7 +610,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                             }
                             onClick={() => {
                               setPersonalType("existing");
-                              setSelected(null);
+                              setSelectedItems([]);
                             }}
                             className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[120px]"
                           >
@@ -559,66 +630,73 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                   .toLowerCase()
                                   .includes("personal")
                           )
-                          .map((category, catIdx) => (
-                            <div key={catIdx}>
-                              <h3 className="font-pixel text-base text-foreground mb-2 pl-1 opacity-80 flex items-center gap-2">
-                                {category.title}
-                              </h3>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {category.items.map((item, itemIdx) => (
-                                  <Button
-                                    key={itemIdx}
-                                    type="button"
-                                    variant={
-                                      selected &&
-                                      selected.categoryIdx === catIdx &&
-                                      selected.itemIdx === itemIdx
-                                        ? "default"
-                                        : "ghost"
-                                    }
-                                    className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
-                                    onClick={() =>
-                                      setSelected({
-                                        categoryIdx: catIdx,
-                                        itemIdx,
-                                      })
-                                    }
-                                  >
-                                    <span className="flex items-center gap-2">
-                                      {category.categoryIcon && (
-                                        <img
-                                          src={category.categoryIcon}
-                                          alt="icon"
-                                          className="w-5 h-5 text-foreground"
-                                        />
-                                      )}
-                                      {item.label}
-                                      {item.hot && (
-                                        <span className="ml-1">
-                                          <img
-                                            src="/assets/icons/fire.svg"
-                                            alt="Popular"
-                                            className="inline-block mr-1 w-4 h-4"
-                                          />
-                                        </span>
-                                      )}
-                                    </span>
-                                    <span
-                                      className={`font-bold font-anekbangla transition-colors duration-150 ${
-                                        selected &&
-                                        selected.categoryIdx === catIdx &&
-                                        selected.itemIdx === itemIdx
-                                          ? "text-foreground"
-                                          : "text-secondary"
-                                      } group-hover:text-white`}
+                          .map((category, filteredIdx) => {
+                            // Find the original index in the full priceList
+                            const originalCatIdx = priceList.findIndex(
+                              (cat) => cat.title === category.title
+                            );
+                            return (
+                              <div key={filteredIdx}>
+                                <h3 className="font-pixel text-base text-foreground mb-2 pl-1 opacity-80 flex items-center gap-2">
+                                  {category.title}
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {category.items.map((item, itemIdx) => (
+                                    <Button
+                                      key={itemIdx}
+                                      type="button"
+                                      variant={
+                                        isItemSelected(originalCatIdx, itemIdx)
+                                          ? "default"
+                                          : "ghost"
+                                      }
+                                      className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
+                                      onClick={() =>
+                                        handleItemSelection(
+                                          originalCatIdx,
+                                          itemIdx
+                                        )
+                                      }
                                     >
-                                      ৳{toBanglaNumber(item.price)}
-                                    </span>
-                                  </Button>
-                                ))}
+                                      <span className="flex items-center gap-2">
+                                        {category.categoryIcon && (
+                                          <img
+                                            src={category.categoryIcon}
+                                            alt="icon"
+                                            className="w-5 h-5 text-foreground"
+                                          />
+                                        )}
+                                        <span className="block whitespace-normal" title={item.label}>
+                                          {item.label}
+                                        </span>
+                                        {item.hot && (
+                                          <span className="ml-1">
+                                            <img
+                                              src="/assets/icons/fire.svg"
+                                              alt="Popular"
+                                              className="inline-block mr-1 w-4 h-4"
+                                            />
+                                          </span>
+                                        )}
+                                      </span>
+                                      <span
+                                        className={`font-bold font-anekbangla transition-colors duration-150 ${
+                                          isItemSelected(
+                                            originalCatIdx,
+                                            itemIdx
+                                          )
+                                            ? "text-foreground"
+                                            : "text-secondary"
+                                        }`}
+                                      >
+                                        ৳{toBanglaNumber(item.price)}
+                                      </span>
+                                    </Button>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                       </div>
                       {/* Account details form only for AI tools with existing account */}
                       {!isSubscription && personalType === "existing" && (
@@ -668,16 +746,12 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                             key={itemIdx}
                             type="button"
                             variant={
-                              selected &&
-                              selected.categoryIdx === catIdx &&
-                              selected.itemIdx === itemIdx
+                              isItemSelected(catIdx, itemIdx)
                                 ? "default"
                                 : "ghost"
                             }
                             className={`relative flex justify-between items-center font-sans text-base md:text-lg px-4 py-3 h-auto`}
-                            onClick={() =>
-                              setSelected({ categoryIdx: catIdx, itemIdx })
-                            }
+                            onClick={() => handleItemSelection(catIdx, itemIdx)}
                           >
                             <span className="flex items-center gap-2">
                               {category.categoryIcon && (
@@ -687,7 +761,9 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                                   className="w-5 h-5 text-foreground"
                                 />
                               )}
-                              {item.label}
+                              <span className="block whitespace-normal" title={item.label}>
+                                {item.label}
+                              </span>
                               {item.hot && (
                                 <span className="ml-1">
                                   <img
@@ -699,15 +775,13 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                               )}
                             </span>
                             <span
-                              className={`font-bold transition-colors duration-150 ${
-                                selected &&
-                                selected.categoryIdx === catIdx &&
-                                selected.itemIdx === itemIdx
-                                  ? "text-white"
-                                  : "text-foreground"
-                              } group-hover:text-white`}
+                              className={`font-bold font-anekbangla transition-colors duration-150 ${
+                                isItemSelected(catIdx, itemIdx)
+                                  ? "text-foreground"
+                                  : "text-secondary"
+                              }`}
                             >
-                              {item.price}৳
+                              ৳{toBanglaNumber(item.price)}
                             </span>
                           </Button>
                         ))}
@@ -718,351 +792,220 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
               </Card>
             )}
 
-            {/* Quantity, Order Summary, and Proceed Button */}
+            {/* Multiple Items Display and Order Summary */}
             <Card className="mb-8 p-4 bg-background">
-              <div className="flex items-center gap-4 mb-4">
-                <label className="font-pixel text-base text-foreground">
-                  Quantity
-                </label>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    className="w-10 h-10 border-2 border-border rounded-lg flex items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  >
-                    -
-                  </button>
-                  <input
-                    className="w-20 border-2 border-border rounded-lg text-base bg-primary p-2 text-center focus:border-primary focus:outline-none transition-colors"
-                    type="number"
-                    min={1}
-                    value={quantity}
-                    onChange={(e) => setQuantity(Number(e.target.value))}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="w-10 h-10 border-2 border-border rounded-lg flex items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors"
-                    onClick={() => setQuantity(quantity + 1)}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              {/* Order Summary and Proceed Button */}
-              {selected !== null && selectedItem && (
-                <>
-                  <div className="rounded-xl border border-primary/30 px-4 py-3 mb-3 flex items-center justify-between gap-4 shadow-sm">
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <span className="font-pixel text-xl text-foreground font-semibold mt-1">
-                        Total
-                      </span>
-                    </div>
-                    <span className="font-pixel text-2xl text-foreground font-bold whitespace-nowrap flex items-center gap-2">
-                      <span className="block text-base font-normal text-foreground mr-2">
-                        {selectedItem.label} x{quantity}
-                      </span>
-                      <span className="block text-xl font-bold text-foreground">
-                        {totalAmount}
-                        <span className="text-lg font-normal ml-1">৳</span>
-                      </span>
-                    </span>
-                  </div>
+              {selectedItems.length > 0 && (
+                <div className="mb-4">
+                  <span className="font-sans text-lg text-foreground font-medium">
+                    Order Summary
+                  </span>
+                  <div className="space-y-2 max-h-40 mt-2 overflow-y-auto">
+                    {selectedItems.map((selectedItem, index) => {
+                      const item =
+                        priceList[selectedItem.categoryIdx]?.items[
+                          selectedItem.itemIdx
+                        ];
+                      if (!item) return null;
 
-                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-                    <Button
-                      className="w-full font-pixel text-lg mt-2 flex items-center justify-center gap-2"
-                      type="button"
-                      disabled={
-                        !selected ||
-                        (!isSubscription &&
-                          purchaseType === "personal" &&
-                          personalType === "existing" &&
-                          (!email || !password))
-                      }
-                      onClick={() => {
-                        if (!isSignedIn) {
-                          localStorage.setItem(
-                            "aiToolOrderInputs",
-                            JSON.stringify({
-                              selected,
-                              purchaseType,
-                              personalType,
-                              email,
-                              quantity,
-                              pathname: location.pathname,
-                            })
-                          );
-                          navigate(
-                            `/auth/login?redirect=${encodeURIComponent(
-                              location.pathname
-                            )}`
-                          );
-                        } else {
-                          setShowPayment(true);
-                        }
-                      }}
-                    >
-                      {!isSignedIn ? (
-                        <>
-                          <Lock className="w-7 h-7 mr-2" strokeWidth={3} />
-                          <span>Please Login to Continue</span>
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-7 h-7 ml-2" strokeWidth={3} />
-                          Proceed to Payment
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full sm:w-36 font-pixel text-base sm:text-lg flex items-center justify-center gap-2 py-3 sm:py-4"
-                      disabled={selectedItem === null}
-                      onClick={() => {
-                        // TODO: Implement add to cart logic
-                        alert("Added to cart!");
-                      }}
-                    >
-                      Add to Cart
-                    </Button>
-                  </div>
-                </>
-              )}
-            </Card>
-
-            {/* Enhanced Payment Method Selection */}
-            {showPayment && (
-              <div className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden mb-8">
-                {/* Header */}
-                <div className="p-4">
-                  <h3 className="font-pixel text-xl text-foreground tracking-tighter mt-2">
-                    Choose Payment Method
-                  </h3>
-                </div>
-
-                {/* Payment Methods Grid */}
-                <div className=" p-4">
-                  <div className="flex gap-4 mb-8 items-start justify-start">
-                    {paymentMethods.map((method) => (
-                      <Button
-                        key={method.id}
-                        type="button"
-                        variant={
-                          paymentMethod === method.id ? "default" : "outline"
-                        }
-                        className={`font-pixel text-base px-6 py-3 rounded-xl ${
-                          paymentMethod === method.id
-                            ? "bg-primary text-white"
-                            : ""
-                        }`}
-                        onClick={() => setPaymentMethod(method.id)}
-                      >
-                        <img
-                          src={method.icon}
-                          alt={method.name}
-                          className="w-18 h-10 inline-block align-middle"
-                        />
-                      </Button>
-                    ))}
-                  </div>
-
-                  {/* Payment Details */}
-                  {paymentMethod && (
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 ">
-                      {paymentMethods.map((method) => {
-                        if (method.id !== paymentMethod) return null;
-
-                        return (
-                          <div key={method.id} className="space-y-6">
-                            {/* Two Column Layout */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                              {/* Instructions */}
-                              <div className="space-y-4">
-                                <h5 className="font-pixel text-base text-foreground mb-4">
-                                  {method.name} Payment Instructions
-                                </h5>
-
-                                <ol className="space-y-3 text-sm">
-                                  {method.instructions.map(
-                                    (instruction, idx) => (
-                                      <li key={idx} className="flex gap-3">
-                                        <span
-                                          className={`flex-shrink-0 w-6 h-6 bg-gradient-to-br ${method.color} text-white rounded-full flex items-center justify-center text-xs font-bold`}
-                                        >
-                                          {idx + 1}
-                                        </span>
-                                        <span
-                                          className="text-base text-gray-500 font-pixel tracking-tight"
-                                          dangerouslySetInnerHTML={{
-                                            __html: instruction,
-                                          }}
-                                        />
-                                      </li>
-                                    )
-                                  )}
-                                </ol>
-
-                                {/* Form */}
-                                <div className="space-y-4">
-                                  <h6 className="font-pixel text-sm text-foreground">
-                                    Transaction Details
-                                  </h6>
-                                  <div>
-                                    <Input
-                                      placeholder={`Enter your ${method.name} number`}
-                                      value={userAccount}
-                                      onChange={(e) =>
-                                        setUserAccount(e.target.value)
-                                      }
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <Input
-                                      placeholder="Enter Transaction ID (TRX ID)"
-                                      value={trxId}
-                                      onChange={(e) => setTrxId(e.target.value)}
-                                    />
-                                  </div>
-
-                                  <Button
-                                    className={`w-full font-pixel ${
-                                      userAccount && trxId && !isProcessingOrder
-                                        ? `bg-gradient-to-r ${method.color} text-white hover:shadow-lg`
-                                        : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                    }`}
-                                    disabled={
-                                      !userAccount ||
-                                      !trxId ||
-                                      isProcessingOrder
-                                    }
-                                    onClick={handleCompletePayment}
-                                  >
-                                    {isProcessingOrder
-                                      ? "Processing..."
-                                      : "Complete Payment"}
-                                  </Button>
-                                </div>
-                              </div>
-
-                              {/* QR Code and Form */}
-                              <div className="">
-                                {/* Account Details */}
-                                <div className="bg-white rounded-xl p-4 border border-gray-200 mb-8">
-                                  <h6 className="font-pixel text-sm text-foreground mb-3">
-                                    Account Details
-                                  </h6>
-                                  <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-gray-600 text-sm">
-                                        {method.name} Number:
-                                      </span>
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-sans font-semibold text-md">
-                                          {method.account}
-                                        </span>
-                                        <button
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              method.account,
-                                              "account"
-                                            )
-                                          }
-                                          className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                        >
-                                          {copiedText === "account" ? (
-                                            <Check className="w-3 h-3 text-green-500" />
-                                          ) : (
-                                            <Copy className="w-3 h-3 text-gray-500" />
-                                          )}
-                                        </button>
-                                      </div>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-gray-600 text-sm">
-                                        Total:
-                                      </span>
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-2xl font-bold font-anekbangla text-secondary">
-                                          {toBanglaNumber(totalAmount)} BDT
-                                        </span>
-                                        <button
-                                          onClick={() =>
-                                            copyToClipboard(
-                                              totalAmount?.toString() || "",
-                                              "amount"
-                                            )
-                                          }
-                                          className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                        >
-                                          {copiedText === "amount" ? (
-                                            <Check className="w-3 h-3 text-green-500" />
-                                          ) : (
-                                            <Copy className="w-3 h-3 text-gray-500" />
-                                          )}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {/* Apply Coupon Field (Mock) */}
-                                  <div className="mt-4 flex gap-2 items-center">
-                                    <Input
-                                      type="text"
-                                      placeholder="Enter coupon code"
-                                      className="font-pixel"
-                                      // You can add value/onChange if you want to handle state
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className="font-pixel"
-                                      size="sm"
-                                      // onClick={() => {/* mock apply logic */}}
-                                    >
-                                      Apply
-                                    </Button>
-                                  </div>
-                                  <span className="text-xs text-gray-400 mt-1 block">
-                                    Coupon is optional
-                                  </span>
-                                </div>
-                                {/* QR Code */}
-                                {method.qr && (
-                                  <div className="text-center mb-6">
-                                    <img
-                                      src={method.qr}
-                                      alt={`${method.name} QR`}
-                                      className="w-64 h-64 mx-auto rounded-xl"
-                                      onError={(e) => {
-                                        const target =
-                                          e.target as HTMLImageElement;
-                                        target.style.display = "none";
-                                        const fallback =
-                                          target.nextSibling as HTMLElement;
-                                        if (fallback)
-                                          fallback.style.display = "flex";
-                                      }}
-                                    />
-                                    <div className="w-56 h-56 bg-gray-100 rounded-lg items-center justify-center text-gray-400 text-sm hidden">
-                                      <img
-                                        src={method.qr}
-                                        alt={`${method.name} QR`}
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center border justify-between rounded-lg p-2"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium text-gray-900 ml-2 whitespace-normal">
+                                <span className="w-auto" title={item.label}>
+                                  {item.label}
+                                </span>
+                              </span>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
+                              onClick={() =>
+                                updateItemQuantity(
+                                  selectedItem.categoryIdx,
+                                  selectedItem.itemIdx,
+                                  selectedItem.quantity - 1
+                                )
+                              }
+                            >
+                              -
+                            </button>
+                            <span className="w-8 text-center font-medium text-sm">
+                              {selectedItem.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
+                              onClick={() =>
+                                updateItemQuantity(
+                                  selectedItem.categoryIdx,
+                                  selectedItem.itemIdx,
+                                  selectedItem.quantity + 1
+                                )
+                              }
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+              )}
+
+              {selectedItems.length > 0 && (
+                <div className="rounded-xl border bg-muted px-4 py-3 mb-3 shadow-sm">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-pixel text-lg text-foreground font-bold">
+                        Total
+                      </span>
+                      <span className="flex gap-2 font-anekbangla text-2xl text-foreground font-bold">
+                        ৳ {toBanglaNumber(totalAmount)} টাকা
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Delivery Method Selection */}
+              {selectedItems.length > 0 &&
+                isSignedIn &&
+                (() => {
+                  const requiredFieldsFilled =
+                    personalType === "new" || (email && password);
+
+                  if (!requiredFieldsFilled) {
+                    return null; // Don't show delivery methods if required fields are missing
+                  }
+
+                  return (
+                    <div className="mb-4">
+                      <span className="font-sans text-md text-muted-foreground font-medium mb-3 block">
+                        Choose Delivery Method
+                      </span>
+                      <div className="grid grid-cols-2 gap-3">
+                        {availableDeliveryMethods.map((method) => (
+                          <Button
+                            key={method.id}
+                            type="button"
+                            variant={
+                              selectedDeliveryMethod === method.id
+                                ? "default"
+                                : "ghost"
+                            }
+                            className="font-pixel text-sm px-3 py-2 flex items-center justify-center gap-2 w-full sm:w-auto"
+                            onClick={() =>
+                              handleDeliveryMethodSelect(method.id)
+                            }
+                          >
+                            {/* Use public svg icons located in public/assets/icons */}
+                            <img
+                              src={`/assets/icons/${
+                                method.icon || method.id
+                              }.svg`}
+                              alt={method.name}
+                              className="w-5 h-5"
+                            />
+                            <span className="whitespace-nowrap">
+                              {method.name}
+                            </span>
+                          </Button>
+                        ))}
+                      </div>
+                      {selectedDeliveryMethod && (
+                        <div className="mt-4">
+                          <span className="text-sm text-muted-foreground font-medium">
+                            ✓{" "}
+                            {
+                              availableDeliveryMethods.find(
+                                (m) => m.id === selectedDeliveryMethod
+                              )?.name
+                            }{" "}
+                            selected
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+                <Button
+                  type="button"
+                  variant="default"
+                  className="w-full sm:flex-1 font-pixel text-base sm:text-lg flex items-center justify-center gap-2 py-3 sm:py-4"
+                  disabled={
+                    selectedItems.length === 0 ||
+                    (!isSubscription &&
+                      purchaseType === "personal" &&
+                      personalType === "existing" &&
+                      (!email || !password)) ||
+                    (isSignedIn &&
+                      (personalType === "new" || (email && password)) &&
+                      !selectedDeliveryMethod)
+                  }
+                  onClick={() => {
+                    if (!isSignedIn) {
+                      localStorage.setItem(
+                        "aiToolOrderInputs",
+                        JSON.stringify({
+                          selectedItems,
+                          purchaseType,
+                          personalType,
+                          email,
+                          pathname: location.pathname,
+                        })
+                      );
+                      navigate(
+                        `/auth/login?redirect=${encodeURIComponent(
+                          location.pathname
+                        )}`
+                      );
+                    } else {
+                      handleCompletePayment();
+                    }
+                  }}
+                >
+                  {!isSignedIn ? (
+                    <>
+                      <Lock
+                        className="w-6 h-6 sm:w-7 sm:h-7 mr-2"
+                        strokeWidth={3}
+                      />
+                      Please Login to Continue
+                    </>
+                  ) : (
+                    <>
+                      <Send
+                        className="w-6 h-6 sm:w-7 sm:h-7 ml-2"
+                        strokeWidth={3}
+                      />
+                      Proceed to Checkout
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-44 font-pixel text-base sm:text-lg flex items-center justify-center"
+                  disabled={selectedItems.length === 0}
+                  onClick={() => {
+                    alert("Added to cart!");
+                  }}
+                >
+                  <ShoppingCart02Icon className="w-6 h-6 sm:w-7 sm:h-7" />
+                  Add to Cart
+                </Button>
               </div>
-            )}
+            </Card>
 
             {/* Info Section */}
             {infoSections.map((section, i) => (
@@ -1090,6 +1033,172 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
         </div>
       </main>
 
+      {/* Delivery Confirmation Modal */}
+      <Dialog
+        open={showDeliveryModal}
+        onOpenChange={(open) => {
+          setShowDeliveryModal(open);
+          if (!open) setIsEditingDelivery(false);
+        }}
+      >
+        <DialogContent className="max-w-md w-full">
+          <DialogHeader>
+            <DialogTitle className="font-pixel text-xl text-foreground mb-2 text-center">
+              Confirm{" "}
+              {selectedDeliveryMethod === "email" ? "Email" : "WhatsApp"}{" "}
+              Delivery
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedDeliveryMethod === "email" ? (
+            <div>
+              <p className="text-gray-600 mb-4">
+                We'll send your order details to this email address:
+              </p>
+              <div className="space-y-3">
+                {isEditingDelivery ? (
+                  <div className="space-y-2">
+                    <input
+                      type="email"
+                      className="w-full border bg-background rounded-lg px-3 py-2"
+                      placeholder="Enter new email"
+                      value={deliveryEmail}
+                      onChange={(e) => setDeliveryEmail(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1 font-pixel"
+                        onClick={() => setIsEditingDelivery(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={() => {
+                          confirmDeliveryDetails();
+                          setIsEditingDelivery(false);
+                        }}
+                        disabled={!deliveryEmail}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="p-3 bg-gray-50 rounded-lg border">
+                      <span className="font-medium text-foreground">
+                        {deliveryEmail}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={confirmDeliveryDetails}
+                      >
+                        Confirm Email
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="font-pixel"
+                        onClick={() => setIsEditingDelivery(true)}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-gray-600 mb-4">
+                We'll send your order details to this WhatsApp number:
+              </p>
+              <div className="space-y-3">
+                {isEditingDelivery ? (
+                  <div className="space-y-2">
+                    <input
+                      type="tel"
+                      className="w-full bg-background border rounded-lg px-3 py-2"
+                      placeholder="Enter WhatsApp number"
+                      value={deliveryPhone}
+                      onChange={(e) => setDeliveryPhone(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1 font-pixel"
+                        onClick={() => setIsEditingDelivery(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={() => {
+                          confirmDeliveryDetails();
+                          setIsEditingDelivery(false);
+                        }}
+                        disabled={!deliveryPhone}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {deliveryPhone ? (
+                      <div className="p-3 bg-gray-50 rounded-lg border">
+                        <span className="font-medium text-foreground">
+                          {deliveryPhone}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <span className="text-yellow-700">
+                          No phone number found. Add new ?
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1 font-pixel"
+                        onClick={confirmDeliveryDetails}
+                        disabled={!deliveryPhone}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="font-pixel"
+                        onClick={() => setIsEditingDelivery(true)}
+                      >
+                        {deliveryPhone ? "Change" : "Add"}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="mt-4" />
+        </DialogContent>
+      </Dialog>
+
       {/* Order Status Modal */}
       <OrderStatusModal
         isOpen={orderModal.isOpen}
@@ -1105,9 +1214,10 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
         onRetry={() => {
           setOrderModal({ ...orderModal, isOpen: false });
           // Reset form to allow retry
-          setPaymentMethod(null);
-          setUserAccount("");
-          setTrxId("");
+          setSelectedItems([]);
+          setSelectedDeliveryMethod("");
+          setDeliveryEmail("");
+          setDeliveryPhone("");
         }}
       />
     </div>

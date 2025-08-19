@@ -182,6 +182,57 @@ const Orders = () => {
     return `${Math.floor(diffInMinutes / 1440)} day(s) ago`;
   };
 
+  // Parse deliveryInfo field which may be a compact JSON string or plain text
+  const parseDeliveryInfo = (deliveryInfo: any) => {
+    if (!deliveryInfo) return { method: null, contact: null, deliveredAt: null, deliveryStatus: null, raw: null };
+    let raw = deliveryInfo;
+    try {
+      if (typeof deliveryInfo === 'string') {
+        const maybe = deliveryInfo.trim();
+        if ((maybe.startsWith('{') && maybe.endsWith('}')) || (maybe.startsWith('[') && maybe.endsWith(']'))) {
+          const obj = JSON.parse(maybe);
+          return {
+            method: obj.method || null,
+            contact: obj.contact || obj.phone || obj.email || null,
+            deliveredAt: obj.deliveredAt || obj.delivered_at || null,
+            deliveryStatus: obj.deliveryStatus || obj.delivery_status || obj.deliveryStatus || null,
+            raw: maybe,
+          };
+        }
+        // fallback: treat as plain contact string
+        return { method: null, contact: maybe, deliveredAt: null, deliveryStatus: null, raw: maybe };
+      }
+      if (typeof deliveryInfo === 'object') {
+        return {
+          method: deliveryInfo.method || null,
+          contact: deliveryInfo.contact || deliveryInfo.phone || deliveryInfo.email || null,
+          deliveredAt: deliveryInfo.deliveredAt || deliveryInfo.delivered_at || null,
+          deliveryStatus: deliveryInfo.deliveryStatus || deliveryInfo.delivery_status || null,
+          raw: JSON.stringify(deliveryInfo),
+        };
+      }
+    } catch (err) {
+      console.warn('Failed to parse deliveryInfo', err, deliveryInfo);
+      return { method: null, contact: String(deliveryInfo), deliveredAt: null, deliveryStatus: null, raw: String(deliveryInfo) };
+    }
+    return { method: null, contact: String(deliveryInfo), deliveredAt: null, deliveryStatus: null, raw: String(deliveryInfo) };
+  };
+
+  // Format delivery contact for display (Bangladesh numbers get +880 prefix if local)
+  const formatDeliveryContact = (contact: any) => {
+    if (!contact) return '';
+    const s = String(contact).replace(/[^0-9+]/g, '');
+    if (s.startsWith('+')) return s;
+    if (s.startsWith('00')) return '+' + s.slice(2);
+    if (s.startsWith('0') && s.length >= 10) {
+      // local BD number like 01630582639 -> +8801630582639
+      return '+88' + s.slice(1);
+    }
+    if (s.startsWith('880')) return '+' + s;
+    // fallback: add + if looks international length
+    return s.length >= 10 ? '+' + s : s;
+  };
+
   // Status badge with improved styling
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig = {
@@ -512,13 +563,14 @@ const Orders = () => {
                     className="rounded border-gray-300 text-foreground focus:ring-primary"
                   />
                 </th>
+                <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Product</th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Order ID</th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Customer</th>
-                <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Product</th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Amount</th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Payment</th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Status</th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Date</th>
+                <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Delivery</th>
                 <th className="px-4 py-3 font-pixel text-xs text-gray-600 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
@@ -549,15 +601,8 @@ const Orders = () => {
                         className="rounded border-gray-300 text-foreground focus:ring-primary"
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="font-mono text-foreground font-bold text-sm">{order.orderID}</div>
-                      <div className="text-xs text-gray-500">#{(order.$id || order.id || "").slice(-8).toUpperCase()}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">{order.userName}</div>
-                      <div className="text-sm text-gray-500">{order.userEmail}</div>
-                    </td>
-                    <td className="px-4 py-3">
+
+                      <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                           <img
@@ -572,10 +617,17 @@ const Orders = () => {
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">{order.productName}</div>
-                          <div className="text-sm text-gray-500">{order.productType}</div>
                           <div className="text-xs text-gray-400">{order.itemLabel} × {order.quantity}</div>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="font-mono text-foreground font-bold text-sm">{order.orderID}</div>
+                      <div className="text-xs text-gray-500">#{(order.$id || order.id || "").slice(-8).toUpperCase()}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-gray-900">{order.userName}</div>
+                      <div className="text-sm text-gray-500">{order.userEmail}</div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-bold text-foreground font-pixel">{order.totalAmount}৳</div>
@@ -591,6 +643,17 @@ const Orders = () => {
                     <td className="px-4 py-3">
                       <div className="text-sm text-gray-900">{new Date(order.createdAt).toLocaleDateString()}</div>
                       <div className="text-xs text-gray-500">{timeAgo(order.createdAt)}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const info = parseDeliveryInfo(order.deliveryInfo);
+                        return (
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">{info.method ? info.method.toUpperCase() : '—'}</span>
+                            <span className="text-xs text-gray-500">{info.contact || 'No contact'}</span>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
@@ -758,14 +821,20 @@ const Orders = () => {
                     </div>
                   </div>
 
-                  {viewOrder.deliveryInfo && (
-                    <div>
-                      <span className="font-pixel text-xs text-muted-foreground">Delivery Information:</span>
-                      <div className="text-sm text-foreground bg-muted p-3 rounded-lg mt-1">
-                        {viewOrder.deliveryInfo}
+                  {viewOrder.deliveryInfo && (() => {
+                    const info = parseDeliveryInfo(viewOrder.deliveryInfo);
+                    return (
+                      <div>
+                        <span className="font-sans text-xs text-muted-foreground">Delivery Information:</span>
+                        <div className="text-sm text-foreground bg-muted p-3 rounded-lg mt-1 flex items-center justify-between">
+                          <div>
+                            <div><strong>Method:</strong> {info.method ? info.method.toUpperCase() : '—'}</div>
+                            <div><strong>Contact:</strong> {info.contact ? formatDeliveryContact(info.contact) : '—'}</div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
