@@ -18,6 +18,8 @@ import {
 import { account } from "@/lib/appwrite";
 import { getUserOrders } from "@/lib/orders";
 import MobileMenu from "../custom/MobileMenu";
+import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 
 // Types
 interface DropdownItem {
@@ -342,6 +344,8 @@ const Header = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+  const { count } = useCart();
+  const navigate = useNavigate();
 
   const location = { pathname: "/" };
 
@@ -434,17 +438,22 @@ const Header = () => {
             {/* Right Actions */}
             <div className="flex items-center gap-4">
 
-              {/* Cart Button - Changed from xl:inline-flex to lg:inline-flex */}
-              <Button
-                variant="default"
-                size="icon"
-                className="relative p-1 h-9 w-9 min-w-0 hidden lg:inline-flex"
-              >
-                <ShoppingCart02Icon className="w-4 h-4 text-secondary" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-[10px] font-medium text-primary-foreground rounded-full flex items-center justify-center">
-                  0
-                </span>
-              </Button>
+                {/* Cart Button - Changed from xl:inline-flex to lg:inline-flex */}
+                <div>
+                  <Button
+                    variant="default"
+                    size="icon"
+                    onClick={() => navigate('/cart')}
+                    className="relative p-1 h-9 w-9 min-w-0 hidden lg:inline-flex"
+                  >
+                    <ShoppingCart02Icon className="w-4 h-4 text-secondary" />
+                    {count > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-[10px] font-medium text-primary-foreground rounded-full flex items-center justify-center">
+                        {count > 9 ? "9+" : count}
+                      </span>
+                    )}
+                  </Button>
+                </div>
 
               {/* Authentication Section */}
               {loading ? (

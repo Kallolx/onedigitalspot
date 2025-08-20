@@ -2,20 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ServiceCard from "@/components/custom/ServiceCard";
 import OrderStatusModal from "@/components/custom/OrderStatusModal";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import React, { useState, useEffect, useRef } from "react";
 import { Info, X } from "lucide-react";
 import { LockKeyIcon, SentIcon, ShoppingCart02Icon } from "hugeicons-react";
+import { useCart } from "@/contexts/CartContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RotateLoader } from "react-spinners";
-import { getCurrentUser, OrderData } from "../../lib/orders";
-import { account } from "../../lib/appwrite";
 
 interface PriceItem {
   label: string;
@@ -57,6 +49,7 @@ interface GameDetailsLayoutProps {
   setSelectedItems?: (v: SelectedItem[]) => void;
   onSubmit?: (e: React.FormEvent) => void;
   infoImage?: string;
+  playerIdLabel?: string; // Custom label for player ID field (e.g., "UUID" for Genshin Impact)
 }
 
 const GameDetailsLayout: React.FC<
@@ -79,6 +72,7 @@ const GameDetailsLayout: React.FC<
   onSubmit,
   infoImage,
   isSignedIn = false, // default to false if not provided
+  playerIdLabel = "Player ID", // default label
 }) => {
   const [showInfo, setShowInfo] = useState<null | "player" | "zone" | "uuid">(
     null
@@ -96,42 +90,10 @@ const GameDetailsLayout: React.FC<
     status: "success",
   });
 
-  // Delivery method states
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
-    string | null
-  >(null);
-  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
-  const [deliveryEmail, setDeliveryEmail] = useState("");
-  const [deliveryPhone, setDeliveryPhone] = useState("");
-  // country code and local part for input UI; default to Bangladesh +88
-  const [countryCode, setCountryCode] = useState("+88");
-  const [phoneLocal, setPhoneLocal] = useState("");
-  const [isEditingDelivery, setIsEditingDelivery] = useState(false);
-  const [availableDeliveryMethods, setAvailableDeliveryMethods] = useState<
-    any[]
-  >([]);
-
   const imgRef = useRef<HTMLImageElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Fetch available delivery methods
-  const fetchDeliveryMethods = async () => {
-    try {
-      const response = await fetch("/api/delivery/methods");
-      const data = await response.json();
-      if (data.success) {
-        setAvailableDeliveryMethods(data.methods);
-      }
-    } catch (error) {
-      console.error("Failed to fetch delivery methods:", error);
-      // Fallback to default methods if API fails
-      setAvailableDeliveryMethods([
-        { id: "email", name: "Email", icon: "email", active: true },
-        { id: "whatsapp", name: "WhatsApp", icon: "whatsapp", active: true },
-      ]);
-    }
-  };
+  const { addItem, setOpen } = useCart();
 
   // Calculate total amount from all selected items
   const totalAmount = selectedItems.reduce((total, item) => {
@@ -154,74 +116,6 @@ const GameDetailsLayout: React.FC<
       .split("")
       .map((c) => (en.includes(c) ? bn[en.indexOf(c)] : c))
       .join("");
-  };
-
-  // Handle delivery method selection
-  const handleDeliveryMethodSelect = async (methodId: string) => {
-    const user = await getCurrentUser();
-
-    if (methodId === "email") {
-      setDeliveryEmail(user.email || "");
-      setSelectedDeliveryMethod(methodId);
-      setShowDeliveryModal(true);
-    } else if (methodId === "whatsapp") {
-      // Read phone from account prefs (Appwrite account) or fallback to user.phone
-      try {
-        const full = (user?.prefs && user.prefs.phone) || user.phone || "";
-        // Parse into country code and local part for the UI
-        if (full && full.startsWith("+")) {
-          const match = full.match(/^\+(\d{1,3})(\d*)$/);
-          if (match) {
-            setCountryCode("+" + match[1]);
-            setPhoneLocal(match[2] || "");
-          } else {
-            setCountryCode("+88");
-            setPhoneLocal(full.replace(/[^0-9]/g, ""));
-          }
-        } else if (full && full.startsWith("00")) {
-          // convert 00xxxx to +xxxx
-          const converted = "+" + full.slice(2).replace(/[^0-9]/g, "");
-          const match = converted.match(/^\+(\d{1,3})(\d*)$/);
-          if (match) {
-            setCountryCode("+" + match[1]);
-            setPhoneLocal(match[2] || "");
-          } else {
-            setCountryCode("+88");
-            setPhoneLocal(converted.replace(/[^0-9]/g, ""));
-          }
-        } else {
-          // assume local BD number if plain digits
-          setCountryCode("+88");
-          setPhoneLocal(full.replace(/[^0-9]/g, ""));
-        }
-        setDeliveryPhone(full);
-      } catch (error) {
-        setDeliveryPhone("");
-      }
-      setSelectedDeliveryMethod(methodId);
-      setShowDeliveryModal(true);
-    } else {
-      // For other delivery methods, just select them directly for now
-      setSelectedDeliveryMethod(methodId);
-    }
-  };
-
-  // Confirm delivery details
-  const confirmDeliveryDetails = async () => {
-    if (selectedDeliveryMethod === "whatsapp" && deliveryPhone) {
-      // Save phone number exactly as user entered it for WhatsApp messaging
-      try {
-        const user = await getCurrentUser();
-        // Save the phone exactly as entered - no normalization
-        setDeliveryPhone(deliveryPhone);
-        const prefs = { ...(user?.prefs || {}), phone: deliveryPhone };
-        await (account as any).updatePrefs(prefs);
-      } catch (error) {
-        console.warn("Could not save phone number to account prefs:", error);
-      }
-    }
-    setShowDeliveryModal(false);
-    setIsEditingDelivery(false);
   };
 
   // Helper functions for multiple selection
@@ -294,8 +188,7 @@ const GameDetailsLayout: React.FC<
 
   // Always scroll to top when this layout mounts
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    fetchDeliveryMethods();
+    window.scrollTo({ top: 10, left: 0, behavior: "auto" });
   }, []);
 
   useEffect(() => {
@@ -463,13 +356,13 @@ const GameDetailsLayout: React.FC<
                             className="block bg-background font-pixel text-base text-foreground mb-1"
                             htmlFor="playerId"
                           >
-                            Player ID <span className="text-red-500">*</span>
+                            {playerIdLabel} <span className="text-red-500">*</span>
                           </label>
                           <div className="relative flex items-center">
                             <input
                               id="playerId"
                               className="input w-full border rounded-lg px-4 py-3 text-base bg-background focus:border-primary focus:ring-2 focus:ring-primary transition"
-                              placeholder="Enter your Player ID"
+                              placeholder={`Enter your ${playerIdLabel}`}
                               value={playerId || ""}
                               onChange={(e) =>
                                 setPlayerId && setPlayerId(e.target.value)
@@ -480,7 +373,7 @@ const GameDetailsLayout: React.FC<
                               type="button"
                               className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground hover:text-blue-600 focus:outline-none"
                               tabIndex={-1}
-                              aria-label="Where to find Player ID"
+                              aria-label={`Where to find ${playerIdLabel}`}
                               onClick={() => setShowInfo("player")}
                             >
                               <Info className="w-5 h-5" />
@@ -572,7 +465,7 @@ const GameDetailsLayout: React.FC<
                       </button>
                       <h3 className="font-pixel text-lg text-foreground mb-2 text-center">
                         Where to find{" "}
-                        {showInfo === "player" ? "Player ID" : "Zone ID"}?
+                        {showInfo === "player" ? playerIdLabel : showInfo === "zone" ? "Zone ID" : "UUID"}?
                       </h3>
                       {infoImage && (
                         <img
@@ -667,70 +560,6 @@ const GameDetailsLayout: React.FC<
                   </div>
                 )}
 
-                {/* Delivery Method Selection */}
-                {selectedItems.length > 0 &&
-                  isSignedIn &&
-                  (() => {
-                    const requiredFieldsFilled =
-                      (typeof playerId === "undefined" || playerId) &&
-                      (typeof zoneId === "undefined" || zoneId) &&
-                      (typeof uuid === "undefined" || uuid);
-
-                    if (!requiredFieldsFilled) {
-                      return null; // Don't show delivery methods if required fields are missing
-                    }
-
-                    return (
-                      <div className="mb-4">
-                        <span className="font-pixel text-lg text-foreground font-semibold mb-3 block">
-                          Choose Delivery Method
-                        </span>
-                        <div className="grid grid-cols-2 gap-3">
-                          {availableDeliveryMethods.map((method) => (
-                            <Button
-                              key={method.id}
-                              type="button"
-                              variant={
-                                selectedDeliveryMethod === method.id
-                                  ? "default"
-                                  : "ghost"
-                              }
-                              className="font-pixel text-sm px-3 py-2 flex items-center justify-center gap-2 w-full sm:w-auto"
-                              onClick={() =>
-                                handleDeliveryMethodSelect(method.id)
-                              }
-                            >
-                              {/* Use public svg icons located in public/assets/icons */}
-                              <img
-                                src={`/assets/icons/${
-                                  method.icon || method.id
-                                }.svg`}
-                                alt={method.name}
-                                className="w-5 h-5"
-                              />
-                              <span className="whitespace-nowrap">
-                                {method.name}
-                              </span>
-                            </Button>
-                          ))}
-                        </div>
-                        {selectedDeliveryMethod && (
-                          <div className="mt-4">
-                            <span className="text-sm text-green-700 font-medium">
-                              ✓{" "}
-                              {
-                                availableDeliveryMethods.find(
-                                  (m) => m.id === selectedDeliveryMethod
-                                )?.name
-                              }{" "}
-                              selected
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                   <Button
@@ -740,13 +569,7 @@ const GameDetailsLayout: React.FC<
                     disabled={
                       selectedItems.length === 0 ||
                       (typeof playerId !== "undefined" && !playerId) ||
-                      (typeof zoneId !== "undefined" && !zoneId) ||
-                      (typeof uuid !== "undefined" && !uuid) ||
-                      (isSignedIn &&
-                        (typeof playerId === "undefined" || playerId) &&
-                        (typeof zoneId === "undefined" || zoneId) &&
-                        (typeof uuid === "undefined" || uuid) &&
-                        !selectedDeliveryMethod)
+                      (typeof zoneId !== "undefined" && !zoneId)
                     }
                     onClick={() => {
                       if (!isSignedIn) {
@@ -790,23 +613,9 @@ const GameDetailsLayout: React.FC<
 
                         const checkoutData = {
                           items: checkoutItems,
-                          deliveryInfo: selectedDeliveryMethod
-                            ? {
-                                method: selectedDeliveryMethod,
-                                email:
-                                  selectedDeliveryMethod === "email"
-                                    ? deliveryEmail
-                                    : undefined,
-                                phone:
-                                  selectedDeliveryMethod === "whatsapp"
-                                    ? deliveryPhone
-                                    : undefined,
-                              }
-                            : undefined,
                           gameInfo: {
                             playerId,
                             zoneId,
-                            uuid,
                           },
                           productDetails: {
                             name: title,
@@ -842,10 +651,31 @@ const GameDetailsLayout: React.FC<
                     type="button"
                     variant="outline"
                     className="w-full sm:w-44 font-pixel text-base sm:text-lg flex items-center justify-center"
-                    disabled={selectedItems.length === 0}
-                    onClick={() => {
-                      alert("Added to cart!");
-                    }}
+                    disabled={
+                      selectedItems.length === 0 ||
+                      (typeof playerId !== "undefined" && !playerId) ||
+                      (typeof zoneId !== "undefined" && !zoneId)
+                    }
+                      onClick={() => {
+                        // convert selectedItems to cart items with game info
+                        selectedItems.forEach((si) => {
+                          const item = priceList[si.categoryIdx]?.items[si.itemIdx];
+                          if (!item) return;
+                          addItem({
+                            productName: title,
+                            productImage: image,
+                            label: item.label,
+                            price: typeof item.price === "number" ? item.price : 0,
+                            quantity: si.quantity,
+                            productType: "Games",
+                            gameInfo: {
+                              playerId,
+                              zoneId,
+                            },
+                          });
+                        });
+                        setOpen(true);
+                      }}
                   >
                     <ShoppingCart02Icon className="w-6 h-6 sm:w-7 sm:h-7" />
                     Add to Cart
@@ -880,182 +710,12 @@ const GameDetailsLayout: React.FC<
         </div>
       </main>
 
-      {/* Delivery Confirmation Modal */}
-      <Dialog
-        open={showDeliveryModal}
-        onOpenChange={(open) => {
-          setShowDeliveryModal(open);
-          if (!open) setIsEditingDelivery(false);
-        }}
-      >
-        <DialogContent className="max-w-md w-full">
-          <DialogHeader>
-            <DialogTitle className="font-pixel text-xl text-foreground mb-2 text-center">
-              Confirm{" "}
-              {selectedDeliveryMethod === "email" ? "Email" : "WhatsApp"}{" "}
-              Delivery
-            </DialogTitle>
-          </DialogHeader>
-
-          {selectedDeliveryMethod === "email" ? (
-            <div>
-              <p className="text-gray-600 mb-4">
-                We'll send your order details and activation codes to this email
-                address:
-              </p>
-              <div className="space-y-3">
-                {isEditingDelivery ? (
-                  <div className="space-y-2">
-                    <input
-                      type="email"
-                      className="w-full border bg-background rounded-lg px-3 py-2"
-                      placeholder="Enter new email"
-                      value={deliveryEmail}
-                      onChange={(e) => setDeliveryEmail(e.target.value)}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex-1 font-pixel"
-                        onClick={() => setIsEditingDelivery(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="default"
-                        className="flex-1 font-pixel"
-                        onClick={() => {
-                          confirmDeliveryDetails();
-                          setIsEditingDelivery(false);
-                        }}
-                        disabled={!deliveryEmail}
-                      >
-                        Update
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="p-3 bg-gray-50 rounded-lg border">
-                      <span className="font-medium text-foreground">
-                        {deliveryEmail}
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="default"
-                        className="flex-1 font-pixel"
-                        onClick={confirmDeliveryDetails}
-                      >
-                        Confirm Email
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="font-pixel"
-                        onClick={() => setIsEditingDelivery(true)}
-                      >
-                        Change
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div>
-              <p className="text-gray-600 mb-4">
-                We'll send your order details and activation codes to this
-                WhatsApp number:
-              </p>
-              <div className="space-y-3">
-                {isEditingDelivery ? (
-                  <div className="space-y-2">
-                    <input
-                      type="tel"
-                      className="w-full bg-background border rounded-lg px-3 py-2"
-                      placeholder="Enter WhatsApp number"
-                      value={deliveryPhone}
-                      onChange={(e) => setDeliveryPhone(e.target.value)}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex-1 font-pixel"
-                        onClick={() => setIsEditingDelivery(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="default"
-                        className="flex-1 font-pixel"
-                        onClick={() => {
-                          confirmDeliveryDetails();
-                          setIsEditingDelivery(false);
-                        }}
-                        disabled={!deliveryPhone}
-                      >
-                        Update
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {deliveryPhone ? (
-                      <div className="p-3 bg-gray-50 rounded-lg border">
-                        <span className="font-medium text-foreground">
-                          {deliveryPhone}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <span className="text-yellow-700">
-                          No phone number found. Please add your WhatsApp
-                          number.
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="default"
-                        className="flex-1 font-pixel"
-                        onClick={confirmDeliveryDetails}
-                        disabled={!deliveryPhone}
-                      >
-                        Confirm
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="font-pixel"
-                        onClick={() => setIsEditingDelivery(true)}
-                      >
-                        {deliveryPhone ? "Change" : "Add"}
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="mt-4" />
-        </DialogContent>
-      </Dialog>
 
       {/* Order Status Modal */}
       <OrderStatusModal
         isOpen={orderModal.isOpen}
         onClose={() => setOrderModal({ ...orderModal, isOpen: false })}
         status={orderModal.status}
-        title={orderModal.title}
-        message={orderModal.message}
         orderData={orderModal.orderData}
         onViewOrders={() => {
           setOrderModal({ ...orderModal, isOpen: false });

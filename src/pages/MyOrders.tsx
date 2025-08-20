@@ -947,7 +947,7 @@ const MyOrders = () => {
                     </div>
 
                     {/* Game Details / Player ID */}
-                    {(order.playerId || order.zoneId) && (
+                    {(order.playerId || order.zoneId || order.uuid) && (
                       <div className="mt-3 text-sm text-gray-700">
                         {order.playerId && (
                           <p>
@@ -959,6 +959,12 @@ const MyOrders = () => {
                           <p>
                             <span className="font-medium">Zone ID:</span>{" "}
                             {order.zoneId}
+                          </p>
+                        )}
+                        {order.uuid && (
+                          <p>
+                            <span className="font-medium">UID:</span>{" "}
+                            {order.uuid}
                           </p>
                         )}
                       </div>
@@ -1208,7 +1214,7 @@ const MyOrders = () => {
                 </div>
 
                 {/* Game Details (if applicable) */}
-                {(selectedOrder.playerId || selectedOrder.zoneId) && (
+                {(selectedOrder.playerId || selectedOrder.zoneId || selectedOrder.uuid) && (
                   <div>
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">
                       Game Account
@@ -1227,6 +1233,14 @@ const MyOrders = () => {
                           <span className="text-gray-600">Zone ID:</span>
                           <code className="text-md bg-secondary text-primary font-bold px-1 rounded">
                             {selectedOrder.zoneId}
+                          </code>
+                        </div>
+                      )}
+                      {selectedOrder.uuid && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">UID:</span>
+                          <code className="text-md bg-secondary text-primary font-bold px-1 rounded">
+                            {selectedOrder.uuid}
                           </code>
                         </div>
                       )}

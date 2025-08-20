@@ -106,6 +106,7 @@ import TinderPlus from "./Products/design/Tinder";
 import Bumble from "./Products/design/Bumble";
 import TelegramStars from "./Products/design/Telegram";
 import Checkout from "./pages/Checkout";
+import CartPage from "./pages/Cart";
 
 const queryClient = new QueryClient();
 
@@ -130,6 +131,7 @@ const App = () => {
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/cart" element={<CartPage />} />
               <Route path="/my-orders" element={<MyOrders />} />
               <Route path="/my-profile" element={<MyProfile />} />
               <Route path="/email-test" element={<EmailTest />} />

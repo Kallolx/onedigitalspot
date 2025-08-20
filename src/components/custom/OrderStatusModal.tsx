@@ -1,7 +1,21 @@
 import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import { CheckCircleIcon, XCircleIcon, ArrowRightIcon, RefreshCwIcon, XIcon } from "lucide-react";
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  ArrowRightIcon,
+  RefreshCwIcon,
+  XIcon,
+} from "lucide-react";
 
 interface OrderStatusModalProps {
   isOpen: boolean;
@@ -29,29 +43,21 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
   onViewOrders,
   onRetry,
 }) => {
-  if (!isOpen) return null;
-
   const isSuccess = status === "success";
 
-  const defaultTitle = isSuccess ? "Order Placed Successfully!" : "Order Failed";
+  const defaultTitle = isSuccess
+    ? "Order Placed Successfully!"
+    : "Order Failed";
   const defaultMessage = isSuccess
     ? "Your order has been successfully placed and is being processed."
     : "There was an issue processing your order. Please try again.";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <Card className="w-full max-w-md bg-background rounded-2xl shadow-retro border-2 border-primary/20 overflow-hidden">
-      {/* Close Icon */}
-          <button
-            onClick={onClose}
-            className="absolute top-10 right-10 text-secondary hover:text-gray-700 transition-colors"
-            aria-label="Close"
-          >
-            <XIcon className="w-6 h-6" />
-          </button>
-        <div className="p-8 text-center">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden">
+        <DialogHeader className="relative p-6">
           {/* Icon */}
-          <div className="mb-6">
+          <div className="mb-6 mt-4">
             <div
               className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${
                 isSuccess
@@ -68,101 +74,97 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-gray-900 font-pixel mb-2">
+          <DialogTitle className="text-2xl font-bold text-center mb-2 font-pixel">
             {title || defaultTitle}
-          </h2>
+          </DialogTitle>
 
           {/* Message */}
-          <p className="text-gray-600 mb-6 leading-relaxed">
+          <DialogDescription className="text-center text-gray-600 mb-6 leading-relaxed">
             {message || defaultMessage}
-          </p>
+          </DialogDescription>
+        </DialogHeader>
 
-          {/* Order Details (Success only) */}
-          {isSuccess && orderData && (
-            <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
-              <h3 className="font-pixel text-sm text-secondary mb-3 uppercase tracking-wide">
-                Order Details
-              </h3>
-              <div className="space-y-2 text-sm">
-                {orderData.orderId && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Order ID:</span>
-                    <span className="font-mono font-medium">
-                      {orderData.orderId}
-                    </span>
-                  </div>
-                )}
-                {orderData.productName && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Product:</span>
-                    <span className="font-medium">{orderData.productName}</span>
-                  </div>
-                )}
-                {orderData.amount && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Amount:</span>
-                    <span className="font-bold text-secondary font-pixel">
-                      {orderData.amount}৳
-                    </span>
-                  </div>
-                )}
-                {orderData.transactionId && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Transaction ID:</span>
-                    <span className="font-mono text-xs">
-                      {orderData.transactionId}
-                    </span>
-                  </div>
-                )}
-              </div>
+        {/* Order Details (Success only) */}
+        {isSuccess && orderData && (
+          <div className="bg-gray-50 rounded-xl p-4 mx-6 mb-6 text-left">
+            <h3 className="font-pixel text-sm text-secondary mb-3 uppercase tracking-wide">
+              Order Details
+            </h3>
+            <div className="space-y-2 text-sm">
+              {orderData.orderId && (
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Order ID:</span>
+                  <span className="font-mono font-medium">
+                    {orderData.orderId}
+                  </span>
+                </div>
+              )}
+              {orderData.productName && (
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Product:</span>
+                  <span className="font-medium">{orderData.productName}</span>
+                </div>
+              )}
+              {orderData.amount && (
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Amount:</span>
+                  <span className="font-bold text-secondary font-pixel">
+                    {orderData.amount}৳
+                  </span>
+                </div>
+              )}
+              {orderData.transactionId && (
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Transaction ID:</span>
+                  <span className="font-mono text-xs">
+                    {orderData.transactionId}
+                  </span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-3">
-            {isSuccess ? (
-              <>
-                {onViewOrders && (
-                  <Button
-                    onClick={onViewOrders}
-                    className="w-full font-pixel flex items-center justify-center gap-2"
-                  >
-                    View My Orders
-                    <ArrowRightIcon className="w-4 h-4" />
-                  </Button>
-                )}
+        {/* Action Buttons */}
+        <DialogFooter className="flex flex-col gap-3 px-6 pb-6">
+          {isSuccess ? (
+            <>
+              {onViewOrders && (
                 <Button
-                  variant="outline"
-                  onClick={onClose}
-                  className="w-full font-pixel"
+                  onClick={onViewOrders}
+                  className="w-full font-pixel flex items-center justify-center gap-2"
                 >
+                  View My Orders
+                  <ArrowRightIcon className="w-4 h-4" />
+                </Button>
+              )}
+              <DialogClose asChild>
+                <Button variant="outline" className="w-full font-pixel">
                   Continue Shopping
                 </Button>
-              </>
-            ) : (
-              <>
-                {onRetry && (
-                  <Button
-                    onClick={onRetry}
-                    className="w-full font-pixel flex items-center justify-center gap-2"
-                  >
-                    <RefreshCwIcon className="w-4 h-4" />
-                    Try Again
-                  </Button>
-                )}
+              </DialogClose>
+            </>
+          ) : (
+            <>
+              {onRetry && (
                 <Button
-                  variant="outline"
-                  onClick={onClose}
-                  className="w-full font-pixel"
+                  onClick={onRetry}
+                  className="w-full font-pixel flex items-center justify-center gap-2"
                 >
+                  <RefreshCwIcon className="w-4 h-4" />
+                  Try Again
+                </Button>
+              )}
+              <DialogClose asChild>
+                <Button variant="outline" className="w-full font-pixel">
                   Close
                 </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </Card>
-    </div>
+              </DialogClose>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

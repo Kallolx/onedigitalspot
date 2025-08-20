@@ -22,6 +22,8 @@ import {
   Star,
 } from "lucide-react";
 import { createOrder, getCurrentUser, OrderData } from "@/lib/orders";
+import { account } from "@/lib/appwrite";
+import { useCart } from "@/contexts/CartContext";
 import OrderStatusModal from "@/components/custom/OrderStatusModal";
 import {
   Dialog,
@@ -30,6 +32,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { ReloadIcon } from "hugeicons-react";
+import Footer from "@/components/landing/Footer";
 
 interface CheckoutItem {
   categoryIdx: number;
@@ -61,6 +65,7 @@ interface CheckoutData {
     image: string;
     type: string;
   };
+  isCartCheckout?: boolean; // Flag to indicate if checkout came from cart
 }
 
 const Checkout: React.FC = () => {
@@ -70,6 +75,8 @@ const Checkout: React.FC = () => {
 
   // Get checkout data from navigation state or localStorage
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
+  const [isCartCheckout, setIsCartCheckout] = useState(false); // Track if checkout came from cart
+  const { items: cartItems, clear: clearCart, setOpen: setCartOpen } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<
     "bkash" | "nagad" | "Rocket" | null
   >(null);
@@ -81,9 +88,18 @@ const Checkout: React.FC = () => {
   const [deliveryEmail, setDeliveryEmail] = useState("");
   const [deliveryPhone, setDeliveryPhone] = useState("");
   const [isEditingDelivery, setIsEditingDelivery] = useState(false);
-  const [expandedPayment, setExpandedPayment] = useState(false);
-  const [showMobileSummary, setShowMobileSummary] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1); // 1: Review, 2: Delivery, 3: Payment
+
+  
+  // Delivery method selection states (moved from GameDetailsLayout)
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<string | null>(null);
+  const [showDeliverySelectionModal, setShowDeliverySelectionModal] = useState(false);
+  const [availableDeliveryMethods, setAvailableDeliveryMethods] = useState<any[]>([
+    { id: "email", name: "Email", icon: "email", active: true },
+    { id: "whatsapp", name: "WhatsApp", icon: "whatsapp", active: true },
+  ]);
+  const [countryCode, setCountryCode] = useState("+88");
+  const [phoneLocal, setPhoneLocal] = useState("");
+  
   const [orderModal, setOrderModal] = useState<{
     isOpen: boolean;
     status: "success" | "error";
@@ -108,28 +124,103 @@ const Checkout: React.FC = () => {
 
   // Load checkout data on component mount
   useEffect(() => {
-    const data =
-      location.state?.checkoutData || localStorage.getItem("checkoutData");
-    if (data) {
-      if (typeof data === "string") {
-        setCheckoutData(JSON.parse(data));
-        localStorage.removeItem("checkoutData");
-      } else {
-        setCheckoutData(data);
-      }
-    } else {
-      // If no checkout data, redirect back
-      navigate(-1);
+    // Always prefer navigation state over everything else (direct product checkout)
+    const navData = (location.state as any)?.checkoutData;
+    
+    if (navData) {
+      setCheckoutData(navData);
+      setIsCartCheckout(navData.isCartCheckout || false);
+      return;
     }
-  }, [location.state, navigate]);
+    
+    // Second priority: saved localStorage value
+    const saved = localStorage.getItem("checkoutData");
+    if (saved) {
+      try {
+        const parsedData = JSON.parse(saved);
+        setCheckoutData(parsedData);
+        setIsCartCheckout(parsedData.isCartCheckout || false);
+        localStorage.removeItem("checkoutData");
+        return;
+      } catch (e) {
+        console.warn("Failed to parse saved checkout data:", e);
+      }
+    }
+  }, [location.state]); // Only depend on location.state to avoid cart interference
+
+  // Separate effect for cart fallback - only runs if no navigation data
+  useEffect(() => {
+    const navData = (location.state as any)?.checkoutData;
+    const saved = localStorage.getItem("checkoutData");
+    
+    // Only use cart as fallback if no other data source is available
+    if (!navData && !saved && !checkoutData && cartItems && cartItems.length > 0) {
+      const checkoutItems: CheckoutItem[] = cartItems.map((ci) => ({
+        categoryIdx: 0,
+        itemIdx: 0,
+        quantity: ci.quantity,
+        label: ci.label || ci.productName,
+        price: ci.price,
+        productName: ci.productName,
+        productImage: ci.productImage || "",
+        productType: ci.productType || "Products",
+      }));
+
+      // Extract game info from cart items (prioritize complete game info)
+      const gameInfoItems = cartItems.filter(item => 
+        item.gameInfo && 
+        (item.gameInfo.playerId || item.gameInfo.zoneId || item.gameInfo.uuid)
+      );
+      
+      // Use the most complete game info available
+      const gameInfo = gameInfoItems.length > 0 
+        ? gameInfoItems.find(item => 
+            item.gameInfo?.playerId && 
+            item.gameInfo?.zoneId
+          )?.gameInfo || gameInfoItems[0]?.gameInfo
+        : undefined;
+
+      setCheckoutData({
+        items: checkoutItems,
+        gameInfo: gameInfo, // Include game information from cart
+        productDetails: {
+          name: checkoutItems.length === 1 ? checkoutItems[0].productName : "Cart",
+          image: checkoutItems[0]?.productImage || "/assets/placeholder.svg",
+          type: checkoutItems[0]?.productType || "Products",
+        },
+      });
+      setIsCartCheckout(true); // Mark this as cart checkout
+    }
+  }, [cartItems, checkoutData, location.state]);
+
+  // Add a fallback check to redirect only if we truly have no data after initialization
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // After 1 second, if we still have no checkout data and no navigation state,
+      // then redirect the user back
+      const navData = (location.state as any)?.checkoutData;
+      const saved = localStorage.getItem("checkoutData");
+      
+      if (!checkoutData && !navData && !saved && (!cartItems || cartItems.length === 0)) {
+        navigate(-1);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [checkoutData, location.state, cartItems, navigate]);
 
   // Initialize delivery info
   useEffect(() => {
     if (checkoutData?.deliveryInfo) {
       setDeliveryEmail(checkoutData.deliveryInfo.email || "");
       setDeliveryPhone(checkoutData.deliveryInfo.phone || "");
+      setSelectedDeliveryMethod(checkoutData.deliveryInfo.method || null);
     }
   }, [checkoutData]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Calculate total amount
   const totalAmount =
@@ -161,8 +252,8 @@ const Checkout: React.FC = () => {
     setCheckoutData({ ...checkoutData, items: updatedItems });
   };
 
-  // Handle delivery method selection
-  const handleDeliveryMethodSelect = (methodId: string) => {
+  // Handle delivery method selection from existing modal
+  const handleDeliveryMethodConfirm = (methodId: string) => {
     if (!checkoutData) return;
 
     const updatedDeliveryInfo = {
@@ -208,6 +299,108 @@ const Checkout: React.FC = () => {
     navigator.clipboard.writeText(text);
     setCopiedText(label);
     setTimeout(() => setCopiedText(""), 2000);
+  };
+
+  // Handle delivery method selection (moved from GameDetailsLayout)
+  const handleDeliveryMethodSelect = async (methodId: string) => {
+    const user = await getCurrentUser();
+
+    if (methodId === "email") {
+      setDeliveryEmail(user.email || "");
+      setSelectedDeliveryMethod(methodId);
+      setShowDeliverySelectionModal(true);
+    } else if (methodId === "whatsapp") {
+      // Read phone from account prefs (Appwrite account) or fallback to user.phone
+      try {
+        const full = (user?.prefs && user.prefs.phone) || user.phone || "";
+        // Parse into country code and local part for the UI
+        if (full && full.startsWith("+")) {
+          const match = full.match(/^\+(\d{1,3})(\d*)$/);
+          if (match) {
+            setCountryCode("+" + match[1]);
+            setPhoneLocal(match[2] || "");
+          } else {
+            setCountryCode("+88");
+            setPhoneLocal(full.replace(/[^0-9]/g, ""));
+          }
+        } else if (full && full.startsWith("00")) {
+          // convert 00xxxx to +xxxx
+          const converted = "+" + full.slice(2).replace(/[^0-9]/g, "");
+          const match = converted.match(/^\+(\d{1,3})(\d*)$/);
+          if (match) {
+            setCountryCode("+" + match[1]);
+            setPhoneLocal(match[2] || "");
+          } else {
+            setCountryCode("+88");
+            setPhoneLocal(converted.replace(/[^0-9]/g, ""));
+          }
+        } else {
+          // assume local BD number if plain digits
+          setCountryCode("+88");
+          setPhoneLocal(full.replace(/[^0-9]/g, ""));
+        }
+        setDeliveryPhone(full);
+      } catch (error) {
+        setDeliveryPhone("");
+      }
+      setSelectedDeliveryMethod(methodId);
+      setShowDeliverySelectionModal(true);
+    } else {
+      // For other delivery methods, just select them directly for now
+      setSelectedDeliveryMethod(methodId);
+    }
+  };
+
+  // Confirm delivery details (moved from GameDetailsLayout)
+  const confirmDeliveryDetailsFromSelection = async () => {
+    if (selectedDeliveryMethod === "whatsapp" && deliveryPhone) {
+      // Save phone number exactly as user entered it for WhatsApp messaging
+      try {
+        const user = await getCurrentUser();
+        // Save the phone exactly as entered - no normalization
+        setDeliveryPhone(deliveryPhone);
+        const prefs = { ...(user?.prefs || {}), phone: deliveryPhone };
+        await (account as any).updatePrefs(prefs);
+      } catch (error) {
+        console.warn("Could not save phone number to account prefs:", error);
+      }
+    }
+
+    // Update checkoutData with selected delivery method
+    if (checkoutData && selectedDeliveryMethod) {
+      const updatedDeliveryInfo = {
+        method: selectedDeliveryMethod,
+        email: selectedDeliveryMethod === "email" ? deliveryEmail : undefined,
+        phone: selectedDeliveryMethod === "whatsapp" ? deliveryPhone : undefined,
+      };
+
+      setCheckoutData({
+        ...checkoutData,
+        deliveryInfo: updatedDeliveryInfo,
+      });
+    }
+
+    setShowDeliverySelectionModal(false);
+    setIsEditingDelivery(false);
+  };
+
+  // Allow user to reselect product/delivery: preserve checkoutData and navigate back
+  const handleReselect = () => {
+    if (!checkoutData) return;
+    try {
+      // store current checkout data so the previous page can restore it
+      localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
+    } catch (e) {
+      console.error("Failed to save checkoutData for reselect:", e);
+    }
+
+    // If navigation origin was provided, go there with state; otherwise go back
+    const origin = (location.state as any)?.from as string | undefined;
+    if (origin) {
+      navigate(origin, { state: { checkoutData } });
+    } else {
+      navigate(-1);
+    }
   };
 
   // Handle order completion
@@ -300,8 +493,12 @@ const Checkout: React.FC = () => {
           isOpen: true,
           status: "success",
           title: "Orders Placed Successfully!",
-          message: `Your ${successfulOrders.length} order(s) have been placed and are being processed.${
-            failedCount > 0 ? ` ${failedCount} order(s) failed. We'll notify you.` : ""
+          message: `Your ${
+            successfulOrders.length
+          } order(s) have been placed and are being processed.${
+            failedCount > 0
+              ? ` ${failedCount} order(s) failed. We'll notify you.`
+              : ""
           } You will receive updates via ${
             checkoutData.deliveryInfo?.method === "email" ? "email" : "WhatsApp"
           }.`,
@@ -312,6 +509,17 @@ const Checkout: React.FC = () => {
             transactionId: trxId,
           },
         });
+
+        // Only clear cart if this checkout came from the cart
+        // Don't clear cart for direct product checkouts
+        if (isCartCheckout) {
+          try {
+            clearCart();
+            setCartOpen(false);
+          } catch (e) {
+            // ignore
+          }
+        }
 
         // Don't clear checkoutData immediately — keep it until the user closes the modal
         // to avoid showing the loading placeholder underneath the modal.
@@ -413,175 +621,149 @@ const Checkout: React.FC = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile Header */}
-      <div className="sticky top-0 z-[60] bg-white border-b border-gray-200 px-4 py-3 md:hidden">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
+  // If checkout data exists but no items, show empty cart message
+  if (checkoutData && checkoutData.items.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Your checkout is empty
+          </h1>
+          <p className="text-gray-600">
+            Add some items to your cart or select products to checkout
+          </p>
+          <Button 
             onClick={() => navigate(-1)}
-            className="p-2"
+            className="mt-4"
           >
-            <ArrowLeft className="w-5 h-5" />
+            Go Back
           </Button>
-          <h1 className="text-lg font-semibold text-gray-900">Checkout</h1>
-          <div className="w-9"></div>
         </div>
       </div>
+    );
+  }
 
+  return (
+    <div className="min-h-screen bg-gray-50">
       {/* Desktop Header */}
-      <div className="hidden md:block border-b border-gray-200">
-        <div className="container mx-auto px-4 py-6">
+      <div>
+        <div className="container mx-auto px-4 pt-6">
           <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              className="font-pixel"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
+            <div className="w-20 flex items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(-1)}
+                className="rounded-full w-10 h-10 flex items-center justify-center"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            </div>
             <div className="text-center flex-1">
               <h1 className="text-3xl font-bold font-pixel text-foreground">
                 Checkout
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 hidden md:block">
                 Review your order and complete payment
               </p>
             </div>
-            <div className="w-20"></div>
+            <div className="w-20 flex items-center justify-end"></div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-6 max-w-7xl">
-        {/* Mobile Summary Modal */}
-        <div className="md:hidden">
-          <Dialog open={showMobileSummary} onOpenChange={setShowMobileSummary}>
-            <DialogContent className="max-w-sm bg-background w-full mx-4">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold">
-                  Order Summary
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal:</span>
-                    <span className="font-anekbangla font-semibold">
-                      ৳{toBanglaNumber(totalAmount)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Delivery:</span>
-                    <span className="text-green-600 font-semibold">Free</span>
-                  </div>
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold">Total:</span>
-                      <span className="font-anekbangla text-xl font-bold text-primary">
-                        ৳{toBanglaNumber(totalAmount)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  className={`w-full h-12 font-semibold ${
-                    userAccount &&
-                    trxId &&
-                    !isProcessingOrder &&
-                    checkoutData.deliveryInfo &&
-                    paymentMethod
-                      ? "bg-primary hover:bg-primary/90"
-                      : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  }`}
-                  disabled={
-                    !userAccount ||
-                    !trxId ||
-                    isProcessingOrder ||
-                    !checkoutData.deliveryInfo ||
-                    !paymentMethod
-                  }
-                  onClick={handleCompletePayment}
-                >
-                  {isProcessingOrder ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Processing...
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4" />
-                      Complete Payment
-                    </div>
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-
         {/* Responsive Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Left Column - Products & Payment Methods */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-8 space-y-4">
             {/* Product Summary Card */}
-            <Card className="shadow-sm border bg-white">
+            <Card className="bg-background">
               <CardContent className="p-4 lg:p-6">
-                <div className="flex items-center gap-4 mb-6">
-                  <img
-                    src={checkoutData.productDetails.image}
-                    alt={checkoutData.productDetails.name}
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-gray-900">
-                      {checkoutData.productDetails.name}
-                    </h2>
-                    <p className="text-gray-600">
-                      {checkoutData.productDetails.type}
-                    </p>
+                <div className="mb-6">
+                  {/* images above title. On md+: side-by-side (images left, text right) */}
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-shrink-0">
+                      {checkoutData.items.length === 1 ? (
+                        <img
+                          src={checkoutData.productDetails.image}
+                          alt={checkoutData.productDetails.name}
+                          className="w-28 h-28 md:w-36 md:h-36 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="flex -space-x-2">
+                          {checkoutData.items.slice(0, 8).map((it, i) => (
+                            <img
+                              key={i}
+                              src={it.productImage}
+                              alt={it.label}
+                              className="w-12 h-12 md:w-14 md:h-14 rounded-md object-cover border bg-white"
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 md:flex-1">
+                      <h2
+                        className="text-xl font-bold text-gray-900 break-words md:leading-snug"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {checkoutData.items.length === 1
+                          ? checkoutData.productDetails.name
+                          : `Cart — ${checkoutData.items.length} items`}
+                      </h2>
+                      <p className="text-gray-600 mt-1 text-sm">
+                        {checkoutData.items.length === 1
+                          ? checkoutData.productDetails.type
+                          : checkoutData.items
+                              .map((it) => it.label)
+                              .slice(0, 3)
+                              .join(", ") +
+                            (checkoutData.items.length > 3
+                              ? ` and ${checkoutData.items.length - 3} more`
+                              : "")}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Order Items */}
-                <div className="space-y-3">
+                <div className="border rounded-md divide-y divide-gray-200">
                   {checkoutData.items.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      className="flex items-center hover:bg-popover justify-between p-3 bg-gray-50 rounded-lg gap-3"
                     >
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate">
                           {item.label}
                         </h4>
-                        <p className="text-sm text-gray-600 font-anekbangla">
-                          ৳{toBanglaNumber(item.price)}
-                        </p>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         {/* Quantity Controls */}
-                        <div className="flex items-center bg-white border rounded-lg">
+                        <div className="flex items-center">
                           <button
                             type="button"
-                            className="p-2 hover:bg-gray-100 rounded-l-lg"
+                            className="w-7 h-7 sm:w-8 sm:h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
                             onClick={() =>
                               updateItemQuantity(index, item.quantity - 1)
                             }
                           >
                             <Minus className="w-3 h-3" />
                           </button>
-                          <span className="px-3 py-2 text-sm font-medium min-w-[40px] text-center">
+                          <span className="px-2 py-1 text-sm font-medium min-w-[34px] text-center">
                             {item.quantity}
                           </span>
                           <button
                             type="button"
-                            className="p-2 hover:bg-gray-100 rounded-r-lg"
+                            className="w-7 h-7 sm:w-8 sm:h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
                             onClick={() =>
                               updateItemQuantity(index, item.quantity + 1)
                             }
@@ -590,13 +772,13 @@ const Checkout: React.FC = () => {
                           </button>
                         </div>
 
-                        <span className="font-bold text-primary font-anekbangla">
+                        <span className="font-bold text-lg sm:text-xl text-secondary font-anekbangla">
                           ৳{toBanglaNumber(item.price * item.quantity)}
                         </span>
 
                         <button
                           type="button"
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                          className="p-1 sm:p-2 text-red-500 hover:bg-red-50 rounded-lg"
                           onClick={() => removeItem(index)}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -606,43 +788,90 @@ const Checkout: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Delivery Method - Display Only */}
-                <div className="mt-6 pt-6 border-t">
+                {/* Delivery Method Selection */}
+                <div className="pt-4">
                   <h3 className="font-medium text-gray-900 mb-3">
-                    Selected Delivery Method
+                    Delivery Method
                   </h3>
-                  {checkoutData.deliveryInfo ? (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 text-green-800">
-                        <Check className="w-4 h-4" />
-                        <span className="font-medium">
-                          {checkoutData.deliveryInfo.method === "email"
-                            ? "Email"
-                            : "WhatsApp"}{" "}
-                          delivery
-                        </span>
+                  
+                  {!checkoutData.deliveryInfo ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        {availableDeliveryMethods.map((method) => (
+                          <Button
+                            key={method.id}
+                            type="button"
+                            variant="outline"
+                            className="font-medium text-sm px-3 py-3 flex items-center justify-center gap-2 h-auto"
+                            onClick={() => handleDeliveryMethodSelect(method.id)}
+                          >
+                            <img
+                              src={`/assets/icons/${method.icon || method.id}.svg`}
+                              alt={method.name}
+                              className="w-5 h-5"
+                            />
+                            <span className="whitespace-nowrap">
+                              {method.name}
+                            </span>
+                          </Button>
+                        ))}
                       </div>
-                      {checkoutData.deliveryInfo.email && (
-                        <p className="text-green-700 text-sm mt-1">
-                          {checkoutData.deliveryInfo.email}
-                        </p>
-                      )}
-                      {checkoutData.deliveryInfo.phone && (
-                        <p className="text-green-700 text-sm mt-1">
-                          {checkoutData.deliveryInfo.phone}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-600 mt-2">
-                        To change delivery method, please go back to the product
-                        page.
-                      </p>
                     </div>
                   ) : (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <p className="text-yellow-800 text-sm">
-                        No delivery method selected. Please go back to select
-                        one.
-                      </p>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center gap-4">
+                        {checkoutData.deliveryInfo.method === "email" ? (
+                          <>
+                            <img
+                              src="/assets/icons/email.svg"
+                              alt="Email"
+                              className="w-8 h-8 flex-shrink-0"
+                            />
+                            <div className="flex flex-col text-sm min-w-0">
+                              <span className="font-medium text-gray-900 truncate">
+                                Email delivery
+                              </span>
+                              <span className="text-sm text-green-700 font-semibold truncate max-w-[16rem]">
+                                {deliveryEmail || checkoutData.deliveryInfo.email || "-"}
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <img
+                              src="/assets/icons/whatsapp.svg"
+                              alt="WhatsApp"
+                              className="w-8 h-8 flex-shrink-0"
+                            />
+                            <div className="flex flex-col text-sm min-w-0">
+                              <span className="font-medium text-gray-900 truncate">
+                                WhatsApp delivery
+                              </span>
+                              <span className="text-sm text-secondary font-bold truncate max-w-[16rem]">
+                                {deliveryPhone || checkoutData.deliveryInfo.phone || "-"}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        <div className="ml-auto flex items-center gap-3">
+                          <span className="hidden md:inline text-sm text-gray-600">Change</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="rounded-full w-10 h-10 flex items-center justify-center"
+                            onClick={() => {
+                              // Reset delivery info to show selection again
+                              setCheckoutData({
+                                ...checkoutData,
+                                deliveryInfo: undefined,
+                              });
+                              setSelectedDeliveryMethod(null);
+                            }}
+                          >
+                            <ReloadIcon className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -650,33 +879,29 @@ const Checkout: React.FC = () => {
             </Card>
 
             {/* Payment Methods Card */}
-            <Card className="shadow-sm border bg-white">
+            <Card className="border bg-background">
               <CardContent className="p-4 lg:p-6">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
                   Payment Method
                 </h3>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 mb-6">
                   {paymentMethods.map((method) => (
                     <button
                       key={method.id}
                       type="button"
-                      className={`p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+                      className={`rounded-lg border-2 ${
                         paymentMethod === method.id
                           ? `${method.borderColor} ${method.bgColor} shadow-lg`
-                          : "border-gray-200 hover:border-gray-300 hover:shadow-md"
+                          : "border-gray-200"
                       }`}
                       onClick={() => setPaymentMethod(method.id)}
                     >
                       <img
                         src={method.icon}
                         alt={method.name}
-                        className="w-8 h-8 mx-auto mb-2"
+                        className="w-auto h-16 mx-auto mb-2"
                       />
-                      <p className="text-xs font-medium text-center">
-                        {method.name}
-                      </p>
                     </button>
                   ))}
                 </div>
@@ -861,9 +1086,175 @@ const Checkout: React.FC = () => {
             </div>
           </div>
         </div>
-
-
       </div>
+
+      {/* Delivery Method Selection Modal */}
+      <Dialog
+        open={showDeliverySelectionModal}
+        onOpenChange={(open) => {
+          setShowDeliverySelectionModal(open);
+          if (!open) setIsEditingDelivery(false);
+        }}
+      >
+        <DialogContent className="max-w-md w-full">
+          <DialogHeader>
+            <DialogTitle className="font-medium text-xl text-foreground mb-2 text-center">
+              Confirm{" "}
+              {selectedDeliveryMethod === "email" ? "Email" : "WhatsApp"}{" "}
+              Delivery
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedDeliveryMethod === "email" ? (
+            <div>
+              <p className="text-gray-600 mb-4">
+                We'll send your order details and activation codes to this email
+                address:
+              </p>
+              <div className="space-y-3">
+                {isEditingDelivery ? (
+                  <div className="space-y-2">
+                    <Input
+                      type="email"
+                      className="h-12"
+                      placeholder="Enter new email"
+                      value={deliveryEmail}
+                      onChange={(e) => setDeliveryEmail(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => setIsEditingDelivery(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1"
+                        onClick={() => {
+                          confirmDeliveryDetailsFromSelection();
+                          setIsEditingDelivery(false);
+                        }}
+                        disabled={!deliveryEmail}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="p-3 bg-gray-50 rounded-lg border">
+                      <span className="font-medium text-foreground">
+                        {deliveryEmail || "No email provided"}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1"
+                        onClick={confirmDeliveryDetailsFromSelection}
+                        disabled={!deliveryEmail}
+                      >
+                        Confirm Email
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsEditingDelivery(true)}
+                      >
+                        {deliveryEmail ? "Change" : "Add"}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-gray-600 mb-4">
+                We'll send your order details and activation codes to this
+                WhatsApp number:
+              </p>
+              <div className="space-y-3">
+                {isEditingDelivery ? (
+                  <div className="space-y-2">
+                    <Input
+                      type="tel"
+                      className="h-12"
+                      placeholder="Enter WhatsApp number"
+                      value={deliveryPhone}
+                      onChange={(e) => setDeliveryPhone(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => setIsEditingDelivery(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1"
+                        onClick={() => {
+                          confirmDeliveryDetailsFromSelection();
+                          setIsEditingDelivery(false);
+                        }}
+                        disabled={!deliveryPhone}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {deliveryPhone ? (
+                      <div className="p-3 bg-gray-50 rounded-lg border">
+                        <span className="font-medium text-foreground">
+                          {deliveryPhone}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <span className="text-yellow-700">
+                          No phone number found. Please add your WhatsApp
+                          number.
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="default"
+                        className="flex-1"
+                        onClick={confirmDeliveryDetailsFromSelection}
+                        disabled={!deliveryPhone}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsEditingDelivery(true)}
+                      >
+                        {deliveryPhone ? "Change" : "Add"}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="mt-4" />
+        </DialogContent>
+      </Dialog>
 
       {/* Delivery Confirmation Modal */}
       <Dialog
@@ -926,7 +1317,7 @@ const Checkout: React.FC = () => {
                 ) : (
                   <>
                     <div className="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                      <p className="font-medium text-gray-900 text-center">
+                      <p className="font-medium text-gray-900 text-center truncate">
                         {deliveryEmail || "Please enter your email"}
                       </p>
                     </div>
@@ -996,7 +1387,7 @@ const Checkout: React.FC = () => {
                 ) : (
                   <>
                     <div className="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                      <p className="font-medium text-gray-900 text-center">
+                      <p className="font-medium text-gray-900 text-center truncate">
                         {deliveryPhone || "Please enter your phone number"}
                       </p>
                     </div>
@@ -1056,6 +1447,8 @@ const Checkout: React.FC = () => {
           setTrxId("");
         }}
       />
+
+      <Footer />
     </div>
   );
 };

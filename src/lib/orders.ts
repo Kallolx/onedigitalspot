@@ -16,8 +16,9 @@ export interface OrderData {
   quantity: number;
   unitPrice: number;
   totalAmount: number;
-  playerId?: string;
-  zoneId?: string;
+  playerId?: string;    // For most mobile games (PUBG, Mobile Legends, etc.)
+  zoneId?: string;      // For games that require zone/server info
+  uuid?: string;        // For games like Genshin Impact that use UID
   paymentMethod: string;
   paymentAccountNumber: string;
   transactionId: string;
