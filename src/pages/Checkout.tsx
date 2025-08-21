@@ -660,7 +660,7 @@ const Checkout: React.FC = () => {
               </Button>
             </div>
             <div className="text-center flex-1">
-              <h1 className="text-3xl font-bold font-pixel text-foreground">
+              <h1 className="text-2xl font-bold font-pixel text-foreground">
                 Checkout
               </h1>
               <p className="text-gray-600 mt-1 hidden md:block">

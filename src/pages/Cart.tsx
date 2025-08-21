@@ -5,22 +5,25 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
-import { 
-  ShoppingCart, 
-  Trash2, 
-  Plus, 
-  Minus, 
-  ArrowLeft, 
+import {
+  ShoppingCart,
+  Trash2,
+  Plus,
+  Minus,
+  ArrowLeft,
   Package,
   CreditCard,
-  ShoppingBag
+  ShoppingBag,
 } from "lucide-react";
 
 const CartPage: React.FC = () => {
   const { items, updateQuantity, removeItem, clear } = useCart();
   const navigate = useNavigate();
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const deliveryFee = subtotal > 500 ? 0 : 50;
   const total = subtotal + deliveryFee;
@@ -41,23 +44,25 @@ const CartPage: React.FC = () => {
       productType: item.productType || "Products",
     }));
 
-    const gameInfoItems = items.filter(item => 
-      item.gameInfo && 
-      (item.gameInfo.playerId || item.gameInfo.zoneId || item.gameInfo.uuid)
+    const gameInfoItems = items.filter(
+      (item) =>
+        item.gameInfo &&
+        (item.gameInfo.playerId || item.gameInfo.zoneId || item.gameInfo.uuid)
     );
-    
-    const gameInfo = gameInfoItems.length > 0 
-      ? gameInfoItems.find(item => 
-          item.gameInfo?.playerId && 
-          item.gameInfo?.zoneId
-        )?.gameInfo || gameInfoItems[0]?.gameInfo
-      : undefined;
+
+    const gameInfo =
+      gameInfoItems.length > 0
+        ? gameInfoItems.find(
+            (item) => item.gameInfo?.playerId && item.gameInfo?.zoneId
+          )?.gameInfo || gameInfoItems[0]?.gameInfo
+        : undefined;
 
     const checkoutData = {
       items: checkoutItems,
       gameInfo: gameInfo,
       productDetails: {
-        name: checkoutItems.length === 1 ? checkoutItems[0].productName : "Cart",
+        name:
+          checkoutItems.length === 1 ? checkoutItems[0].productName : "Cart",
         image: checkoutItems[0]?.productImage || "/assets/placeholder.svg",
         type: checkoutItems[0]?.productType || "Products",
       },
@@ -77,7 +82,9 @@ const CartPage: React.FC = () => {
       <CardContent className="space-y-4">
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Subtotal ({totalItems} items)</span>
+            <span className="text-muted-foreground">
+              Subtotal ({totalItems} items)
+            </span>
             <span className="font-medium">৳{subtotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-sm">
@@ -100,8 +107,8 @@ const CartPage: React.FC = () => {
           </div>
         </div>
 
-        <Button 
-          onClick={goToCheckout} 
+        <Button
+          onClick={goToCheckout}
           className="w-full h-12 text-base font-semibold"
           size="lg"
         >
@@ -109,8 +116,8 @@ const CartPage: React.FC = () => {
           Proceed to Checkout
         </Button>
 
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => navigate("/")}
           className="w-full"
         >
@@ -133,15 +140,14 @@ const CartPage: React.FC = () => {
       <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-6">
         <ShoppingCart className="w-16 h-16 text-gray-400" />
       </div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        Your cart is empty
+      </h2>
       <p className="text-gray-500 mb-8 max-w-md">
-        Looks like you haven't added anything to your cart yet. Start shopping to fill it up!
+        Looks like you haven't added anything to your cart yet. Start shopping
+        to fill it up!
       </p>
-      <Button 
-        onClick={() => navigate("/")}
-        size="lg"
-        className="px-8"
-      >
+      <Button onClick={() => navigate("/")} size="lg" className="px-8">
         <ShoppingBag className="w-4 h-4 mr-2" />
         Start Shopping
       </Button>
@@ -151,25 +157,19 @@ const CartPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate(-1)}
-              className="p-2"
+              className="rounded-full w-10 h-10 flex items-center justify-center"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
             </Button>
             <div className="flex items-center gap-3">
-              <ShoppingCart className="w-6 h-6 text-primary" />
-              <h1 className="text-xl font-bold">Shopping Cart</h1>
-              {items.length > 0 && (
-                <Badge variant="secondary" className="px-2 py-1">
-                  {totalItems}
-                </Badge>
-              )}
+              <h1 className="text-2xl font-bold">Shopping Cart</h1>
             </div>
           </div>
         </div>
@@ -189,10 +189,10 @@ const CartPage: React.FC = () => {
                       <div className="flex gap-4">
                         {/* Product Image */}
                         <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
-                          <img 
-                            src={item.productImage || "/assets/placeholder.svg"} 
+                          <img
+                            src={item.productImage || "/assets/placeholder.svg"}
                             alt={item.productName}
-                            className="w-full h-full rounded-lg object-cover bg-gray-100" 
+                            className="w-full h-full rounded-lg object-cover bg-gray-100"
                           />
                         </div>
 
@@ -204,7 +204,9 @@ const CartPage: React.FC = () => {
                                 {item.productName}
                               </h3>
                               {item.label && (
-                                <p className="text-sm text-muted-foreground mt-1">{item.label}</p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {item.label}
+                                </p>
                               )}
                             </div>
                             <Button
@@ -216,30 +218,41 @@ const CartPage: React.FC = () => {
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
-                          
+
                           {/* Game Info Display */}
-                          {item.gameInfo && (item.gameInfo.playerId || item.gameInfo.zoneId || item.gameInfo.uuid) && (
-                            <div className="space-y-1 mb-3">
-                              {item.gameInfo.playerId && (
-                                <Badge variant="outline" className="text-xs mr-2">
-                                  Player id: {item.gameInfo.playerId}
-                                </Badge>
-                              )}
-                              {item.gameInfo.zoneId && (
-                                <Badge variant="outline" className="text-xs mr-2">
-                                  Zone id: {item.gameInfo.zoneId}
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                          
+                          {item.gameInfo &&
+                            (item.gameInfo.playerId ||
+                              item.gameInfo.zoneId ||
+                              item.gameInfo.uuid) && (
+                              <div className="space-y-1 mb-3">
+                                {item.gameInfo.playerId && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs mr-2"
+                                  >
+                                    Player id: {item.gameInfo.playerId}
+                                  </Badge>
+                                )}
+                                {item.gameInfo.zoneId && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs mr-2"
+                                  >
+                                    Zone id: {item.gameInfo.zoneId}
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+
                           {/* Price and Quantity Controls */}
                           <div className="flex items-center justify-between mt-auto">
                             <div className="flex items-center border rounded-lg">
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                onClick={() =>
+                                  updateQuantity(item.id, item.quantity - 1)
+                                }
                                 disabled={item.quantity <= 1}
                                 className="h-8 w-8 p-0 hover:bg-gray-100"
                               >
@@ -251,13 +264,15 @@ const CartPage: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                onClick={() =>
+                                  updateQuantity(item.id, item.quantity + 1)
+                                }
                                 className="h-8 w-8 p-0 hover:bg-gray-100"
                               >
                                 <Plus className="w-4 h-4" />
                               </Button>
                             </div>
-                            
+
                             <div className="text-right">
                               <div className="font-bold text-lg">
                                 ৳{(item.price * item.quantity).toLocaleString()}
@@ -289,8 +304,12 @@ const CartPage: React.FC = () => {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <div>
-                  <div className="font-bold text-lg">৳{total.toLocaleString()}</div>
-                  <div className="text-sm text-muted-foreground">{totalItems} items</div>
+                  <div className="font-bold text-lg">
+                    ৳{total.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {totalItems} items
+                  </div>
                 </div>
                 <Button onClick={goToCheckout} size="lg" className="px-8">
                   <CreditCard className="w-4 h-4 mr-2" />
