@@ -62,11 +62,11 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
               className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${
                 isSuccess
                   ? "bg-green-100 border-2 border-green-200"
-                  : "bg-red-100 border-2 border-red-200"
+                  : "bg-red-100 border-2 border-destructive"
               }`}
             >
               {isSuccess ? (
-                <CheckCircleIcon className="w-10 h-10 text-green-600" />
+                <CheckCircleIcon className="w-10 h-10 text-secondary" />
               ) : (
                 <XCircleIcon className="w-10 h-10 text-red-600" />
               )}
@@ -94,7 +94,7 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
               {orderData.orderId && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Order ID:</span>
-                  <span className="font-mono font-medium">
+                  <span className="font-sans font-bold text-md text-secondary">
                     {orderData.orderId}
                   </span>
                 </div>
@@ -116,7 +116,7 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
               {orderData.transactionId && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Transaction ID:</span>
-                  <span className="font-mono text-xs">
+                  <span className="font-mono text-md">
                     {orderData.transactionId}
                   </span>
                 </div>

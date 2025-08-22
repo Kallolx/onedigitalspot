@@ -276,23 +276,13 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
       >
         <div className="container px-4 py-4 max-h-[calc(100vh-73px)] overflow-y-auto rounded-lg">
           {/* Mobile Search and Cart beside each other, full width */}
-          <div className="w-full mt-2 mb-4 flex items-center gap-2">
+          <div className="w-full mt-2 mb-4 items-center">
             <div className="flex-1">
               <SearchComponent
                 className="w-full"
                 showFullResults={true}
               />
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative h-11 w-11 min-w-0 flex items-center justify-center"
-            >
-              <ShoppingCart02Icon className="w-6 h-6 text-secondary" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-xs font-bold text-primary-foreground rounded-full flex items-center justify-center">
-                0
-              </span>
-            </Button>
           </div>
           <nav className="flex flex-col gap-2 mb-4 tracking-tighter">
             {/* Home Link */}

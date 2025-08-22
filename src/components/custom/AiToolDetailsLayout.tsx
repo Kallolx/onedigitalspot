@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { ShoppingCart02Icon } from "hugeicons-react";
 import { useCart } from "@/contexts/CartContext";
+import { toast } from "@/components/ui/sonner";
 
 interface PriceItem {
   label: string;
@@ -311,7 +312,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Image Section */}
           <div className="lg:col-span-4">
-            <div className="bg-background border rounded-2xl shadow-card p-6 sticky top-8">
+            <div className="bg-background border rounded-2xl p-6 sticky top-32">
               <div className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto">
                 {/* Loader while loading or error */}
                 {(!imgLoaded || imgError) && (
@@ -832,6 +833,23 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                         productType: isSubscription ? "Subscriptions" : "AI Tools",
                       });
                     });
+
+                    // Toast summary for added items (show up to 3 items)
+                    const summaryItems = selectedItems
+                      .slice(0, 3)
+                      .map((si) => {
+                        const it = priceList[si.categoryIdx]?.items[si.itemIdx];
+                        return it ? `${si.quantity} x ${it.label}` : null;
+                      })
+                      .filter(Boolean) as string[];
+                    const remaining = selectedItems.length - summaryItems.length;
+                    const message = summaryItems.length
+                      ? `${summaryItems.join(", ")}${
+                          remaining > 0 ? ` and ${remaining} more` : ""
+                        } added to cart`
+                      : "Item added to cart";
+
+                    toast.success(message);
                     setOpen(true);
                   }}
                 >

@@ -29,11 +29,12 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { ReloadIcon } from "hugeicons-react";
 import Footer from "@/components/landing/Footer";
+import { DialogTitle } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/sonner";
 
 interface CheckoutItem {
   categoryIdx: number;
@@ -76,7 +77,11 @@ const Checkout: React.FC = () => {
   // Get checkout data from navigation state or localStorage
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
   const [isCartCheckout, setIsCartCheckout] = useState(false); // Track if checkout came from cart
-  const { items: cartItems, clear: clearCart, setOpen: setCartOpen } = useCart();
+  const {
+    items: cartItems,
+    clear: clearCart,
+    setOpen: setCartOpen,
+  } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<
     "bkash" | "nagad" | "Rocket" | null
   >(null);
@@ -85,21 +90,26 @@ const Checkout: React.FC = () => {
   const [copiedText, setCopiedText] = useState("");
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [deliveryEmail, setDeliveryEmail] = useState("");
   const [deliveryPhone, setDeliveryPhone] = useState("");
   const [isEditingDelivery, setIsEditingDelivery] = useState(false);
 
-  
   // Delivery method selection states (moved from GameDetailsLayout)
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<string | null>(null);
-  const [showDeliverySelectionModal, setShowDeliverySelectionModal] = useState(false);
-  const [availableDeliveryMethods, setAvailableDeliveryMethods] = useState<any[]>([
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
+    string | null
+  >(null);
+  const [showDeliverySelectionModal, setShowDeliverySelectionModal] =
+    useState(false);
+  const [availableDeliveryMethods, setAvailableDeliveryMethods] = useState<
+    any[]
+  >([
     { id: "email", name: "Email", icon: "email", active: true },
     { id: "whatsapp", name: "WhatsApp", icon: "whatsapp", active: true },
   ]);
   const [countryCode, setCountryCode] = useState("+88");
   const [phoneLocal, setPhoneLocal] = useState("");
-  
+
   const [orderModal, setOrderModal] = useState<{
     isOpen: boolean;
     status: "success" | "error";
@@ -126,13 +136,13 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     // Always prefer navigation state over everything else (direct product checkout)
     const navData = (location.state as any)?.checkoutData;
-    
+
     if (navData) {
       setCheckoutData(navData);
       setIsCartCheckout(navData.isCartCheckout || false);
       return;
     }
-    
+
     // Second priority: saved localStorage value
     const saved = localStorage.getItem("checkoutData");
     if (saved) {
@@ -152,9 +162,15 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     const navData = (location.state as any)?.checkoutData;
     const saved = localStorage.getItem("checkoutData");
-    
+
     // Only use cart as fallback if no other data source is available
-    if (!navData && !saved && !checkoutData && cartItems && cartItems.length > 0) {
+    if (
+      !navData &&
+      !saved &&
+      !checkoutData &&
+      cartItems &&
+      cartItems.length > 0
+    ) {
       const checkoutItems: CheckoutItem[] = cartItems.map((ci) => ({
         categoryIdx: 0,
         itemIdx: 0,
@@ -167,24 +183,26 @@ const Checkout: React.FC = () => {
       }));
 
       // Extract game info from cart items (prioritize complete game info)
-      const gameInfoItems = cartItems.filter(item => 
-        item.gameInfo && 
-        (item.gameInfo.playerId || item.gameInfo.zoneId || item.gameInfo.uuid)
+      const gameInfoItems = cartItems.filter(
+        (item) =>
+          item.gameInfo &&
+          (item.gameInfo.playerId || item.gameInfo.zoneId || item.gameInfo.uuid)
       );
-      
+
       // Use the most complete game info available
-      const gameInfo = gameInfoItems.length > 0 
-        ? gameInfoItems.find(item => 
-            item.gameInfo?.playerId && 
-            item.gameInfo?.zoneId
-          )?.gameInfo || gameInfoItems[0]?.gameInfo
-        : undefined;
+      const gameInfo =
+        gameInfoItems.length > 0
+          ? gameInfoItems.find(
+              (item) => item.gameInfo?.playerId && item.gameInfo?.zoneId
+            )?.gameInfo || gameInfoItems[0]?.gameInfo
+          : undefined;
 
       setCheckoutData({
         items: checkoutItems,
         gameInfo: gameInfo, // Include game information from cart
         productDetails: {
-          name: checkoutItems.length === 1 ? checkoutItems[0].productName : "Cart",
+          name:
+            checkoutItems.length === 1 ? checkoutItems[0].productName : "Cart",
           image: checkoutItems[0]?.productImage || "/assets/placeholder.svg",
           type: checkoutItems[0]?.productType || "Products",
         },
@@ -200,8 +218,13 @@ const Checkout: React.FC = () => {
       // then redirect the user back
       const navData = (location.state as any)?.checkoutData;
       const saved = localStorage.getItem("checkoutData");
-      
-      if (!checkoutData && !navData && !saved && (!cartItems || cartItems.length === 0)) {
+
+      if (
+        !checkoutData &&
+        !navData &&
+        !saved &&
+        (!cartItems || cartItems.length === 0)
+      ) {
         navigate(-1);
       }
     }, 1000);
@@ -371,7 +394,8 @@ const Checkout: React.FC = () => {
       const updatedDeliveryInfo = {
         method: selectedDeliveryMethod,
         email: selectedDeliveryMethod === "email" ? deliveryEmail : undefined,
-        phone: selectedDeliveryMethod === "whatsapp" ? deliveryPhone : undefined,
+        phone:
+          selectedDeliveryMethod === "whatsapp" ? deliveryPhone : undefined,
       };
 
       setCheckoutData({
@@ -404,20 +428,41 @@ const Checkout: React.FC = () => {
   };
 
   // Handle order completion
+
+  // Helper to scroll to a field by id
+  const scrollToField = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.focus?.();
+    }
+  };
+
   const handleCompletePayment = async () => {
-    if (
-      !paymentMethod ||
-      !userAccount ||
-      !trxId ||
-      !checkoutData ||
-      checkoutData.items.length === 0
-    ) {
-      setOrderModal({
-        isOpen: true,
-        status: "error",
-        title: "Missing Information",
-        message: "Please fill in all payment details before proceeding.",
-      });
+    if (!checkoutData || checkoutData.items.length === 0) {
+      toast.error(
+        "Your cart is empty. Please add items before placing an order."
+      );
+      return;
+    }
+    if (!checkoutData.deliveryInfo) {
+      toast.error("Please select a delivery method.");
+      scrollToField("delivery-section");
+      return;
+    }
+    if (!paymentMethod) {
+      toast.error("Please select a payment method.");
+      scrollToField("payment-section");
+      return;
+    }
+    if (!userAccount) {
+      toast.error("Please enter your payment number.");
+      scrollToField("user-account-input");
+      return;
+    }
+    if (!trxId) {
+      toast.error("Please enter your transaction ID.");
+      scrollToField("trxid-input");
       return;
     }
 
@@ -546,76 +591,85 @@ const Checkout: React.FC = () => {
       id: "bkash" as const,
       name: "bKash",
       icon: "/assets/icons/bKash.svg",
-      color: "from-pink-500 to-pink-600",
-      bgColor: "bg-gradient-to-r from-pink-50 to-pink-100",
-      borderColor: "border-pink-200",
       account: "01831624571",
-      type: "Send Money",
-      qr: "/assets/qr/bkash.png",
-      description: "Most popular mobile banking in Bangladesh",
+      type: "সেন্ড মানি",
+      description: "বাংলাদেশের সবচেয়ে জনপ্রিয় মোবাইল ব্যাংকিং",
       instructions: [
-        'Open up the bKash app & Choose "Send Money" Its a Personal Account',
-        'Enter the bKash Account Number: <span class="font-bold text-pink-600">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-pink-600\">${toBanglaNumber(
+        'বিকাশ অ্যাপ খুলুন এবং "Send Money" অপশন বেছে নিন',
+        'বিকাশ নাম্বার লিখুন: <span class="font-bold text-secondary">01831624571</span>',
+        `এক্স্যাক্ট টাকা লিখুন: <span class="font-bold font-anekbangla text-secondary">${toBanglaNumber(
           totalAmount
         )}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a bKash Transaction ID (TRX ID)",
+        "লেনদেন কনফার্ম করুন",
+        "টাকা পাঠানোর পর আপনি একটি বিকাশ ট্রানজ্যাকশন আইডি (TRX ID) পাবেন",
       ],
     },
     {
       id: "nagad" as const,
       name: "Nagad",
       icon: "/assets/icons/nagad.svg",
-      color: "from-orange-500 to-red-500",
-      bgColor: "bg-gradient-to-r from-orange-50 to-red-100",
-      borderColor: "border-orange-200",
       account: "01831624571",
-      type: "Send Money",
-      description: "Digital financial service by Bangladesh Post Office",
+      type: "সেন্ড মানি",
+      description: "বাংলাদেশ ডাক বিভাগের ডিজিটাল ফিনান্সিয়াল সার্ভিস",
       instructions: [
-        'Open up the Nagad app & Choose "Send Money"',
-        'Enter the Nagad Account Number: <span class="font-bold text-orange-600">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-orange-600\">${toBanglaNumber(
+        'নগদ অ্যাপ খুলুন এবং "Send Money" অপশন বেছে নিন',
+        'নগদ নাম্বার লিখুন: <span class="font-bold text-secondary">01831624571</span>',
+        `এক্স্যাক্ট টাকা লিখুন: <span class="font-bold font-anekbangla text-secondary">${toBanglaNumber(
           totalAmount
         )}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a Nagad Transaction ID",
+        "লেনদেন কনফার্ম করুন",
+        "টাকা পাঠানোর পর আপনি একটি নগদ ট্রানজ্যাকশন আইডি পাবেন",
       ],
     },
     {
       id: "Rocket" as const,
       name: "Rocket",
       icon: "/assets/icons/rocket.png",
-      color: "from-blue-500 to-purple-600",
-      bgColor: "bg-gradient-to-r from-blue-50 to-purple-100",
-      borderColor: "border-blue-200",
       account: "01831624571",
-      type: "Send Money",
-      description: "Mobile financial service by Dutch-Bangla Bank",
+      type: "সেন্ড মানি",
+      description: "ডাচ-বাংলা ব্যাংকের মোবাইল ফিনান্সিয়াল সার্ভিস",
       instructions: [
-        'Open up the Rocket app & Choose "Send Money"',
-        'Enter the Rocket Account Number: <span class="font-bold text-blue-600">01831624571</span>',
-        `Enter the exact amount: <span class=\"font-bold font-anekbangla text-blue-600\">${toBanglaNumber(
+        'রকেট অ্যাপ খুলুন এবং "Send Money" অপশন বেছে নিন',
+        'রকেট নাম্বার লিখুন: <span class="font-bold text-secondary">01831624571</span>',
+        `এক্স্যাক্ট টাকা লিখুন: <span class="font-bold font-anekbangla text-secondary">${toBanglaNumber(
           totalAmount
         )}৳</span>`,
-        "Confirm the Transaction",
-        "After sending money, you'll receive a Rocket Transaction ID",
+        "লেনদেন কনফার্ম করুন",
+        "টাকা পাঠানোর পর আপনি একটি রকেট ট্রানজ্যাকশন আইডি পাবেন",
       ],
     },
   ];
 
+  // Show empty state if checkoutData is null after order completion
   if (!checkoutData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <h1 className="text-xl font-semibold text-gray-900">
-            Loading checkout...
+      <div className="min-h-screen flex items-start justify-center px-4 pt-12 md:pt-20">
+        <div className="max-w-md w-full p-8 text-center shadow">
+          <img
+            src="/assets/icons/error.svg"
+            alt="Empty checkout"
+            className="mx-auto mb-6"
+          />
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Your checkout is empty
           </h1>
-          <p className="text-gray-600">
-            Please wait while we prepare your order
+          <p className="text-gray-600 mt-2">
+            It looks like you don't have any items to checkout. Browse products
+            or open your cart to continue.
           </p>
+
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <Button onClick={() => navigate("/")} className="px-4 py-2">
+              Shop Again
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/cart")}
+              className="px-4 py-2"
+            >
+              View Cart
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -624,27 +678,40 @@ const Checkout: React.FC = () => {
   // If checkout data exists but no items, show empty cart message
   if (checkoutData && checkoutData.items.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-4">
+      <div className="min-h-screen flex items-start justify-center bg-gray-50 px-4 pt-12 md:pt-20">
+        <div className="max-w-md w-full bg-white border rounded-xl p-8 text-center shadow">
+          <img
+            src="/assets/icons/empty.svg"
+            alt="Empty checkout"
+            className="mx-auto h-24 mb-6"
+          />
           <h1 className="text-2xl font-semibold text-gray-900">
-            Your checkout is empty
+            Nothing to checkout
           </h1>
-          <p className="text-gray-600">
-            Add some items to your cart or select products to checkout
+          <p className="text-gray-600 mt-2">
+            Your checkout has no items. Add products to your cart or go back to
+            browse the store.
           </p>
-          <Button 
-            onClick={() => navigate(-1)}
-            className="mt-4"
-          >
-            Go Back
-          </Button>
+
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <Button onClick={() => navigate(-1)} className="px-4 py-2">
+              Go Back
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/")}
+              className="px-4 py-2"
+            >
+              Shop Now
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Desktop Header */}
       <div>
         <div className="container mx-auto px-4 pt-6">
@@ -681,14 +748,20 @@ const Checkout: React.FC = () => {
             <Card className="bg-background">
               <CardContent className="p-4 lg:p-6">
                 <div className="mb-6">
-                  {/* images above title. On md+: side-by-side (images left, text right) */}
-                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  {/* images and info: on md+ side-by-side, on mobile side-by-side if 1 item, else stacked */}
+                  <div
+                    className={`gap-4 ${
+                      checkoutData.items.length === 1
+                        ? "flex flex-row items-center"
+                        : "flex flex-col md:flex-row md:items-center"
+                    }`}
+                  >
                     <div className="flex-shrink-0">
                       {checkoutData.items.length === 1 ? (
                         <img
                           src={checkoutData.productDetails.image}
                           alt={checkoutData.productDetails.name}
-                          className="w-28 h-28 md:w-36 md:h-36 rounded-lg object-cover"
+                          className="w-16 h-16 rounded-lg object-cover"
                         />
                       ) : (
                         <div className="flex -space-x-2">
@@ -718,17 +791,33 @@ const Checkout: React.FC = () => {
                           ? checkoutData.productDetails.name
                           : `Cart — ${checkoutData.items.length} items`}
                       </h2>
-                      <p className="text-gray-600 mt-1 text-sm">
-                        {checkoutData.items.length === 1
-                          ? checkoutData.productDetails.type
-                          : checkoutData.items
-                              .map((it) => it.label)
-                              .slice(0, 3)
-                              .join(", ") +
-                            (checkoutData.items.length > 3
-                              ? ` and ${checkoutData.items.length - 3} more`
-                              : "")}
-                      </p>
+                      {/* Show playerId/zoneId if available for single item */}
+                      {checkoutData.items.length === 1 && (
+                        <div className="flex flex-wrap gap-2">
+                          {checkoutData.gameInfo?.playerId && (
+                            <span className="inline-block text-xs text-muted-foreground rounded">
+                              Player ID: {checkoutData.gameInfo.playerId}
+                            </span>
+                          )}
+                          {checkoutData.gameInfo?.zoneId && (
+                            <span className="inline-block text-xs text-muted-foreground rounded px-2">
+                              Zone ID: {checkoutData.gameInfo.zoneId}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {/* For multiple items, show up to 3 item names, then count */}
+                      {checkoutData.items.length > 1 && (
+                        <p className="text-gray-600 mt-1 text-sm">
+                          {checkoutData.items
+                            .map((it) => it.productName)
+                            .slice(0, 3)
+                            .join(", ")}
+                          {checkoutData.items.length > 3
+                            ? ` and ${checkoutData.items.length - 3} more`
+                            : ""}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -789,11 +878,11 @@ const Checkout: React.FC = () => {
                 </div>
 
                 {/* Delivery Method Selection */}
-                <div className="pt-4">
+                <div className="pt-4" id="delivery-section">
                   <h3 className="font-medium text-gray-900 mb-3">
                     Delivery Method
                   </h3>
-                  
+
                   {!checkoutData.deliveryInfo ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-3">
@@ -803,10 +892,14 @@ const Checkout: React.FC = () => {
                             type="button"
                             variant="outline"
                             className="font-medium text-sm px-3 py-3 flex items-center justify-center gap-2 h-auto"
-                            onClick={() => handleDeliveryMethodSelect(method.id)}
+                            onClick={() =>
+                              handleDeliveryMethodSelect(method.id)
+                            }
                           >
                             <img
-                              src={`/assets/icons/${method.icon || method.id}.svg`}
+                              src={`/assets/icons/${
+                                method.icon || method.id
+                              }.svg`}
                               alt={method.name}
                               className="w-5 h-5"
                             />
@@ -832,7 +925,9 @@ const Checkout: React.FC = () => {
                                 Email delivery
                               </span>
                               <span className="text-sm text-green-700 font-semibold truncate max-w-[16rem]">
-                                {deliveryEmail || checkoutData.deliveryInfo.email || "-"}
+                                {deliveryEmail ||
+                                  checkoutData.deliveryInfo.email ||
+                                  "-"}
                               </span>
                             </div>
                           </>
@@ -848,13 +943,17 @@ const Checkout: React.FC = () => {
                                 WhatsApp delivery
                               </span>
                               <span className="text-sm text-secondary font-bold truncate max-w-[16rem]">
-                                {deliveryPhone || checkoutData.deliveryInfo.phone || "-"}
+                                {deliveryPhone ||
+                                  checkoutData.deliveryInfo.phone ||
+                                  "-"}
                               </span>
                             </div>
                           </>
                         )}
                         <div className="ml-auto flex items-center gap-3">
-                          <span className="hidden md:inline text-sm text-gray-600">Change</span>
+                          <span className="hidden md:inline text-sm text-gray-600">
+                            Change
+                          </span>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -879,7 +978,7 @@ const Checkout: React.FC = () => {
             </Card>
 
             {/* Payment Methods Card */}
-            <Card className="border bg-background">
+            <Card className="border bg-background" id="payment-section">
               <CardContent className="p-4 lg:p-6">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   Payment Method
@@ -887,22 +986,21 @@ const Checkout: React.FC = () => {
 
                 <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 mb-6">
                   {paymentMethods.map((method) => (
-                    <button
+                    <Button
                       key={method.id}
                       type="button"
-                      className={`rounded-lg border-2 ${
-                        paymentMethod === method.id
-                          ? `${method.borderColor} ${method.bgColor} shadow-lg`
-                          : "border-gray-200"
-                      }`}
+                      variant={
+                        paymentMethod === method.id ? "outline" : "ghost"
+                      }
                       onClick={() => setPaymentMethod(method.id)}
+                      className="flex flex-col items-center p-3 rounded-lg"
                     >
                       <img
                         src={method.icon}
                         alt={method.name}
-                        className="w-auto h-16 mx-auto mb-2"
+                        className="w-auto h-14 mx-auto mb-2"
                       />
-                    </button>
+                    </Button>
                   ))}
                 </div>
 
@@ -915,72 +1013,77 @@ const Checkout: React.FC = () => {
                       return (
                         <div key={method.id} className="space-y-4">
                           {/* Account Info */}
-                          <div
-                            className={`${method.bgColor} rounded-lg p-4 border ${method.borderColor}`}
-                          >
-                            <div className="flex items-center gap-3 mb-3">
-                              <img
-                                src={method.icon}
-                                alt={method.name}
-                                className="w-6 h-6"
-                              />
-                              <div>
-                                <h5 className="font-semibold">{method.name}</h5>
-                                <p className="text-xs text-gray-600">
-                                  {method.description}
-                                </p>
+                          <div className="rounded-lg p-4 border border-gray-200 bg-white space-y-3">
+                            {/* Number Row */}
+                            <div className="p-3 border rounded-md bg-gray-50 flex justify-between items-center">
+                              <span className="text-sm text-secondary">
+                                Number:
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">
+                                  {method.account}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    copyToClipboard(method.account, "account")
+                                  }
+                                  className="p-1 hover:bg-gray-100 rounded"
+                                >
+                                  {copiedText === "account" ? (
+                                    <Check className="w-3 h-3 text-green-500" />
+                                  ) : (
+                                    <Copy className="w-3 h-3 text-gray-500" />
+                                  )}
+                                </button>
                               </div>
                             </div>
 
-                            <div className="bg-white/80 rounded-lg p-3 space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">
-                                  Number:
+                            {/* Amount Row */}
+                            <div className="p-3 border rounded-md bg-gray-50 flex justify-between items-center">
+                              <span className="text-sm text-secondary">
+                                Amount:
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold font-anekbangla text-xl text-secondary">
+                                  ৳{toBanglaNumber(totalAmount)} টাকা{" "}
                                 </span>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold">
-                                    {method.account}
-                                  </span>
-                                  <button
-                                    onClick={() =>
-                                      copyToClipboard(method.account, "account")
-                                    }
-                                    className="p-1 hover:bg-gray-100 rounded"
-                                  >
-                                    {copiedText === "account" ? (
-                                      <Check className="w-3 h-3 text-green-500" />
-                                    ) : (
-                                      <Copy className="w-3 h-3 text-gray-500" />
-                                    )}
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">
-                                  Amount:
-                                </span>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-bold font-anekbangla text-primary">
-                                    ৳{toBanglaNumber(totalAmount)}
-                                  </span>
-                                  <button
-                                    onClick={() =>
-                                      copyToClipboard(
-                                        totalAmount.toString(),
-                                        "amount"
-                                      )
-                                    }
-                                    className="p-1 hover:bg-gray-100 rounded"
-                                  >
-                                    {copiedText === "amount" ? (
-                                      <Check className="w-3 h-3 text-green-500" />
-                                    ) : (
-                                      <Copy className="w-3 h-3 text-gray-500" />
-                                    )}
-                                  </button>
-                                </div>
+                                <button
+                                  onClick={() =>
+                                    copyToClipboard(
+                                      totalAmount.toString(),
+                                      "amount"
+                                    )
+                                  }
+                                  className="p-1 hover:bg-gray-100 rounded"
+                                >
+                                  {copiedText === "amount" ? (
+                                    <Check className="w-3 h-3 text-green-500" />
+                                  ) : (
+                                    <Copy className="w-3 h-3 text-gray-500" />
+                                  )}
+                                </button>
                               </div>
                             </div>
+
+                            {/* Instructions */}
+                            {method.instructions &&
+                              method.instructions.length > 0 && (
+                                <div className="mt-1 text-sm text-gray-800">
+                                  <div className="font-medium mb-4">
+                                    How to pay
+                                  </div>
+                                  <ol className="list-decimal ml-4 text-md text-muted-foreground font-anekbangla space-y-1">
+                                    {method.instructions.map((inst, idx) => (
+                                      <li
+                                        key={idx}
+                                        dangerouslySetInnerHTML={{
+                                          __html: inst,
+                                        }}
+                                      />
+                                    ))}
+                                  </ol>
+                                </div>
+                              )}
                           </div>
 
                           {/* Payment Form */}
@@ -990,7 +1093,8 @@ const Checkout: React.FC = () => {
                                 Your {method.name} Number *
                               </label>
                               <Input
-                                placeholder={`Enter your ${method.name} number`}
+                                id="user-account-input"
+                                placeholder={`Enter your number`}
                                 value={userAccount}
                                 onChange={(e) => setUserAccount(e.target.value)}
                                 className="h-12"
@@ -1001,7 +1105,8 @@ const Checkout: React.FC = () => {
                                 Transaction ID *
                               </label>
                               <Input
-                                placeholder="Enter transaction ID (TRX ID)"
+                                id="trxid-input"
+                                placeholder="Enter trx ID"
                                 value={trxId}
                                 onChange={(e) => setTrxId(e.target.value)}
                                 className="h-12"
@@ -1019,31 +1124,121 @@ const Checkout: React.FC = () => {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-4">
-            <div className="lg:sticky lg:top-24">
-              <Card className="shadow-lg border bg-white">
-                <div className="bg-gradient-to-r from-primary to-primary/90 text-white p-4 lg:p-6">
+            <div className="lg:sticky lg:top-32">
+              <Card className="bg-background hidden lg:block">
+                <div className="text-white rounded-md p-4 lg:p-6">
                   <h3 className="text-lg font-bold flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5" />
+                    <ShoppingBag className="w-8 h-8" />
                     Order Summary
                   </h3>
                 </div>
 
-                <CardContent className="p-4 lg:p-6">
+                <CardContent>
                   <div className="space-y-3 mb-6">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Subtotal:</span>
-                      <span className="font-anekbangla font-semibold">
-                        ৳{toBanglaNumber(totalAmount)}
-                      </span>
+                    {/* Per-item list: product name (left) and line price (right) */}
+                    <div className="space-y-2">
+                      {checkoutData.items.map((item, i) => (
+                        <div key={i} className="flex flex-col gap-0.5">
+                          <div className="flex justify-between items-center text-sm">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <span className="text-muted-foreground shrink-0">
+                                {i + 1}.
+                              </span>
+                              <span className="truncate font-medium text-foreground">
+                                {item.productName}
+                              </span>
+                            </div>
+                            <div className="text-right text-lg font-anekbangla font-bold shrink-0">
+                              ৳{toBanglaNumber(item.price * item.quantity)}
+                            </div>
+                          </div>
+                          {item.label && item.label !== item.productName && (
+                            <div className="flex justify-between items-center text-xs text-muted-foreground">
+                              <div className="min-w-0 text-secondary truncate">
+                                {item.label}
+                                <span className="ml-1 text-foreground">
+                                  x{item.quantity}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Delivery:</span>
-                      <span className="text-green-600 font-semibold">Free</span>
+
+                    {/* Delivery and Payment method (show selected labels) */}
+                    <div className="space-y-2">
+                      {/* Delivery row with icon */}
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Delivery:</span>
+                        <div className="flex items-center gap-2">
+                          {checkoutData.deliveryInfo?.method === "email" ? (
+                            <>
+                              <img
+                                src="/assets/icons/email.svg"
+                                alt="Email"
+                                className="w-5 h-5"
+                              />
+                              <span className="text-gray-800 font-medium">
+                                Email
+                              </span>
+                            </>
+                          ) : checkoutData.deliveryInfo?.method ===
+                            "whatsapp" ? (
+                            <>
+                              <img
+                                src="/assets/icons/whatsapp.svg"
+                                alt="WhatsApp"
+                                className="w-5 h-5"
+                              />
+                              <span className="text-gray-800 font-medium">
+                                WhatsApp
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-gray-800 font-medium">
+                              Not selected
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Payment row with icon (use paymentMethods array to get icon/name) */}
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Payment:</span>
+                        <div className="flex items-center gap-2">
+                          {paymentMethod ? (
+                            (() => {
+                              const pm = paymentMethods.find(
+                                (m) => m.id === (paymentMethod as any)
+                              );
+                              return pm ? (
+                                <>
+                                  <img
+                                    src={pm.icon}
+                                    alt={pm.name}
+                                    className="w-auto h-12"
+                                  />
+                                </>
+                              ) : (
+                                <span className="text-gray-800 font-medium capitalize">
+                                  {paymentMethod}
+                                </span>
+                              );
+                            })()
+                          ) : (
+                            <span className="text-gray-800 font-medium">
+                              Not selected
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="border-t pt-3">
+
+                    <div className="border-t border-muted pt-3">
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-semibold">Total:</span>
-                        <span className="font-anekbangla text-2xl font-bold text-primary">
+                        <span className="font-anekbangla text-2xl font-bold text-secondary">
                           ৳{toBanglaNumber(totalAmount)}
                         </span>
                       </div>
@@ -1424,11 +1619,13 @@ const Checkout: React.FC = () => {
         isOpen={orderModal.isOpen}
         onClose={() => {
           setOrderModal({ ...orderModal, isOpen: false });
-          // clear checkout data when modal is dismissed
-          setCheckoutData(null);
-          setPaymentMethod(null);
-          setUserAccount("");
-          setTrxId("");
+          // Only clear checkout data if order was successful
+          if (orderModal.status === "success") {
+            setCheckoutData(null);
+            setPaymentMethod(null);
+            setUserAccount("");
+            setTrxId("");
+          }
         }}
         status={orderModal.status}
         title={orderModal.title}
@@ -1448,7 +1645,154 @@ const Checkout: React.FC = () => {
         }}
       />
 
-      <Footer />
+      {/* Mobile sticky summary (Cart-like) */}
+      <div className="lg:hidden">
+        {/* Expanded card (shows above sticky bar when isSheetOpen is true) */}
+        <div
+          className={`fixed left-4 right-4 bottom-24 z-40 transform transition-all duration-300 ${
+            isSheetOpen
+              ? "translate-y-0 opacity-100"
+              : "translate-y-full opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="bg-accent border rounded-lg shadow-lg p-4 space-y-3">
+            {/* Order Summary Title (mobile) */}
+            <div className="flex items-center gap-2 mb-2">
+              <ShoppingBag className="w-4 h-4 text-foreground" />
+              <span className="text-base font-bold text-foreground">
+                Order Summary
+              </span>
+            </div>
+            {/* Mobile-specific order details (no total shown here) */}
+            <div className="space-y-2">
+              {checkoutData.items.map((item, i) => (
+                <div key={i} className="flex justify-between items-start">
+                  <div className="min-w-0 pr-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground text-sm">
+                        {i + 1}.
+                      </span>
+                      <div className="truncate font-medium text-sm">
+                        {item.productName}
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {item.label} · x{item.quantity}
+                    </div>
+                  </div>
+                  <div className="text-right font-anekbangla font-bold text-sm">
+                    ৳{toBanglaNumber(item.price * item.quantity)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-muted pt-2 space-y-1">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">Delivery</span>
+                <span className="flex items-center gap-2">
+                  {checkoutData.deliveryInfo?.method === "email" ? (
+                    <>
+                      <span className="text-gray-800 font-medium">Email</span>
+                      <img
+                        src="/assets/icons/email.svg"
+                        alt="Email"
+                        className="w-5 h-5"
+                      />
+                    </>
+                  ) : checkoutData.deliveryInfo?.method === "whatsapp" ? (
+                    <>
+                      <img
+                        src="/assets/icons/whatsapp.svg"
+                        alt="WhatsApp"
+                        className="w-5 h-5"
+                      />
+                      <span className="text-gray-800 font-medium">
+                        WhatsApp
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-gray-800 font-medium">
+                      Not selected
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">Payment</span>
+                <span className="flex items-center gap-2">
+                  {paymentMethod ? (
+                    (() => {
+                      const pm = paymentMethods.find(
+                        (m) => m.id === paymentMethod
+                      );
+                      return pm ? (
+                        <img
+                          src={pm.icon}
+                          alt={pm.name}
+                          className="w-auto h-12"
+                        />
+                      ) : (
+                        <span className="text-gray-800 font-medium capitalize">
+                          {paymentMethod}
+                        </span>
+                      );
+                    })()
+                  ) : (
+                    <span className="text-gray-800 font-medium">
+                      Not selected
+                    </span>
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky bottom bar */}
+        <div className="fixed bottom-0 left-0 right-0 p-6 bg-background border-t z-50">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-muted-foreground">Total</div>
+              <div className="text-xl text-secondary font-anekbangla font-bold">
+                ৳{toBanglaNumber(totalAmount)} টাকা
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSheetOpen(!isSheetOpen)}
+                className="h-8 w-8 p-0"
+              >
+                {isSheetOpen ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronUp className="w-4 h-4" />
+                )}
+              </Button>
+              <Button
+                onClick={handleCompletePayment}
+                className="h-10"
+                disabled={
+                  !userAccount ||
+                  !trxId ||
+                  isProcessingOrder ||
+                  !checkoutData.deliveryInfo ||
+                  !paymentMethod
+                }
+              >
+                Place Order
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="h-20" />
+      </div>
+
+      <div className="hidden lg:block">
+        <Footer />
+      </div>
     </div>
   );
 };

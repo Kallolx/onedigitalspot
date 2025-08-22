@@ -43,7 +43,7 @@ const generateOrderId = (productType: string, productName: string): string => {
     "Gift Cards": "GC",
     "AI Tools": "AI",
     "Subscriptions": "SB"
-  }[productType] || "XX";
+  }[productType] || "PD";
   
   // Generate 2 random characters (numbers + letters)
   const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

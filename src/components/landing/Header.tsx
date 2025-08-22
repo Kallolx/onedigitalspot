@@ -48,29 +48,29 @@ interface User {
 const PRODUCT_IMAGES = {
   // Gift Cards
   "Discord Nitro": "/assets/icons/gift-cards/discord.svg",
-  "Steam": "/assets/icons/gift-cards/steam-card.svg",
+  Steam: "/assets/icons/gift-cards/steam-card.svg",
   "Google Play": "/assets/icons/gift-cards/google-play.svg",
   "Apple Store": "/assets/icons/subscriptions/apple.svg",
-  "PlayStation": "/assets/icons/gift-cards/playstation.svg",
-  
+  PlayStation: "/assets/icons/gift-cards/playstation.svg",
+
   // Design Tools
   "Canva Pro": "/assets/icons/design/canva.svg",
   "Figma Pro": "/assets/icons/design/figma.svg",
   "CapCut Pro": "/assets/icons/design/capcut.svg",
   "Telegram Stars": "/assets/icons/design/telegram.svg",
-  
+
   // Games
-  "Valorant": "/assets/icons/gift-cards/valorant.svg",
+  Valorant: "/assets/icons/gift-cards/valorant.svg",
   "Apex Legends": "/assets/icons/games/apex.svg",
   "PUBG Mobile": "/assets/icons/games/pubg-mobile.svg",
   "Free Fire": "/assets/icons/games/free-fire.svg",
-  
+
   // Subscriptions
-  "Netflix": "/assets/icons/subscriptions/netflix.svg",
-  "Crunchyroll": "/assets/icons/subscriptions/crunchyroll.svg",
+  Netflix: "/assets/icons/subscriptions/netflix.svg",
+  Crunchyroll: "/assets/icons/subscriptions/crunchyroll.svg",
   "Disney+": "/assets/icons/subscriptions/disney.svg",
-  "Spotify": "/assets/icons/subscriptions/spotify.svg",
-  
+  Spotify: "/assets/icons/subscriptions/spotify.svg",
+
   // AI Tools
   "ChatGPT Pro": "/assets/icons/ai-tools/chatgpt.svg",
   "Claude Pro": "/assets/icons/ai-tools/claude.svg",
@@ -134,7 +134,13 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
 
 // Utility Components
 const MoreIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <circle cx="3" cy="8" r="1.5" fill="currentColor" />
     <circle cx="8" cy="8" r="1.5" fill="currentColor" />
     <circle cx="13" cy="8" r="1.5" fill="currentColor" />
@@ -142,14 +148,16 @@ const MoreIcon = () => (
 );
 
 const DropdownLink = ({ item }: { item: DropdownItem }) => {
-  const imgSrc = PRODUCT_IMAGES[item.name as keyof typeof PRODUCT_IMAGES] || "/assets/icons/placeholder.svg";
+  const imgSrc =
+    PRODUCT_IMAGES[item.name as keyof typeof PRODUCT_IMAGES] ||
+    "/assets/icons/placeholder.svg";
   const isMore = item.name === "More";
-  
+
   // Section header styling
   if (item.isHeader) {
     return (
       <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-t border-border mt-2 pt-2">
-        {item.name.replace(/---/g, '').trim()}
+        {item.name.replace(/---/g, "").trim()}
       </div>
     );
   }
@@ -161,7 +169,11 @@ const DropdownLink = ({ item }: { item: DropdownItem }) => {
     >
       {!isMore && (
         <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-          <img src={imgSrc} alt={item.name} className="w-full h-full object-cover" />
+          <img
+            src={imgSrc}
+            alt={item.name}
+            className="w-full h-full object-cover"
+          />
         </span>
       )}
       {item.name}
@@ -188,9 +200,16 @@ const NavigationDropdown = ({ item }: { item: NavigationItem }) => {
   );
 };
 
-const NavigationItem = ({ item, location }: { item: NavigationItem; location: { pathname: string } }) => {
+const NavigationItem = ({
+  item,
+  location,
+}: {
+  item: NavigationItem;
+  location: { pathname: string };
+}) => {
   const Icon = item.icon;
-  const isActive = item.isActive || (item.path && location.pathname.startsWith(item.path));
+  const isActive =
+    item.isActive || (item.path && location.pathname.startsWith(item.path));
 
   return (
     <div className="relative group">
@@ -211,13 +230,13 @@ const NavigationItem = ({ item, location }: { item: NavigationItem; location: { 
   );
 };
 
-const UserMenu = ({ 
-  user, 
-  isOpen, 
-  onToggle, 
-  onLogout, 
-  onSendVerification, 
-  pendingOrdersCount 
+const UserMenu = ({
+  user,
+  isOpen,
+  onToggle,
+  onLogout,
+  onSendVerification,
+  pendingOrdersCount,
 }: {
   user: User;
   isOpen: boolean;
@@ -243,7 +262,7 @@ const UserMenu = ({
         onClick={onToggle}
       >
         <UserIcon className="w-5 h-5" />
-        <span className="text-md font-medium">{getUserDisplayName()}</span>
+        <span className="hidden lg:inline-block text-md font-medium">{getUserDisplayName()}</span>
         <ArrowDown01Icon className="w-3 h-3" />
       </Button>
 
@@ -252,7 +271,9 @@ const UserMenu = ({
           <div className="space-y-1">
             {/* User Info */}
             <div className="px-3 py-2 border-b border-border">
-              <p className="text-sm font-medium text-foreground">{user.name || "User"}</p>
+              <p className="text-sm font-medium text-foreground">
+                {user.name || "User"}
+              </p>
               <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
 
@@ -317,16 +338,22 @@ const UserMenu = ({
 };
 
 const BroadcastTicker = () => {
-  const text = "⏰ ডেলিভারি সময় ৩০ মিনিট থেকে ৪ ঘণ্টা •  🕛 আমরা ২৪ ঘণ্টা খোলা • 💬 কেনার পর কাস্টমার সাপোর্টে অবশ্যই মেসেজ করুন • ✨ কোন সমস্যা বা অভিযোগ থাকলে কাস্টমার সাপোর্টে মেসেজ করুন •";
+  const text =
+    "⏰ ডেলিভারি সময় ৩০ মিনিট থেকে ৪ ঘণ্টা •  🕛 আমরা ২৪ ঘণ্টা খোলা • 💬 কেনার পর কাস্টমার সাপোর্টে অবশ্যই মেসেজ করুন • ✨ কোন সমস্যা বা অভিযোগ থাকলে কাস্টমার সাপোর্টে মেসেজ করুন •";
 
   return (
     <div className="sticky top-[64px] z-40 w-full bg-gradient-to-r from-primary to-primary/80 border-b border-primary/30 shadow-sm">
       <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-8 py-1">
         <div className="broadcast-ticker-container overflow-hidden">
-          <div className="broadcast-ticker-content"
-               style={{ fontFamily: "Hind Siliguri, sans-serif" }}>
+          <div
+            className="broadcast-ticker-content"
+            style={{ fontFamily: "Hind Siliguri, sans-serif" }}
+          >
             {[...Array(3)].map((_, i) => (
-              <span key={i} className="inline-block px-4 whitespace-nowrap text-primary-foreground">
+              <span
+                key={i}
+                className="inline-block px-4 whitespace-nowrap text-primary-foreground"
+              >
                 {text}
               </span>
             ))}
@@ -419,41 +446,58 @@ const Header = () => {
         <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <a href="/" className="flex items-center h-full">
-              <img
-                src="/assets/logo-av.avif"
-                alt="LootBox Logo"
-                className="h-full object-contain"
-                style={{ width: "auto", maxHeight: "48px" }}
-              />
-            </a>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden h-10 w-10 mobile-menu-container"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? (
+                  <Cancel01Icon className="w-5 h-5" />
+                ) : (
+                  <Menu03Icon className="w-5 h-5" />
+                )}
+              </Button>
+              <a href="/" className="flex items-center h-full">
+                <img
+                  src="/assets/logo-av.avif"
+                  alt="LootBox Logo"
+                  className="h-full object-contain"
+                  style={{ width: "auto", maxHeight: "48px" }}
+                />
+              </a>
+            </div>
 
             {/* Desktop Navigation - Changed from xl:flex to lg:flex */}
             <nav className="hidden lg:flex items-center gap-1">
               {NAVIGATION_ITEMS.map((item) => (
-                <NavigationItem key={item.name} item={item} location={location} />
+                <NavigationItem
+                  key={item.name}
+                  item={item}
+                  location={location}
+                />
               ))}
             </nav>
 
             {/* Right Actions */}
             <div className="flex items-center gap-4">
-
-                {/* Cart Button - Changed from xl:inline-flex to lg:inline-flex */}
-                <div>
-                  <Button
-                    variant="default"
-                    size="icon"
-                    onClick={() => navigate('/cart')}
-                    className="relative p-1 h-9 w-9 min-w-0 hidden lg:inline-flex"
-                  >
-                    <ShoppingCart02Icon className="w-4 h-4 text-secondary" />
-                    {count > 0 && (
-                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-[10px] font-medium text-primary-foreground rounded-full flex items-center justify-center">
-                        {count > 9 ? "9+" : count}
-                      </span>
-                    )}
-                  </Button>
-                </div>
+              {/* Cart Button - visible on mobile and desktop */}
+              <div>
+                <Button
+                  variant="default"
+                  size="icon"
+                  onClick={() => navigate("/cart")}
+                  className="relative p-1 h-9 w-9 min-w-0 inline-flex"
+                >
+                  <ShoppingCart02Icon className="w-4 h-4 text-secondary" />
+                  {count > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-[10px] font-medium text-primary-foreground rounded-full flex items-center justify-center">
+                      {count > 9 ? "9+" : count}
+                    </span>
+                  )}
+                </Button>
+              </div>
 
               {/* Authentication Section */}
               {loading ? (
@@ -468,27 +512,20 @@ const Header = () => {
                   pendingOrdersCount={pendingOrdersCount}
                 />
               ) : (
-                <Button asChild variant="default" size="default" className="h-10 px-4">
-                  <a href="/auth/login" className="flex items-center gap-2">
-                    <Logout03Icon className="w-5 h-5" />
-                    <span className="text-sm font-medium">LOG IN</span>
-                  </a>
+                <Button
+                  asChild
+                  variant="default"
+                  size="default"
+                  className="h-10 px-4"
+                >
+                    <a href="/auth/login" className="flex items-center gap-2">
+                      <Logout03Icon className="w-5 h-5" />
+                      <span className="hidden lg:inline-block text-sm font-medium">LOG IN</span>
+                    </a>
                 </Button>
               )}
 
-              {/* Mobile Menu Toggle - Changed from xl:hidden to lg:hidden */}
-              <Button
-                variant="default"
-                size="icon"
-                className="lg:hidden h-10 w-10 mobile-menu-container"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                {isMobileMenuOpen ? (
-                  <Cancel01Icon className="w-5 h-5" />
-                ) : (
-                  <Menu03Icon className="w-5 h-5" />
-                )}
-              </Button>
+              {/* Mobile menu toggle moved next to logo to avoid duplicates on mobile */}
             </div>
           </div>
 

@@ -6,8 +6,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { Info, X } from "lucide-react";
 import { LockKeyIcon, SentIcon, ShoppingCart02Icon } from "hugeicons-react";
 import { useCart } from "@/contexts/CartContext";
+import { toast } from "@/components/ui/sonner";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RotateLoader } from "react-spinners";
+import Footer from "../landing/Footer";
+import { Input } from "../ui/input";
 
 interface PriceItem {
   label: string;
@@ -227,7 +230,7 @@ const GameDetailsLayout: React.FC<
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Game Image Section - Compact */}
           <div className="lg:col-span-4">
-            <div className="bg-background border rounded-2xl shadow-card p-4 sticky top-8">
+            <div className="bg-background border rounded-2xl p-4 sticky top-32">
               <div className="w-[400px] h-[400px] max-w-full max-h-[80vw] rounded-xl overflow-hidden mb-4 flex items-center justify-center bg-gray-50 relative mx-auto">
                 {/* Loader while loading or error */}
                 {(!imgLoaded || imgError) && (
@@ -280,7 +283,7 @@ const GameDetailsLayout: React.FC<
           </div>
           <div className="flex-1">
             {/* Price List with Categories */}
-            <Card className="mb-6 p-4 bg-transparent">
+            <Card className="mb-6 p-4 bg-transparent order-1 lg:order-0">
               <div className="flex flex-col gap-6">
                 {priceList.map((category, catIdx) => (
                   <div key={catIdx}>
@@ -344,7 +347,7 @@ const GameDetailsLayout: React.FC<
             </Card>
 
             {/* Purchase Form */}
-            <Card className="mb-8 p-4 bg-transparent">
+            <Card className="mb-8 p-4 bg-transparent order-0 lg:order-1">
               <form onSubmit={onSubmit || ((e) => e.preventDefault())}>
                 <div className="mb-4">
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -359,9 +362,9 @@ const GameDetailsLayout: React.FC<
                             {playerIdLabel} <span className="text-red-500">*</span>
                           </label>
                           <div className="relative flex items-center">
-                            <input
+                            <Input
                               id="playerId"
-                              className="input w-full border rounded-lg px-4 py-3 text-base bg-background focus:border-primary focus:ring-2 focus:ring-primary transition"
+                              className="h-12"
                               placeholder={`Enter your ${playerIdLabel}`}
                               value={playerId || ""}
                               onChange={(e) =>
@@ -375,40 +378,6 @@ const GameDetailsLayout: React.FC<
                               tabIndex={-1}
                               aria-label={`Where to find ${playerIdLabel}`}
                               onClick={() => setShowInfo("player")}
-                            >
-                              <Info className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                    {/* UUID Field */}
-                    {typeof uuid !== "undefined" &&
-                      typeof setUuid !== "undefined" && (
-                        <div className="flex-1">
-                          <label
-                            className="block font-pixel text-base text-foreground mb-1"
-                            htmlFor="uuid"
-                          >
-                            UUID <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative flex items-center">
-                            <input
-                              id="uuid"
-                              className="input w-full border rounded-lg px-4 py-3 text-base bg-background focus:border-primary focus:ring-2 focus:ring-primary transition"
-                              placeholder="Enter your UUID"
-                              value={uuid || ""}
-                              onChange={(e) =>
-                                setUuid && setUuid(e.target.value)
-                              }
-                              required
-                            />
-                            <button
-                              type="button"
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground hover:text-blue-600 focus:outline-none"
-                              tabIndex={-1}
-                              aria-label="Where to find UUID"
-                              onClick={() => setShowInfo("uuid")}
                             >
                               <Info className="w-5 h-5" />
                             </button>
@@ -658,7 +627,7 @@ const GameDetailsLayout: React.FC<
                     }
                       onClick={() => {
                         // convert selectedItems to cart items with game info
-                        selectedItems.forEach((si) => {
+                          selectedItems.forEach((si) => {
                           const item = priceList[si.categoryIdx]?.items[si.itemIdx];
                           if (!item) return;
                           addItem({
@@ -674,7 +643,21 @@ const GameDetailsLayout: React.FC<
                             },
                           });
                         });
-                        setOpen(true);
+                          setOpen(true);
+                          // Build a short summary for the toast
+                          const addedSummary = selectedItems
+                            .map((si) => {
+                              const it = priceList[si.categoryIdx]?.items[si.itemIdx];
+                              if (!it) return null;
+                              return `${it.label}${si.quantity && si.quantity > 1 ? ` x${si.quantity}` : ""}`;
+                            })
+                            .filter(Boolean)
+                            .slice(0, 3)
+                            .join(", ");
+
+                          const moreCount = Math.max(0, selectedItems.length - 3);
+                          const message = `${addedSummary}${moreCount > 0 ? ` and ${moreCount} more` : ""} added to cart`;
+                          toast.success(message);
                       }}
                   >
                     <ShoppingCart02Icon className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -726,6 +709,7 @@ const GameDetailsLayout: React.FC<
           // Reset is now handled in the checkout page
         }}
       />
+      <Footer />
     </div>
   );
 };

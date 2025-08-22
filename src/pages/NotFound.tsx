@@ -13,34 +13,30 @@ const NotFound = () => {
     );
   }, [location.pathname]);
 
-  return (   
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center max-w-md w-full">
-        {/* Optional: Themed illustration */}
-        <img
-          src="/assets/404-pixel.svg"
-          alt="404 Not Found"
-          className="mx-auto mb-6 w-32 h-32 object-contain drop-shadow-lg"
-          onError={(e) => (e.currentTarget.style.display = "none")}
-        />
-        <h1 className="text-6xl md:text-7xl font-pixel text-foreground mb-2 tracking-tighter">
-          404
-        </h1>
-        <p className="text-lg md:text-xl font-pixel text-foreground mb-4">
-          Page Not Found
-        </p>
-        <p className="text-base text-muted-foreground mb-8">
-          Sorry, the page you are looking for does not exist or has been moved.
-        </p>
-        <Button>
-          <Link
-            to="/"
-            className="inline-block font-pixel bg-primary text-white px-6 py-2 rounded-lg shadow hover:bg-primary/90 transition-colors text-lg"
-          >
-            Return Home
-          </Link>
-        </Button>
-      </div>
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
+      {/* Error SVG Illustration */}
+      <img
+        src="/assets/icons/error.svg"
+        alt="404 Not Found"
+        className="w-40 sm:w-56 md:w-72 lg:w-80 mb-6 drop-shadow-lg"
+        onError={(e) => (e.currentTarget.style.display = "none")}
+      />
+
+      {/* Title & Message */}
+      <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground mb-2 tracking-tight">
+        Oops! Page not found
+      </h1>
+      <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6">
+        The page you’re looking for doesn’t exist or has been moved.
+      </p>
+
+      {/* Return Home Button */}
+      <Button asChild>
+        <Link to="/" className="font-medium text-sm sm:text-base">
+          Return Home
+        </Link>
+      </Button>
     </div>
   );
 };

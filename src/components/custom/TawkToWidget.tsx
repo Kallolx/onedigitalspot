@@ -12,15 +12,10 @@ const tawkId = import.meta.env.VITE_TAWKTO_ID;
 export default function TawkToWidget() {
   const location = useLocation();
 
-  // Paths to hide the widget on
-  const excludedPaths = ['/cart'];
-  const excludedPrefixes = ['/admin'];
-
   useEffect(() => {
     const path = location.pathname || '/';
-    const shouldHide =
-      excludedPaths.includes(path) ||
-      excludedPrefixes.some((p) => path.startsWith(p));
+    // Only allow the widget on the site root. Hide/remove it on all other routes.
+    const shouldLoad = path === '/';
 
     // Helper to remove any existing tawk script tags and iframes
     const removeTawkElements = () => {
@@ -46,12 +41,12 @@ export default function TawkToWidget() {
       }
     };
 
-    if (shouldHide) {
+    if (!shouldLoad) {
       removeTawkElements();
       return;
     }
 
-    // otherwise ensure tawk script is present
+    // otherwise ensure tawk script is present on root
     if ((window as any).Tawk_API) {
       // already loaded; try show
       try {
