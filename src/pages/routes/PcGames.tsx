@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { pcGames } from "../../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/custom/ServiceCard";
@@ -24,6 +24,10 @@ const PcGames = () => {
     const priceNum = Number(String(g.price).replace(/[^\d.]/g, ""));
     return priceNum >= selectedPrice.min && priceNum < selectedPrice.max;
   });
+  
+    useEffect(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }, []);
 
   return (
     <div className="min-h-screen bg-background">

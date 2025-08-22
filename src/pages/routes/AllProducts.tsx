@@ -81,6 +81,10 @@ const AllProducts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, selectedPrice]);
 
+    useEffect(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8">

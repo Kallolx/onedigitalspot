@@ -1,19 +1,19 @@
 import {
   Home03Icon,
-  ShopSignIcon,
-  CoinsDollarIcon,
   AiMagicIcon,
   GiftCardIcon,
   Tv01Icon,
   ArrowDown01Icon,
   MoreHorizontalSquare01Icon,
-  ShoppingCart02Icon,
+  GameController03Icon,
+  Backpack03Icon,
+  Cancel01Icon,
+  GiftIcon,
 } from "hugeicons-react";
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import SearchComponent from "./SearchComponent";
-import { Button } from "../ui/button";
 
 interface MenuItem {
   name: string;
@@ -30,13 +30,65 @@ interface MenuSection {
 
 interface MobileMenuProps {
   isOpen: boolean;
+  onClose: () => void;
 }
 
 const MENU_SECTIONS: MenuSection[] = [
   {
+    id: "ai-tools",
+    title: "AI Tools",
+    icon: AiMagicIcon,
+    items: [
+      {
+        name: "ChatGPT Pro",
+        path: "/ai-tools/chatgpt",
+        icon: "/assets/icons/ai-tools/chatgpt.svg",
+      },
+      {
+        name: "Claude Pro",
+        path: "/ai-tools/claude",
+        icon: "/assets/icons/ai-tools/claude.svg",
+      },
+      {
+        name: "Cursor Pro",
+        path: "/ai-tools/cursor",
+        icon: "/assets/icons/ai-tools/cursor.svg",
+      },
+      {
+        name: "Github Pro",
+        path: "/ai-tools/github",
+        icon: "/assets/icons/ai-tools/github.svg",
+      },
+      { name: "More", path: "/ai-tools" },
+    ],
+  },
+  {
+    id: "Productivity",
+    title: "Productivity",
+    icon: Backpack03Icon,
+    items: [
+      {
+        name: "Canva Pro",
+        path: "/subscriptions/canva-pro",
+        icon: "/assets/icons/design/canva.svg",
+      },
+      {
+        name: "CapCut Pro",
+        path: "/subscriptions/capcut-pro",
+        icon: "/assets/icons/design/capcut.svg",
+      },
+      {
+        name: "Figma Pro",
+        path: "/subscriptions/figma-pro",
+        icon: "/assets/icons/design/figma.svg",
+      },
+      { name: "More", path: "/productivity" },
+    ],
+  },
+  {
     id: "gaming",
     title: "Gaming",
-    icon: ShopSignIcon,
+    icon: GameController03Icon,
     items: [
       {
         name: "PUBG Mobile",
@@ -58,69 +110,16 @@ const MENU_SECTIONS: MenuSection[] = [
         path: "/pc-games/apex-legends",
         icon: "/assets/icons/games/apex.svg",
       },
-      { name: "More", path: "/all-games" },
-    ],
-  },
-  {
-    id: "design-tools",
-    title: "Design Tools",
-    icon: CoinsDollarIcon,
-    items: [
       {
-        name: "Canva Pro",
-        path: "/design-tools/canva",
-        icon: "/assets/icons/design/canva.svg",
+        name: "Mobile Games", path: "/mobile-games",
       },
-      {
-        name: "CapCut Pro",
-        path: "/design-tools/capcut",
-        icon: "/assets/icons/design/capcut.svg",
-      },
-      {
-        name: "Figma Pro",
-        path: "/design-tools/figma",
-        icon: "/assets/icons/design/figma.svg",
-      },
-      {
-        name: "Telegram Stars",
-        path: "/design-tools/discord-nitro",
-        icon: "/assets/icons/design/telegram.svg",
-      },
-      { name: "More", path: "/design-tools" },
-    ],
-  },
-  {
-    id: "ai-tools",
-    title: "AI Tools",
-    icon: AiMagicIcon,
-    items: [
-      {
-        name: "ChatGPT Pro",
-        path: "/ai-tools/chatgpt",
-        icon: "/assets/icons/ai-tools/chatgpt.svg",
-      },
-      {
-        name: "Claude Pro",
-        path: "/ai-tools/claude",
-        icon: "/assets/icons/ai-tools/claude.svg",
-      },
-      {
-        name: "Cursor Pro",
-        path: "/ai-tools/midjourney",
-        icon: "/assets/icons/ai-tools/cursor.svg",
-      },
-      {
-        name: "Github Pro",
-        path: "/ai-tools/github",
-        icon: "/assets/icons/ai-tools/github.svg",
-      },
-      { name: "More", path: "/ai-tools" },
+      { name: "PC Games", path: "/pc-games" },
     ],
   },
   {
     id: "gift-cards",
     title: "Gift Cards",
-    icon: GiftCardIcon,
+    icon: GiftIcon,
     items: [
       {
         name: "Steam",
@@ -175,45 +174,29 @@ const MENU_SECTIONS: MenuSection[] = [
   },
 ];
 
-const MenuButton = ({
-  section,
-  isActive,
-  onToggle,
+const MenuItemLink = ({
+  item,
+  onClose,
 }: {
-  section: MenuSection;
-  isActive: boolean;
-  onToggle: () => void;
+  item: MenuItem;
+  onClose: () => void;
 }) => (
-  <button
-    onClick={onToggle}
-    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-  >
-    <div className="flex items-center gap-2">
-      <section.icon className="w-5 h-5" />
-      <span className="font-medium">{section.title}</span>
-    </div>
-    <ArrowDown01Icon
-      className={`w-4 h-4 transition-transform ${isActive ? "rotate-180" : ""}`}
-    />
-  </button>
-);
-
-const MenuItemLink = ({ item }: { item: MenuItem }) => (
   <Link
     to={item.path}
-    className="block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+    onClick={onClose}
+    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/50 transition-all duration-150"
   >
     {item.icon && item.name !== "More" && (
-      <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
-        <img
-          src={item.icon}
-          alt={item.name}
-          className="w-full h-full object-cover"
-        />
-      </span>
+      <img
+        src={item.icon}
+        alt={item.name}
+        className="w-6 h-6 flex-shrink-0 object-contain"
+      />
     )}
-    {item.name}
-    {item.name === "More" && <MoreHorizontalSquare01Icon className="w-3 h-3" />}
+    <span className="text-sm font-medium text-foreground">{item.name}</span>
+    {(item.name === "More" || item.name === "PC Games" || item.name === "Mobile Games") && (
+      <MoreHorizontalSquare01Icon className="w-4 h-4 ml-auto" />
+    )}
   </Link>
 );
 
@@ -221,81 +204,154 @@ const MenuSection = ({
   section,
   activeSubmenu,
   onToggleSubmenu,
+  onClose,
 }: {
   section: MenuSection;
   activeSubmenu: string | null;
   onToggleSubmenu: (id: string) => void;
+  onClose: () => void;
 }) => {
   const isActive = activeSubmenu === section.id;
 
   return (
-    <div>
-      <MenuButton
-        section={section}
-        isActive={isActive}
-        onToggle={() => onToggleSubmenu(section.id)}
-      />
-      {isActive && (
-        <div className="mt-2 space-y-1">
-          {section.items.map((item) => (
-            <MenuItemLink key={item.name} item={item} />
-          ))}
+    <div className="overflow-hidden relative">
+      <div className="flex items-stretch gap-0">
+        {/* left column: icon + vertical connector */}
+        <div className="w-12 flex flex-col items-center relative">
+          <div className="mt-4 z-10">
+            <section.icon className="w-6 h-6 text-foreground" />
+          </div>
+          {/* vertical line connector - stretches to match submenu height when active */}
+          <div
+            className={`absolute top-12 left-1/2 -translate-x-1/2 w-px bg-muted/60 transition-all duration-300 ${
+              isActive ? "opacity-100 bottom-3" : "opacity-0 h-0"
+            }`}
+          />
         </div>
-      )}
+
+        {/* right column: header button and submenu */}
+        <div className="flex-1">
+          <button
+            onClick={() => onToggleSubmenu(section.id)}
+            className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-muted/30 transition-all duration-200 group"
+          >
+            <div className="flex items-center gap-3">
+              <span className="font-medium tracking-tighter text-foreground">
+                {section.title}
+              </span>
+            </div>
+            <ArrowDown01Icon
+              className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${
+                isActive ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          <div
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              isActive ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="pl-0 pr-4 pb-2 space-y-1">
+              {section.items.map((item) => (
+                <MenuItemLink key={item.name} item={item} onClose={onClose} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-
-const MobileMenu = ({ isOpen }: MobileMenuProps) => {
+const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const location = useLocation();
 
   const toggleSubmenu = (menuId: string) => {
     setActiveSubmenu(activeSubmenu === menuId ? null : menuId);
   };
 
+  // Auto-close menu when route changes
+  useEffect(() => {
+    if (isOpen) {
+      onClose();
+    }
+  }, [location.pathname]);
+
+  // Close menu when clicking outside or pressing escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
+
+  // Reset submenu when menu closes
+  useEffect(() => {
+    if (isOpen) {
+      // Expand the top menu by default when the mobile menu opens
+      const first =
+        MENU_SECTIONS && MENU_SECTIONS.length > 0 ? MENU_SECTIONS[0].id : null;
+      setActiveSubmenu(first);
+    } else {
+      setActiveSubmenu(null);
+    }
+  }, [isOpen]);
+
   return (
     <>
-      {/* Blurred overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-x-0 top-[64px] bottom-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
-          aria-hidden="true"
-        />
-      )}
+      {/* Backdrop overlay */}
       <div
-        className={`
-          lg:hidden fixed inset-x-0 top-[64px] bg-background
-          transition-all duration-300 transform origin-top z-50
-          ${
-            isOpen
-              ? "translate-y-0 opacity-100 visible pointer-events-auto"
-              : "-translate-y-full opacity-0 invisible pointer-events-none"
-          }
-        `}
-      >
-        <div className="container px-4 py-4 max-h-[calc(100vh-73px)] overflow-y-auto rounded-lg">
-          {/* Mobile Search and Cart beside each other, full width */}
-          <div className="w-full mt-2 mb-4 items-center">
-            <div className="flex-1">
-              <SearchComponent
-                className="w-full"
-                showFullResults={true}
-              />
-            </div>
-          </div>
-          <nav className="flex flex-col gap-2 mb-4 tracking-tighter">
-            {/* Home Link */}
-            <Link
-              to="/"
-              className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <Home03Icon className="w-5 h-5" />
-                <span className="font-medium">Home</span>
-              </div>
-            </Link>
+        className={`fixed inset-0 bg-black/80 backdrop-blur-md z-40 transition-all duration-300 lg:hidden ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-background/95 backdrop-blur-xl border-r shadow-2xl z-50 lg:hidden transition-all duration-300 ease-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Header */}
+        <div className="grid grid-cols-3 items-center p-4 border-b bg-background/50">
+          <div className="flex items-center justify-start">
+            <button
+              onClick={onClose}
+              className="w-10 h-10 rounded-full flex items-center justify-center border border-border bg-transparent hover:bg-muted/10 text-foreground transition-all duration-200"
+              aria-label="Close menu"
+            >
+              <Cancel01Icon className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-center">
+            <img
+              src="/assets/logo-av.avif"
+              alt="Logo"
+              className="h-12 w-auto"
+            />
+          </div>
+
+          <div className="flex items-center justify-end" />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4">
+          {/* Search */}
+          <div className="mb-6">
+            <SearchComponent className="w-full" showFullResults={true} />
+          </div>
+
+          {/* Navigation */}
+          <nav className="space-y-2">
             {/* Dynamic Menu Sections */}
             {MENU_SECTIONS.map((section) => (
               <MenuSection
@@ -303,6 +359,7 @@ const MobileMenu = ({ isOpen }: MobileMenuProps) => {
                 section={section}
                 activeSubmenu={activeSubmenu}
                 onToggleSubmenu={toggleSubmenu}
+                onClose={onClose}
               />
             ))}
           </nav>

@@ -119,15 +119,15 @@ export default function WindsurfIDE() {
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selected={selected}
-      setSelected={setSelected as any}
-      playerId={playerId} // Email address
-      setPlayerId={setPlayerId}
-      zoneId={zoneId} // Not used
-      setZoneId={setZoneId}
-      quantity={quantity}
-      setQuantity={setQuantity}
-      infoImage={infoImage}
+      selectedItems={selected ? [{ categoryIdx: selected.categoryIdx, itemIdx: selected.itemIdx, quantity }] : []}
+    setSelectedItems={(items) => {
+      if (!items || items.length === 0) {
+        setSelected(null);
+      } else {
+        const it = items[0];
+        setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
+      }
+    }}
     />
   );
 }

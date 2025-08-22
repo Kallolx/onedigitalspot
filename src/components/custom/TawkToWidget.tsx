@@ -15,7 +15,7 @@ export default function TawkToWidget() {
   useEffect(() => {
     const path = location.pathname || '/';
     // Only allow the widget on the site root. Hide/remove it on all other routes.
-    const shouldLoad = path === '/';
+    const shouldLoad = path === '/' || path === '/contact-us' || path === '/refund-policy' || path === '/product-delivery' || path === '/auth/login';
 
     // Helper to remove any existing tawk script tags and iframes
     const removeTawkElements = () => {

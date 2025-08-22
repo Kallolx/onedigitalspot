@@ -498,6 +498,10 @@ const MyOrders = () => {
       .join("");
   }
 
+    useEffect(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }, []);
+
   // normalize selected order status to avoid casing/whitespace issues
   const selectedStatus = selectedOrder?.status?.toLowerCase().trim() ?? "";
 

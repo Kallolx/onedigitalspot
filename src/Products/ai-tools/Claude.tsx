@@ -14,16 +14,19 @@ const infoSections = [
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Claude Pro gives you access to Anthropic’s advanced Claude models with higher usage limits,
-          priority access, and faster responses. Choose between shared access for quick use, or a personal
-          subscription tied to your own account.
+          Claude Pro gives you access to Anthropic’s advanced Claude models with
+          higher usage limits, priority access, and faster responses. Choose
+          between shared access for quick use, or a personal subscription tied
+          to your own account.
         </p>
         <ul className="list-disc pl-5">
           <li>
-            Shared Account: We provide login credentials. Use on one device at a time.
+            Shared Account: We provide login credentials. Use on one device at a
+            time.
           </li>
           <li>
-            Personal Account: Use your own Anthropic account, or let us create a new one for you.
+            Personal Account: Use your own Anthropic account, or let us create a
+            new one for you.
           </li>
         </ul>
       </div>
@@ -36,7 +39,9 @@ const infoSections = [
         <li>Choose your purchase type: Shared or Personal.</li>
         <li>If Personal account, select Existing or New account type.</li>
         <li>For Existing accounts, provide your Anthropic account email.</li>
-        <li>For password recovery, enter your email in Account Recovery field.</li>
+        <li>
+          For password recovery, enter your email in Account Recovery field.
+        </li>
         <li>Proceed to payment and follow instructions sent to your email.</li>
       </ol>
     ),
@@ -49,10 +54,21 @@ const infoSections = [
           Fill in the required account information based on your purchase type:
         </p>
         <ul className="list-disc pl-5 text-base mb-4">
-          <li><strong>Account Email:</strong> Your Anthropic account email (for existing accounts)</li>
-          <li><strong>Account Recovery:</strong> Backup email for account recovery (optional)</li>
-          <li>For shared accounts, we'll provide login credentials after purchase</li>
-          <li>For new personal accounts, we'll create one using your provided email</li>
+          <li>
+            <strong>Account Email:</strong> Your Anthropic account email (for
+            existing accounts)
+          </li>
+          <li>
+            <strong>Account Recovery:</strong> Backup email for account recovery
+            (optional)
+          </li>
+          <li>
+            For shared accounts, we'll provide login credentials after purchase
+          </li>
+          <li>
+            For new personal accounts, we'll create one using your provided
+            email
+          </li>
         </ul>
       </div>
     ),
@@ -60,7 +76,10 @@ const infoSections = [
 ];
 
 export default function Claude() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  const [selected, setSelected] = useState<{
+    categoryIdx: number;
+    itemIdx: number;
+  } | null>(null);
   const [playerId, setPlayerId] = useState("");
   const [zoneId, setZoneId] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -69,18 +88,24 @@ export default function Claude() {
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const claudeProduct = aiTools.find(p => p.title === "Claude Premium");
+  const claudeProduct = aiTools.find((p) => p.title === "Claude Premium");
   const infoImage = claudeProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID;
-        const response = await databases.listDocuments(databaseId, collectionId);
+        const collectionId = import.meta.env
+          .VITE_APPWRITE_COLLECTION_AI_TOOLS_ID;
+        const response = await databases.listDocuments(
+          databaseId,
+          collectionId
+        );
         const products = response.documents;
         // Find Claude Premium (case-insensitive)
-        const claude = products.find((g) => g.title && g.title.toLowerCase() === "claude premium");
+        const claude = products.find(
+          (g) => g.title && g.title.toLowerCase() === "claude premium"
+        );
         setCg(claude);
         // Group priceList if available
         if (claude && Array.isArray(claude.priceList)) {
@@ -138,15 +163,25 @@ export default function Claude() {
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selected={selected}
-      setSelected={setSelected as any}
-      playerId={playerId}
-      setPlayerId={setPlayerId}
-      zoneId={zoneId}
-      setZoneId={setZoneId}
-      quantity={quantity}
-      setQuantity={setQuantity}
-      infoImage={infoImage}
+      selectedItems={
+        selected
+          ? [
+              {
+                categoryIdx: selected.categoryIdx,
+                itemIdx: selected.itemIdx,
+                quantity,
+              },
+            ]
+          : []
+      }
+      setSelectedItems={(items) => {
+        if (!items || items.length === 0) {
+          setSelected(null);
+        } else {
+          const it = items[0];
+          setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
+        }
+      }}
     />
   );
 }

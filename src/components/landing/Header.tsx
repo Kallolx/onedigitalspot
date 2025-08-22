@@ -14,6 +14,8 @@ import {
   UserIcon,
   MailValidation01Icon,
   WebDesign01Icon,
+  GameController03Icon,
+  GiftIcon,
 } from "hugeicons-react";
 import { account } from "@/lib/appwrite";
 import { getUserOrders } from "@/lib/orders";
@@ -81,35 +83,36 @@ const PRODUCT_IMAGES = {
 const NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Gaming",
-    icon: ShopSignIcon,
+    icon: GameController03Icon,
     dropdown: [
       { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
       { name: "Free Fire", path: "/mobile-games/free-fire" },
       { name: "Valorant", path: "/pc-games/valorant" },
       { name: "Apex Legends", path: "/pc-games/apex-legends" },
-      { name: "More", path: "/all-games" },
+      { name: "Mobile Games", path: "/mobile-games" },
+      { name: "PC Games", path: "/pc-games" },
     ],
   },
   {
-    name: "Productivity",
-    path: "/productivity",
+    name: "AI Tools",
+    path: "/ai-tools",
     icon: AiMagicIcon,
     dropdown: [
+      { name: "ChatGPT Pro", path: "/ai-tools/chatgpt" },
+      { name: "Claude Pro", path: "/ai-tools/claude" },
+      { name: "Cursor Pro", path: "/ai-tools/cursor" },
+      { name: "More", path: "/productivity" },
+      { name: "--- Productivity ---", path: "#", isHeader: true },
       { name: "Canva Pro", path: "/subscriptions/canva-pro" },
       { name: "CapCut Pro", path: "/subscriptions/capcut-pro" },
       { name: "Figma Pro", path: "/subscriptions/figma-pro" },
       { name: "More", path: "/productivity" },
-      { name: "--- AI Tools ---", path: "#", isHeader: true },
-      { name: "ChatGPT Pro", path: "/ai-tools/chatgpt" },
-      { name: "Claude Pro", path: "/ai-tools/claude" },
-      { name: "Cursor Pro", path: "/ai-tools/cursor" },
-      { name: "More", path: "/ai-tools" },
     ],
   },
   {
     name: "Gift Cards",
     path: "/gift-cards",
-    icon: GiftCardIcon,
+    icon: GiftIcon,
     dropdown: [
       { name: "Steam", path: "/gift-cards/steam-wallet" },
       { name: "Google Play", path: "/gift-cards/google-play" },
@@ -151,7 +154,10 @@ const DropdownLink = ({ item }: { item: DropdownItem }) => {
   const imgSrc =
     PRODUCT_IMAGES[item.name as keyof typeof PRODUCT_IMAGES] ||
     "/assets/icons/placeholder.svg";
-  const isMore = item.name === "More";
+  const isMore =
+    item.name === "More" ||
+    item.name === "Mobile Games" ||
+    item.name === "PC Games";
 
   // Section header styling
   if (item.isHeader) {
@@ -262,7 +268,9 @@ const UserMenu = ({
         onClick={onToggle}
       >
         <UserIcon className="w-5 h-5" />
-        <span className="hidden lg:inline-block text-md font-medium">{getUserDisplayName()}</span>
+        <span className="hidden lg:inline-block text-md font-medium">
+          {getUserDisplayName()}
+        </span>
         <ArrowDown01Icon className="w-3 h-3" />
       </Button>
 
@@ -443,7 +451,7 @@ const Header = () => {
   return (
     <>
       <header className="sticky top-0 left-0 right-0 z-50 w-full bg-background">
-        <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-8 py-4">
+        <div className="w-full max-w-[1300px] mx-auto px-4 sm:px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2">
@@ -518,20 +526,18 @@ const Header = () => {
                   size="default"
                   className="h-10 px-4"
                 >
-                    <a href="/auth/login" className="flex items-center gap-2">
-                      <Logout03Icon className="w-5 h-5" />
-                      <span className="hidden lg:inline-block text-sm font-medium">LOG IN</span>
-                    </a>
+                  <a href="/auth/login" className="flex items-center gap-2">
+                    <Logout03Icon className="w-5 h-5" />
+                    <span className="text-sm font-medium">LOG IN</span>
+                  </a>
                 </Button>
               )}
-
-              {/* Mobile menu toggle moved next to logo to avoid duplicates on mobile */}
             </div>
           </div>
 
           {/* Mobile Menu - Changed from xl:hidden to lg:hidden */}
           <div className="lg:hidden">
-            <MobileMenu isOpen={isMobileMenuOpen} />
+            <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
           </div>
         </div>
 

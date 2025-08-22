@@ -270,7 +270,7 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
 
   // Always scroll to top when this layout mounts
   useEffect(() => {
-    window.scrollTo({ top: 10, left: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
 
   // Load saved inputs from localStorage
@@ -481,12 +481,13 @@ const AiToolDetailsLayout: React.FC<AiToolDetailsLayoutProps> = ({
                               personalType === "new" ? "default" : "outline"
                             }
                             onClick={() => {
-                              setPurchaseType("shared");
+                              // Switch to personal->new sub-tab (do not switch back to shared)
+                              setPersonalType("new");
                               setSelectedItems([]);
                             }}
                             className="px-3 py-1 text-xs sm:text-sm rounded-md min-w-[120px]"
                           >
-                            Recieve New Account
+                            Receive New Account
                           </Button>
                           <Button
                             type="button"

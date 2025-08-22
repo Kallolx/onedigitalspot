@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { account } from "@/lib/appwrite";
 import { useCart } from "@/contexts/CartContext";
 import {
   ShoppingCart,
@@ -21,6 +22,8 @@ import { MasterCardIcon, ShoppingBag02Icon } from "hugeicons-react";
 const CartPage: React.FC = () => {
   const { items, updateQuantity, removeItem, clear } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -32,6 +35,17 @@ const CartPage: React.FC = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    account
+      .get()
+      .then(() => mounted && setIsSignedIn(true))
+      .catch(() => mounted && setIsSignedIn(false));
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Utility to convert English digits to Bangla digits
@@ -53,6 +67,12 @@ const CartPage: React.FC = () => {
   };
 
   const goToCheckout = () => {
+    const checkoutData = buildCheckoutData();
+    navigate("/checkout", { state: { checkoutData } });
+  };
+
+  // Build checkout payload from cart items (used for direct checkout and for saving before redirect)
+  const buildCheckoutData = () => {
     const checkoutItems = items.map((item) => ({
       categoryIdx: 0,
       itemIdx: 0,
@@ -86,9 +106,27 @@ const CartPage: React.FC = () => {
         image: checkoutItems[0]?.productImage || "/assets/placeholder.svg",
         type: checkoutItems[0]?.productType || "Products",
       },
+      isCartCheckout: true,
     };
 
-    navigate("/checkout", { state: { checkoutData } });
+    return checkoutData;
+  };
+
+  const handleCheckoutClick = () => {
+    if (isSignedIn) {
+      goToCheckout();
+      return;
+    }
+
+    try {
+      const cd = buildCheckoutData();
+      localStorage.setItem("checkoutData", JSON.stringify(cd));
+    } catch (e) {
+      console.warn("Could not persist checkout data before redirect:", e);
+    }
+
+    // Redirect user to login, then to /checkout where saved data will be read
+    navigate(`/auth/login?redirect=${encodeURIComponent("/checkout")}`);
   };
 
   const CartSummary = ({ className = "" }: { className?: string }) => (
@@ -132,12 +170,21 @@ const CartPage: React.FC = () => {
         </div>
 
         <Button
-          onClick={goToCheckout}
+          onClick={handleCheckoutClick}
           className="w-full h-12 font-semibold"
           size="lg"
         >
-          <MasterCardIcon className="w-8 h-8" />
-          Proceed to Checkout
+          {isSignedIn ? (
+            <>
+              <MasterCardIcon className="w-8 h-8" />
+              Proceed to Checkout
+            </>
+          ) : (
+            <>
+              <span className="hidden lg:inline">Login to Continue</span>
+              <span className="inline lg:hidden">Login</span>
+            </>
+          )}
         </Button>
 
         <Button
@@ -152,7 +199,7 @@ const CartPage: React.FC = () => {
     </Card>
   );
 
-  // If cart is empty, render a full-page empty state (hide header/footer and other chrome)
+  // If cart is empty
   if (!items || items.length === 0) {
     return (
       <div className="min-h-screen flex items-start justify-center px-4 pt-12 md:pt-20">
@@ -176,7 +223,7 @@ const CartPage: React.FC = () => {
             </Button>
             <Button
               variant="outline"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/all-products")}
               className="px-4 py-2"
             >
               Browse Products
@@ -377,9 +424,19 @@ const CartPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button onClick={goToCheckout} className="h-10" size="lg">
-                  <MasterCardIcon className="w-8 h-8" />
-                  Checkout
+                <Button
+                  onClick={handleCheckoutClick}
+                  className="h-10"
+                  size="lg"
+                >
+                  {isSignedIn ? (
+                    <>
+                      <MasterCardIcon className="w-8 h-8" />
+                      Checkout
+                    </>
+                  ) : (
+                    <span>Login to continue</span>
+                  )}
                 </Button>
               </div>
             </div>

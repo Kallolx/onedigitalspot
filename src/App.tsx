@@ -34,6 +34,7 @@ import Signup from "./auth/signup";
 import ForgotPasswordPage from "./auth/forgot";
 import ResetPasswordPage from "./auth/reset-password";
 import AdminGuard from "./admin/AdminGuard";
+import RequireAuth from "./admin/RequireAuth";
 import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
@@ -68,11 +69,9 @@ import Hulu from "./Products/subscriptions/Hulu";
 import LinkedIn from "./Products/design/LinkedIn";
 import Office365 from "./Products/design/Office365";
 import Photoshop from "./Products/design/Photoshop";
-import Shopify from "./Products/subscriptions/Spotify";
 import YoutubePremium from "./Products/subscriptions/YoutubePremium";
 import ZoomPro from "./Products/design/ZoomPro";
 import Productivity from "./pages/routes/Productivity";
-import AllGames from "./pages/routes/AllGames";
 import TawkToWidget from "./components/custom/TawkToWidget";
 import CookieConsent from "@/components/consent/CookieConsent";
 import DeltaForce from "./Products/game-details/mobile-games/DeltaForce";
@@ -130,10 +129,10 @@ const App = () => {
 
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/my-orders" element={<MyOrders />} />
-              <Route path="/my-profile" element={<MyProfile />} />
+              <Route path="/my-orders" element={<RequireAuth><MyOrders /></RequireAuth>} />
+              <Route path="/my-profile" element={<RequireAuth><MyProfile /></RequireAuth>} />
               <Route path="/email-test" element={<EmailTest />} />
 
               {/* Category Pages */}
@@ -143,7 +142,6 @@ const App = () => {
               <Route path="/subscriptions" element={<Subscriptions />} />
               <Route path="/ai-tools" element={<AiTools />} />
               <Route path="/productivity" element={<Productivity />} />
-              <Route path="/all-games" element={<AllGames />} />
               <Route path="/all-products" element={<AllProducts />} />
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/refund-policy" element={<RefundPolicy />} />

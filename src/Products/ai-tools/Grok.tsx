@@ -138,15 +138,15 @@ export default function Grok() {
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selected={selected}
-      setSelected={setSelected as any}
-      playerId={playerId}
-      setPlayerId={setPlayerId}
-      zoneId={zoneId}
-      setZoneId={setZoneId}
-      quantity={quantity}
-      setQuantity={setQuantity}
-      infoImage={infoImage}
+      selectedItems={selected ? [{ categoryIdx: selected.categoryIdx, itemIdx: selected.itemIdx, quantity }] : []}
+    setSelectedItems={(items) => {
+      if (!items || items.length === 0) {
+        setSelected(null);
+      } else {
+        const it = items[0];
+        setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
+      }
+    }}
     />
   );
 }
