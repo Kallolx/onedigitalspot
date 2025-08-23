@@ -65,7 +65,7 @@ export default function SpotifySubscription() {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   // Use image from subscriptions array
-  const spotifyProduct = subscriptions.find(p => p.title === "Spotify");
+  const spotifyProduct = subscriptions.find(p => p.title === "Spotify Premium");
   const infoImage = spotifyProduct?.image;
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function SpotifySubscription() {
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
         const spotifyProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "spotify"
+          (g) => g.title && g.title.toLowerCase() === "spotify premium"
         );
         setSpotify(spotifyProduct);
 

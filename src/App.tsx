@@ -26,7 +26,8 @@ import Apple from "./Products/gift-cards/Apple";
 import DiscordNitro from "./Products/gift-cards/DiscordNitro";
 import GameStop from "./Products/gift-cards/GameStop";
 import Roblox from "./Products/gift-cards/Roblox";
-import Spotify from "./Products/gift-cards/Spotify";
+import SpotifyGiftCard from "./Products/gift-cards/Spotify";
+import SpotifySubscription from "./Products/subscriptions/Spotify";
 import ChatGPT from "./Products/ai-tools/ChatGPT";
 import Netflix from "./Products/subscriptions/Netflix";
 import Login from "./auth/login";
@@ -217,7 +218,7 @@ const App = () => {
               />
               <Route path="/gift-cards/gamestop" element={<GameStop />} />
               <Route path="/gift-cards/roblox" element={<Roblox />} />
-              <Route path="/gift-cards/spotify" element={<Spotify />} />
+              <Route path="/gift-cards/spotify" element={<SpotifyGiftCard />} />
 
               {/* AI Tools Routes */}
               <Route path="/ai-tools/chatgpt" element={<ChatGPT />} />
@@ -258,7 +259,7 @@ const App = () => {
               <Route path="/subscriptions/linkedin" element={<LinkedIn />} />
               <Route path="/subscriptions/office-365" element={<Office365 />} />
               <Route path="/subscriptions/photoshop" element={<Photoshop />} />
-              <Route path="/subscriptions/spotify" element={<Spotify />} />
+              <Route path="/subscriptions/spotify" element={<SpotifySubscription />} />
               <Route
                 path="/subscriptions/crunchyroll"
                 element={<Crunchyroll />}

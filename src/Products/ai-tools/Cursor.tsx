@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { aiTools } from "@/lib/products";
-import AiToolDetailsLayout from "@/components/custom/AiToolDetailsLayout";
+
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 const categoryIcons = {
   Personal: "/assets/icons/ai-tools/cursor.svg",
@@ -58,10 +59,10 @@ const infoSections = [
 ];
 
 export default function CursorIDE() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  type SelectedItem = { categoryIdx: number; itemIdx: number; quantity: number };
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState(""); // Email address
   const [zoneId, setZoneId] = useState(""); // Not applicable here
-  const [quantity, setQuantity] = useState(1);
   const [cursor, setCursor] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
@@ -119,22 +120,15 @@ export default function CursorIDE() {
   }, []);
 
   return (
-    <AiToolDetailsLayout
+    <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Cursor IDE"
       image={cursorProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selectedItems={selected ? [{ categoryIdx: selected.categoryIdx, itemIdx: selected.itemIdx, quantity }] : []}
-    setSelectedItems={(items) => {
-      if (!items || items.length === 0) {
-        setSelected(null);
-      } else {
-        const it = items[0];
-        setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
-      }
-    }}
+  selectedItems={selectedItems}
+  setSelectedItems={setSelectedItems}
     />
   );
 }

@@ -46,13 +46,13 @@ const infoSections = [
 
 export default function SpotifyGiftCard() {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
-  const [sgc, setSgc] = useState(null);
+  const [sgc, setSgc] = useState<any>(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
-      // Use image from subscriptions array
-  const spotifyGiftCardProduct = giftCards.find(p => p.title === "Spotify Gift Card");
+  // Use image from giftCards array
+  const spotifyGiftCardProduct = giftCards.find((p) => p.title === "Spotify Gift Card");
   const infoImage = spotifyGiftCardProduct?.image;
 
   useEffect(() => {
@@ -72,8 +72,8 @@ export default function SpotifyGiftCard() {
 
         if (spotifyGiftCard && Array.isArray(spotifyGiftCard.priceList)) {
           // Group into Spotify Gift Cards (USD)
-          const cards = [];
-          spotifyGiftCard.priceList.forEach((item) => {
+          const cards: any[] = [];
+          spotifyGiftCard.priceList.forEach((item: string) => {
             const [label, price, hot] = item.split("|");
             cards.push({ label, price: Number(price), hot: hot === "true" });
           });
@@ -88,7 +88,7 @@ export default function SpotifyGiftCard() {
 
         // Get similar products excluding Spotify Gift Card
         setSimilar(
-          giftCards.filter((g) => g.title.toLowerCase() !== "spotify").slice(0, 4)
+          giftCards.filter((g) => g.title.toLowerCase() !== "spotify gift card").slice(0, 4)
         );
       } catch (err) {
         setSgc(null);

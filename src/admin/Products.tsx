@@ -41,6 +41,7 @@ import {
   TableHead,
 } from "@/components/ui/table";
 import { databases } from "@/lib/appwrite";
+import { Query } from "appwrite";
 import { mobileGames, pcGames, giftCards, aiTools, subscriptions, productivity } from "@/lib/products";
 import {
   Dialog,
@@ -151,12 +152,23 @@ const Products = () => {
       };
 
       const results = await Promise.all(
-        Object.entries(collectionMap).map(([key, collectionId]) =>
-          databases
-            .listDocuments(databaseId, collectionId)
-            .then((response) => ({ key, documents: response.documents }))
-            .catch(() => ({ key, documents: [] }))
-        )
+        Object.entries(collectionMap).map(async ([key, collectionId]) => {
+          try {
+            const allDocs = [];
+            let offset = 0;
+            const pageSize = 100;
+            while (true) {
+              const response = await databases.listDocuments(databaseId, collectionId, [Query.limit(pageSize), Query.offset(offset)]);
+              allDocs.push(...response.documents);
+              // stop when we've fetched all or no documents returned
+              if ((response.total && allDocs.length >= response.total) || response.documents.length === 0) break;
+              offset += pageSize;
+            }
+            return { key, documents: allDocs };
+          } catch (err) {
+            return { key, documents: [] };
+          }
+        })
       );
 
       const newProductsByCategory = {

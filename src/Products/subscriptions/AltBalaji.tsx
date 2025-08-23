@@ -52,7 +52,7 @@ export default function AltBalajiSubscription() {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   // Use image from subscriptions array
-  const altBalajiProduct = subscriptions.find(p => p.title === "Alt Balaji Premium");
+  const altBalajiProduct = subscriptions.find(p => p.title === "Alt Balaji");
   const infoImage = altBalajiProduct?.image;
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function AltBalajiSubscription() {
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
         const altBalajiProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "alt balaji premium"
+          (g) => g.title && g.title.toLowerCase() === "alt balaji"
         );
         setAltBalaji(altBalajiProduct);
 

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import ServiceCard from "@/components/custom/ServiceCard";
 import OrderStatusModal from "@/components/custom/OrderStatusModal";
 import React, { useState, useEffect, useRef } from "react";
-import { Info, X } from "lucide-react";
+import { Info, X, ArrowLeft } from "lucide-react";
 import { LockKeyIcon, SentIcon, ShoppingCart02Icon } from "hugeicons-react";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "@/components/ui/sonner";
@@ -224,9 +224,22 @@ const GameDetailsLayout: React.FC<
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tighter text-center mb-6 font-pixel text-foreground">
-          Purchase {title}
-        </h1>
+        <div className="relative mb-6">
+          {/* Back button (rounded ghost) placed left; title stays centered */}
+          <button
+            type="button"
+            aria-label="Go back"
+            onClick={() => navigate(-1)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-transparent border hover:bg-muted/60 rounded-full p-2"
+          >
+            <span className="sr-only">Go back</span>
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tighter text-center font-pixel text-foreground">
+            Purchase {title}
+          </h1>
+        </div>
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Game Image Section - Compact */}
           <div className="lg:col-span-4">

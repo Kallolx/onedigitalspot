@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 import { productivity } from "@/lib/products";
+import { Query } from "appwrite";
 
 const infoSections = [
   {
@@ -61,8 +62,17 @@ export default function NotionSubscription() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
-        const response = await databases.listDocuments(databaseId, collectionId);
-        const products = response.documents;
+        // fetch all documents from the subscriptions collection (no fixed cap)
+        const allDocs: any[] = [];
+        let offset = 0;
+        const pageSize = 100;
+        while (true) {
+          const resp = await databases.listDocuments(databaseId, collectionId, [Query.limit(pageSize), Query.offset(offset)]);
+          allDocs.push(...resp.documents);
+          if ((resp.total && allDocs.length >= resp.total) || resp.documents.length === 0) break;
+          offset += pageSize;
+        }
+        const products = allDocs;
         const n = products.find(
           (g) => g.title && g.title.toLowerCase() === "notion pro"
         );

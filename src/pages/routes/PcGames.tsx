@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { pcGames } from "../../lib/products";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import ServiceCard from "@/components/custom/ServiceCard";
+import Footer from "@/components/landing/Footer";
 
 const categories = Array.from(new Set(pcGames.map(g => g.category)));
 
@@ -73,6 +74,7 @@ const PcGames = () => {
           )}
         </div>
       </main>
+       <Footer />
     </div>
   );
 };

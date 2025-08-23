@@ -138,6 +138,7 @@ const AllProducts = () => {
         ))}
         <Footer />
       </main>
+       <Footer />
     </div>
   );
 };

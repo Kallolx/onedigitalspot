@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { aiTools } from "@/lib/products";
-import AiToolDetailsLayout from "@/components/custom/AiToolDetailsLayout";
+
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 const categoryIcons = {
   Shared: "/assets/icons/ai-tools/grok.svg",
@@ -60,16 +61,16 @@ const infoSections = [
 ];
 
 export default function Grok() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  type SelectedItem = { categoryIdx: number; itemIdx: number; quantity: number };
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
   const [zoneId, setZoneId] = useState("");
-  const [quantity, setQuantity] = useState(1);
   const [cg, setCg] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const grokProduct = aiTools.find(p => p.title === "Super Grok Premium");
+  const grokProduct = aiTools.find(p => p.title === "Grok Premium");
   const infoImage = grokProduct?.image;
 
   useEffect(() => {
@@ -131,22 +132,15 @@ export default function Grok() {
   }, []);
 
   return (
-    <AiToolDetailsLayout
+    <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Grok Premium"
       image={grokProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selectedItems={selected ? [{ categoryIdx: selected.categoryIdx, itemIdx: selected.itemIdx, quantity }] : []}
-    setSelectedItems={(items) => {
-      if (!items || items.length === 0) {
-        setSelected(null);
-      } else {
-        const it = items[0];
-        setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
-      }
-    }}
+  selectedItems={selectedItems}
+  setSelectedItems={setSelectedItems}
     />
   );
 }

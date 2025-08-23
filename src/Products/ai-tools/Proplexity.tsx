@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { aiTools } from "@/lib/products";
-import AiToolDetailsLayout from "@/components/custom/AiToolDetailsLayout";
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 const categoryIcons = {
   Shared: "/assets/icons/ai-tools/perplexity.svg", 
@@ -60,10 +60,10 @@ const infoSections = [
 ];
 
 export default function PerplexityAI() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  type SelectedItem = { categoryIdx: number; itemIdx: number; quantity: number };
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
   const [zoneId, setZoneId] = useState("");
-  const [quantity, setQuantity] = useState(1);
   const [perplexity, setPerplexity] = useState<any>(null);
   const [priceList, setPriceList] = useState<any[]>([]);
   const [similar, setSimilar] = useState<any[]>([]);
@@ -132,22 +132,15 @@ export default function PerplexityAI() {
   }, []);
 
   return (
-    <AiToolDetailsLayout
+    <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Perplexity AI Pro"
       image={perplexityProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selectedItems={selected ? [{ categoryIdx: selected.categoryIdx, itemIdx: selected.itemIdx, quantity }] : []}
-    setSelectedItems={(items) => {
-      if (!items || items.length === 0) {
-        setSelected(null);
-      } else {
-        const it = items[0];
-        setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
-      }
-    }}
+  selectedItems={selectedItems}
+  setSelectedItems={setSelectedItems}
     />
   );
 }

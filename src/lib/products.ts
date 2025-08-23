@@ -257,7 +257,7 @@ export const giftCards: Product[] = [
     route: "/gift-cards/roblox",
   },
   {
-    title: "Spotify",
+    title: "Spotify Gift Card",
     image: "/products/gift-cards/spotify.avif",
     price: "600",
     rating: 5,
@@ -475,7 +475,7 @@ export const subscriptions: Product[] = [
     route: "/subscriptions/crunchyroll",
   },
   {
-    title: "Spotify",
+    title: "Spotify Premium",
     image: "/products/subscriptions/spotify.avif",
     price: "299",
     rating: 5,
@@ -527,7 +527,7 @@ export const productivity: Product[] = [
     route: "/subscriptions/duolingo",
   },
   {
-    title: "QuillBot",
+    title: "Quillbot",
     image: "/products/others/quillbot.avif",
     price: "599",
     rating: 5,

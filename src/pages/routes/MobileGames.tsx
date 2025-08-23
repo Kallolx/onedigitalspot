@@ -9,6 +9,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import ServiceCard from "@/components/custom/ServiceCard";
+import Footer from "@/components/landing/Footer";
 
 const categories = Array.from(new Set(mobileGames.map((g) => g.category)));
 
@@ -105,6 +106,7 @@ const MobileGames = () => {
           )}
         </div>
       </main>
+       <Footer />
     </div>
   );
 };

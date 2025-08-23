@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { aiTools } from "@/lib/products";
-import AiToolDetailsLayout from "@/components/custom/AiToolDetailsLayout";
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 const categoryIcons = {
   Shared: "/assets/icons/ai-tools/claude.svg",
@@ -76,13 +76,8 @@ const infoSections = [
 ];
 
 export default function Claude() {
-  const [selected, setSelected] = useState<{
-    categoryIdx: number;
-    itemIdx: number;
-  } | null>(null);
-  const [playerId, setPlayerId] = useState("");
-  const [zoneId, setZoneId] = useState("");
-  const [quantity, setQuantity] = useState(1);
+  type SelectedItem = { categoryIdx: number; itemIdx: number; quantity: number };
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [cg, setCg] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
@@ -156,32 +151,15 @@ export default function Claude() {
   }, []);
 
   return (
-    <AiToolDetailsLayout
+    <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Claude Premium"
       image={claudeProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selectedItems={
-        selected
-          ? [
-              {
-                categoryIdx: selected.categoryIdx,
-                itemIdx: selected.itemIdx,
-                quantity,
-              },
-            ]
-          : []
-      }
-      setSelectedItems={(items) => {
-        if (!items || items.length === 0) {
-          setSelected(null);
-        } else {
-          const it = items[0];
-          setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
-        }
-      }}
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
     />
   );
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
 import { aiTools } from "@/lib/products";
-import AiToolDetailsLayout from "@/components/custom/AiToolDetailsLayout";
+
+import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 
 const categoryIcons = {
   Individual: "/assets/icons/ai-tools/github.svg",
@@ -56,10 +57,10 @@ const infoSections = [
 ];
 
 export default function GitHubPro() {
-  const [selected, setSelected] = useState<{ categoryIdx: number; itemIdx: number } | null>(null);
+  type SelectedItem = { categoryIdx: number; itemIdx: number; quantity: number };
+  const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState(""); // GitHub username or org name
   const [zoneId, setZoneId] = useState(""); // Not applicable here
-  const [quantity, setQuantity] = useState(1);
   const [pro, setPro] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
@@ -127,22 +128,15 @@ export default function GitHubPro() {
   }, []);
 
   return (
-    <AiToolDetailsLayout
+    <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="GitHub Pro"
       image={proProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-      selectedItems={selected ? [{ categoryIdx: selected.categoryIdx, itemIdx: selected.itemIdx, quantity }] : []}
-    setSelectedItems={(items) => {
-      if (!items || items.length === 0) {
-        setSelected(null);
-      } else {
-        const it = items[0];
-        setSelected({ categoryIdx: it.categoryIdx, itemIdx: it.itemIdx });
-      }
-    }}
+  selectedItems={selectedItems}
+  setSelectedItems={setSelectedItems}
     />
   );
 }

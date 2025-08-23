@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { databases, account } from "@/lib/appwrite";
+import { Query } from "appwrite";
 import GameDetailsLayout from "@/components/custom/GameDetailsLayout";
 import { productivity } from "@/lib/products";
 
@@ -61,8 +62,25 @@ export default function Bumble() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
         const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
-        const response = await databases.listDocuments(databaseId, collectionId);
-        const products = response.documents;
+
+        const pageSize = 100;
+        let offset = 0;
+        let allDocs = [];
+
+        while (true) {
+          const resp = await databases.listDocuments(databaseId, collectionId, [
+            Query.limit(pageSize),
+            Query.offset(offset),
+          ]);
+          const docs = resp.documents || [];
+          allDocs = allDocs.concat(docs);
+          offset += pageSize;
+
+          if (!resp.total || allDocs.length >= resp.total) break;
+          if (docs.length === 0) break;
+        }
+
+        const products = allDocs;
         const f = products.find(
           (g) => g.title && g.title.toLowerCase() === "bumble plus"
         );
@@ -70,21 +88,33 @@ export default function Bumble() {
 
         if (f && Array.isArray(f.priceList)) {
           const items = f.priceList.map((item) => {
-            const [label, price, hot] = item.split("|");
-            return { label, price: Number(price), hot: hot === "true" };
+            if (typeof item === "string") {
+              const [label, price, hot] = item.split("|");
+              return { label: label ?? "", price: Number(price ?? 0), hot: String(hot) === "true" };
+            }
+
+            if (item && typeof item === "object") {
+              return {
+                label: item.label ?? item.title ?? "",
+                price: Number(item.price ?? item.amount ?? 0),
+                hot: Boolean(item.popular || item.hot),
+              };
+            }
+
+            return { label: String(item), price: 0, hot: false };
           });
 
           setPriceList([
             {
-              title: "Figma Subscription",
-              categoryIcon: "/assets/icons/tools/figma.svg",
+              title: "Bumble Plus Subscription",
+              categoryIcon: "/assets/icons/tools/bumble.svg",
               items,
             },
           ]);
         }
 
         setSimilar(
-          productivity.filter((g) => g.title.toLowerCase() !== "figma").slice(0, 4)
+          productivity.filter((g) => g.title.toLowerCase() !== "bumble plus").slice(0, 4)
         );
       } catch {
         setBumble(null);
