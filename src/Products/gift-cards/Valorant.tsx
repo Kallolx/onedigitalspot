@@ -65,7 +65,7 @@ export default function ValorantGiftCard() {
 
         // Find Valorant Gift Card (case-insensitive)
         const valorantGiftCard = products.find(
-          (g) => g.title && g.title.toLowerCase() === "valorant gift card"
+          (g) => g.title && g.title.toLowerCase() === "valorant gift cards"
         );
         setVgc(valorantGiftCard);
 

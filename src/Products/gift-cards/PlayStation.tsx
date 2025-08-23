@@ -65,7 +65,7 @@ export default function PlayStationGiftCard() {
 
         // Find PlayStation Gift Card (case-insensitive)
         const playStationGiftCard = products.find(
-          (g) => g.title && g.title.toLowerCase() === "playstation gift card"
+          (g) => g.title && g.title.toLowerCase() === "playstation"
         );
         setPsgc(playStationGiftCard);
 

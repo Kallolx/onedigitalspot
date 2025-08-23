@@ -233,6 +233,53 @@ const Orders = () => {
     return s.length >= 10 ? '+' + s : s;
   };
 
+  // Extract playerId and zoneId from various shapes (top-level, payload, details, stringified JSON)
+  const extractPlayerZone = (order: any) => {
+    if (!order) return { playerId: null, zoneId: null };
+
+    const tryGet = (obj: any) => {
+      // Only accept explicit player/zone identifiers — do NOT treat userId as playerId
+      if (!obj || typeof obj !== 'object') return { playerId: null, zoneId: null };
+      const playerId = obj.playerId || obj.player_id || obj.player?.id || obj.player?.playerId || null;
+      const zoneId = obj.zoneId || obj.zone_id || obj.zone?.id || obj.zone?.zoneId || null;
+      return { playerId, zoneId };
+    };
+
+    const candidates = [order, order.payload, order.details, order.meta, order.data];
+
+    for (let cand of candidates) {
+      if (!cand) continue;
+      // if string, try parse JSON
+      if (typeof cand === 'string') {
+        const s = cand.trim();
+        if ((s.startsWith('{') && s.endsWith('}')) || (s.startsWith('[') && s.endsWith(']'))) {
+          try {
+            cand = JSON.parse(s);
+          } catch (e) {
+            // not JSON
+            continue;
+          }
+        } else {
+          continue;
+        }
+      }
+
+      const found = tryGet(cand);
+      if (found.playerId || found.zoneId) return { playerId: String(found.playerId || '').trim() || null, zoneId: String(found.zoneId || '').trim() || null };
+      // also check nested payload.player or payload.meta
+      if (cand.player && typeof cand.player === 'object') {
+        const f = tryGet(cand.player);
+        if (f.playerId || f.zoneId) return { playerId: String(f.playerId || '').trim() || null, zoneId: String(f.zoneId || '').trim() || null };
+      }
+      if (cand.meta && typeof cand.meta === 'object') {
+        const f = tryGet(cand.meta);
+        if (f.playerId || f.zoneId) return { playerId: String(f.playerId || '').trim() || null, zoneId: String(f.zoneId || '').trim() || null };
+      }
+    }
+
+    return { playerId: null, zoneId: null };
+  };
+
   // Status badge with improved styling
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig = {
@@ -836,6 +883,24 @@ const Orders = () => {
                     );
                   })()}
                 </div>
+
+                {/* Player / Zone info */}
+                {(() => {
+                  const { playerId, zoneId } = extractPlayerZone(viewOrder as any);
+                  if (!playerId && !zoneId) return null;
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-xs text-muted-foreground">Player ID</div>
+                        <div className="font-mono font-bold">{playerId || '\u2014'}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-muted-foreground">Zone ID</div>
+                        <div className="font-mono font-bold">{zoneId || '\u2014'}</div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
                   <Button 

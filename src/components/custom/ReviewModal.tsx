@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Star, X, Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import React, { useState } from "react";
+import { Star, X, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "../ui/textarea";
 
 interface OrderData {
   id?: string;
@@ -11,6 +12,7 @@ interface OrderData {
   itemLabel: string;
   quantity: number;
   totalAmount: number;
+  productImage?: string;
 }
 
 interface ReviewModalProps {
@@ -24,28 +26,29 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
   order,
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
 }) => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      alert('Please select a rating before submitting.');
+      alert("Please select a rating before submitting.");
       return;
     }
 
+
     setIsSubmitting(true);
     try {
-      await onSubmit(order.$id || order.id || '', rating, comment);
+      await onSubmit(order.$id || order.id || "", rating, comment);
       onClose();
       setRating(0);
-      setComment('');
+      setComment("");
     } catch (error) {
-      console.error('Error submitting review:', error);
-      alert('Failed to submit review. Please try again.');
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -59,6 +62,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-bold text-gray-900">Rate Your Order</h2>
+
           <Button
             variant="ghost"
             size="sm"
@@ -69,16 +73,61 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
           </Button>
         </div>
 
-        {/* Product Info */}
-        <div className="p-4 border-b">
-          <h3 className="font-semibold text-gray-900">{order.productName}</h3>
-          <p className="text-sm text-gray-600">{order.itemLabel}</p>
-          <p className="text-sm text-gray-900 font-semibold">৳{order.totalAmount}</p>
+        {/* Product Info with Image */}
+        <div className="p-6 border-b">
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-md bg-gray-100 overflow-hidden flex-shrink-0">
+              <img
+                src={order.productImage || "/assets/placeholder.svg"}
+                alt={order.productName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "/assets/placeholder.svg";
+                }}
+              />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">
+                {order.productName}
+              </h3>
+              <p className="text-sm text-gray-600">{order.itemLabel}</p>
+              <p className="text-sm text-gray-900 font-semibold">
+                ৳{order.totalAmount}
+              </p>
+            </div>
+
+            {/* Reorder ghost button placed to the far right of this row */}
+            <div className="ml-auto">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  // open product page by slugifying productName; fallback to home
+                  const slug = String(order.productName || "")
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/(^-|-$)/g, "");
+                  const url = slug ? `/products/${slug}` : "/products";
+                  try {
+                    window.open(url, "_blank");
+                  } catch (e) {
+                    window.location.href = url;
+                  }
+                }}
+                disabled={isSubmitting}
+                className="text-sm"
+                title={`Reorder ${order.productName}`}
+              >
+                Reorder
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Rating Section */}
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+        <div className="p-6 pt-2">
+          <h3 className="text-lg font-medium text-muted-foreground mb-2 text-center">
             How was your experience?
           </h3>
 
@@ -90,8 +139,8 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
                 type="button"
                 className={`p-1 transition-colors ${
                   star <= (hoveredRating || rating)
-                    ? 'text-yellow-400'
-                    : 'text-gray-300'
+                    ? "text-retro-yellow"
+                    : "text-retro-yellow"
                 } hover:text-yellow-400`}
                 onClick={() => setRating(star)}
                 onMouseEnter={() => setHoveredRating(star)}
@@ -99,7 +148,9 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
               >
                 <Star
                   className="w-8 h-8"
-                  fill={star <= (hoveredRating || rating) ? 'currentColor' : 'none'}
+                  fill={
+                    star <= (hoveredRating || rating) ? "currentColor" : "none"
+                  }
                 />
               </button>
             ))}
@@ -107,18 +158,18 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
 
           {/* Comment Section */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-muted-foreground mb-2">
               Share your feedback (optional)
             </label>
-            <textarea
+            <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Tell us about your experience..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+              placeholder="type here..."
+              className="w-full px-3 py-2 bg-popover"
               rows={3}
               maxLength={255}
             />
-            <div className="text-right text-xs text-gray-500 mt-1">
+            <div className="text-right text-xs text-gray-500 mt-2">
               {comment.length}/255 characters
             </div>
           </div>

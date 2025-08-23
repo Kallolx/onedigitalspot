@@ -66,7 +66,7 @@ export default function RobloxGiftCard() {
 
         // Find Roblox Gift Card (case-insensitive)
         const robloxGiftCard = products.find(
-          (g) => g.title && g.title.toLowerCase() === "roblox gift card"
+          (g) => g.title && g.title.toLowerCase() === "roblox gift cards"
         );
         setRgc(robloxGiftCard);
 

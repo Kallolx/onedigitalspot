@@ -160,9 +160,18 @@ const MyOrders = () => {
   >([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [processedOrderIds, setProcessedOrderIds] = useState<Set<string>>(
-    new Set()
-  );
+  const [processedOrderIds, setProcessedOrderIds] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem("processedOrderIds");
+      if (raw) {
+        const arr = JSON.parse(raw) as string[];
+        return new Set(arr.filter(Boolean));
+      }
+    } catch (e) {
+      // ignore
+    }
+    return new Set();
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
   const receiptRef = useRef<{ download: () => Promise<void> } | null>(null);
@@ -310,12 +319,18 @@ const MyOrders = () => {
         setCompletedOrdersToReview(completedWithoutReviews);
         setReviewOrder(completedWithoutReviews[0]);
 
-        // Mark these orders as processed so modal doesn't show again
+        // Mark these orders as processed so modal doesn't show again (persisted)
         setProcessedOrderIds((prev) => {
           const newSet = new Set(prev);
           completedWithoutReviews.forEach((order) => {
-            newSet.add(order.$id || order.id || "");
+            const id = order.$id || order.id || "";
+            if (id) newSet.add(id);
           });
+          try {
+            localStorage.setItem("processedOrderIds", JSON.stringify(Array.from(newSet)));
+          } catch (e) {
+            // ignore storage errors
+          }
           return newSet;
         });
       }
