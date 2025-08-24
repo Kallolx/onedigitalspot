@@ -59,7 +59,7 @@ const PRODUCT_IMAGES = {
   "Canva Pro": "/assets/icons/design/canva.svg",
   "Figma Pro": "/assets/icons/design/figma.svg",
   "CapCut Pro": "/assets/icons/design/capcut.svg",
-  "Telegram Stars": "/assets/icons/design/telegram.svg",
+  "Tinder": "/assets/icons/design/tinder.svg",
 
   // Games
   Valorant: "/assets/icons/gift-cards/valorant.svg",
@@ -74,10 +74,10 @@ const PRODUCT_IMAGES = {
   Spotify: "/assets/icons/subscriptions/spotify.svg",
 
   // AI Tools
-  "ChatGPT Pro": "/assets/icons/ai-tools/chatgpt.svg",
+  "ChatGPT": "/assets/icons/ai-tools/chatgpt.svg",
   "Claude Pro": "/assets/icons/ai-tools/claude.svg",
   "Cursor Pro": "/assets/icons/ai-tools/cursor.svg",
-  "Github Pro": "/assets/icons/ai-tools/github.svg",
+  "Gemini Pro": "/assets/icons/ai-tools/gemini.svg",
 } as const;
 
 const NAVIGATION_ITEMS: NavigationItem[] = [
@@ -98,14 +98,15 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
     path: "/ai-tools",
     icon: AiMagicIcon,
     dropdown: [
-      { name: "ChatGPT Pro", path: "/ai-tools/chatgpt" },
+      { name: "ChatGPT", path: "/ai-tools/chatgpt" },
       { name: "Claude Pro", path: "/ai-tools/claude" },
       { name: "Cursor Pro", path: "/ai-tools/cursor" },
-      { name: "More", path: "/productivity" },
-      { name: "--- Productivity ---", path: "#", isHeader: true },
+      { name: "Gemini Pro", path: "/ai-tools/gemini" },
+      { name: "More", path: "/ai-tools" },
       { name: "Canva Pro", path: "/subscriptions/canva-pro" },
       { name: "CapCut Pro", path: "/subscriptions/capcut-pro" },
       { name: "Figma Pro", path: "/subscriptions/figma-pro" },
+      { name: "Tinder", path: "/subscriptions/tinder" },
       { name: "More", path: "/productivity" },
     ],
   },
@@ -194,6 +195,32 @@ const DropdownLink = ({ item }: { item: DropdownItem }) => {
 
 const NavigationDropdown = ({ item }: { item: NavigationItem }) => {
   if (!item.dropdown) return null;
+
+  // Special layout for AI Tools: two columns with a vertical divider
+  if (item.name === "AI Tools") {
+    const cols = 2;
+    const items = item.dropdown;
+    const mid = Math.ceil(items.length / cols);
+    const left = items.slice(0, mid);
+    const right = items.slice(mid);
+
+    return (
+      <div className="absolute hidden group-hover:block top-full left-0 w-80 p-3 bg-background border-2 border-border rounded-md shadow-card text-foreground z-50">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1 pr-2 border-r border-border">
+            {left.map((dropItem, index) => (
+              <DropdownLink key={`${dropItem.name}-left-${index}`} item={dropItem} />
+            ))}
+          </div>
+          <div className="space-y-1 pl-2">
+            {right.map((dropItem, index) => (
+              <DropdownLink key={`${dropItem.name}-right-${index}`} item={dropItem} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute hidden group-hover:block top-full left-0 w-48 p-2 bg-background border-2 border-border rounded-md shadow-card text-foreground z-50">

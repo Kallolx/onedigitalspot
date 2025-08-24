@@ -107,7 +107,7 @@ export default function Bumble() {
           setPriceList([
             {
               title: "Bumble Plus Subscription",
-              categoryIcon: "/assets/icons/tools/bumble.svg",
+              categoryIcon: "/assets/icons/design/bumble.svg",
               items,
             },
           ]);

@@ -6,6 +6,9 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { databases } from "@/lib/appwrite";
+import { Query } from "appwrite";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "../ui/button";
@@ -17,42 +20,45 @@ import {
 } from "@/components/ui/tooltip";
 import SearchComponent from "../custom/SearchComponent";
 
-const avatars = [
-  {
-    imageUrl: "https://avatars.githubusercontent.com/u/16860528",
-    profileUrl: "https://github.com/dillionverma",
-  },
-  {
-    imageUrl: "https://avatars.githubusercontent.com/u/20110627",
-    profileUrl: "https://github.com/tomonarifeehan",
-  },
-  {
-    imageUrl: "https://avatars.githubusercontent.com/u/106103625",
-    profileUrl: "https://github.com/BankkRoll",
-  },
-  {
-    imageUrl: "https://avatars.githubusercontent.com/u/59228569",
-    profileUrl: "https://github.com/safethecode",
-  },
-];
 
-const heroSlides = [
-  {
-    imageDesktop: "/assets/banners/welcome.avif",
-    title: "Welcome",
-  },
-  {
-    imageDesktop: "/assets/banners/ai-promo.avif",
-    title: "AI Promo",
-  },
-  {
-    imageDesktop: "/assets/banners/tools-promo.avif",
-    title: "Tools Promo",
-  },
-];
+const fetchHeroBanners = async () => {
+  const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+  const HERO_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_BANNER_ID;
+  if (!DATABASE_ID || !HERO_COLLECTION_ID) return [];
+  try {
+    const res = await databases.listDocuments(DATABASE_ID, HERO_COLLECTION_ID, [Query.orderAsc("order")]);
+    return res.documents.map((d: any) => {
+      // Cloudinary upload responses or admin save may store the URL under different keys.
+      const imageUrl =
+        d.imageUrl ||
+        d.url ||
+        d.secure_url ||
+        d.image?.secure_url ||
+        d.asset?.secure_url ||
+        d.imageUrlSecure ||
+        (d.fields && (d.fields.imageUrl || d.fields.url)) ||
+        "";
+
+      if (!imageUrl) console.warn("Hero banner document has no image URL:", d);
+
+      return { imageDesktop: imageUrl, title: d.title || d.name || "" };
+    });
+  } catch (err) {
+    console.error("Error fetching hero banners:", err);
+    return [];
+  }
+};
 
 const HeroSection = () => {
   const [api, setApi] = React.useState<CarouselApi>();
+  const { data: dynamicSlides = [] } = useQuery<any[], Error>({ queryKey: ["hero-banners-public"], queryFn: fetchHeroBanners });
+
+  React.useEffect(() => {
+    // Helpful debug log when slides are fetched; remove in production if noisy.
+    console.debug("HeroSection - dynamicSlides:", dynamicSlides);
+  }, [dynamicSlides]);
+
+  const [loadStatus, setLoadStatus] = React.useState<Record<number, string>>({});
 
   React.useEffect(() => {
     if (!api) return;
@@ -183,30 +189,41 @@ const HeroSection = () => {
             {/* Right: Carousel section */}
             <div className="w-full md:w-3/5 h-full flex items-center grow-1250 pt-0 md:pt-8">
               <div className="w-full h-full">
-                <Carousel
-                  setApi={setApi}
-                  className="w-full h-full rounded-xl overflow-hidden"
-                  opts={{
-                    align: "start",
-                    loop: true,
-                  }}
-                >
-                  <CarouselContent className="pt-4 md:pt-0 h-full">
-                    {heroSlides.map((slide, index) => (
-                      <CarouselItem key={index} className="pl-4 h-full">
-                        <Card className="relative overflow-hidden rounded-lg md:rounded-xl  h-full">
-                          <img
-                            src={slide.imageDesktop}
-                            alt={slide.title}
-                            className="w-full h-full object-cover"
-                          />
-                          {/* Gradient overlay for better text contrast */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                        </Card>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
+                {dynamicSlides.length > 0 && (
+                  <Carousel
+                    setApi={setApi}
+                    className="w-full h-full rounded-xl overflow-hidden"
+                    opts={{
+                      align: "start",
+                      loop: true,
+                    }}
+                  >
+                    <CarouselContent className="pt-4 md:pt-0 h-full">
+                      {dynamicSlides.map((slide, index) => (
+                        <CarouselItem key={index} className="pl-4 h-full">
+                          <Card className="relative overflow-hidden rounded-lg md:rounded-xl  h-full">
+                            <img
+                              src={slide.imageDesktop}
+                              alt={slide.title}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              onLoad={() => setLoadStatus(prev => ({ ...prev, [index]: "ok" }))}
+                              onError={(e) => {
+                                const img = e.currentTarget as HTMLImageElement;
+                                console.warn("Hero image failed to load, falling back:", img.src);
+                                setLoadStatus(prev => ({ ...prev, [index]: "error" }));
+                                img.onerror = null;
+                                img.src = "/assets/banners/welcome.avif";
+                              }}
+                            />
+                            {/* Gradient overlay for better text contrast */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                          </Card>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </Carousel>
+                )}
               </div>
             </div>
           </div>

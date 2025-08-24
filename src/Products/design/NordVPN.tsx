@@ -106,7 +106,7 @@ export default function NordVPN() {
           setPriceList([
             {
               title: "NordVPN Subscription",
-              categoryIcon: "/assets/icons/tools/vpn.svg",
+              categoryIcon: "/assets/icons/design/nord.svg",
               items,
             },
           ]);

@@ -11,8 +11,8 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Passes & Vouchers": "/assets/icons/battle-pass.svg",
-  "UC Packages": "/assets/icons/uc.svg",
+  "Passes & Vouchers": "/assets/icons/games/pass.svg",
+  "UC Packages": "/assets/icons/games/delta.svg",
 };
 
 function groupPriceList(priceList) {

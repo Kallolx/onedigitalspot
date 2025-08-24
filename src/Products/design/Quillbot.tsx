@@ -110,7 +110,7 @@ export default function QuillBotSubscription() {
           setPriceList([
             {
               title: "QuillBot Subscription",
-              categoryIcon: "/assets/icons/tools/quillbot.svg", // Update with your icon path
+              categoryIcon: "/assets/icons/design/quillbot.svg", 
               items,
             },
           ]);

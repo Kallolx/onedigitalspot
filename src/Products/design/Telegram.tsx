@@ -77,7 +77,7 @@ export default function TelegramStars() {
           setPriceList([
             {
               title: "Figma Subscription",
-              categoryIcon: "/assets/icons/tools/figma.svg",
+              categoryIcon: "/assets/icons/design/figma.svg",
               items,
             },
           ]);

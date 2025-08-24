@@ -10,8 +10,8 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Passes & Vouchers": "/assets/icons/battle-pass.svg",
-  "Coins Packages": "/assets/icons/coins.svg",
+  "Passes & Vouchers": "/assets/icons/games/pass.svg",
+  "Coins Packages": "/assets/icons/games/coins.svg",
 };
 
 function groupPriceList(priceList) {

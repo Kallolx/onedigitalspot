@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -41,9 +42,9 @@ import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
 import Products from "./admin/Products";
 import Users from "./admin/Users";
-import DeliveryMethods from "./admin/DeliveryMethods";
 import Subscriptions from "./pages/routes/Subscriptions";
 import Settings from "./admin/Settings";
+const AdminHeroBanners = React.lazy(() => import("./admin/HeroBanners"));
 import GenshinImpact from "./Products/game-details/mobile-games/GenshinImpact";
 import CodMobile from "./Products/game-details/mobile-games/CodMobile";
 import FreeFire from "./Products/game-details/mobile-games/FreeFire";
@@ -306,7 +307,11 @@ const App = () => {
                 <Route path="orders" element={<Orders />} />
                 <Route path="products" element={<Products />} />
                 <Route path="users" element={<Users />} />
-                <Route path="delivery" element={<DeliveryMethods />} />
+                <Route path="hero-banners" element={
+                  <React.Suspense fallback={<div>Loading...</div>}>
+                    <AdminHeroBanners />
+                  </React.Suspense>
+                } />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>

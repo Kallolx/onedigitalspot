@@ -106,7 +106,7 @@ export default function ExpressVPN() {
           setPriceList([
             {
               title: "ExpressVPN Subscription",
-              categoryIcon: "/assets/icons/tools/vpn.svg",
+              categoryIcon: "/assets/icons/design/express.svg",
               items,
             },
           ]);

@@ -10,7 +10,7 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Robux Packages": "/assets/icons/robux.svg",
+  "Robux Packages": "/assets/icons/gift-cards/roblox.svg",
 };
 
 function groupPriceList(priceList) {

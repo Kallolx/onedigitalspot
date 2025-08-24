@@ -81,14 +81,14 @@ const Footer: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <a href="#">
               <img
-                src="/assets/icons/google-badge.svg"
+                src="/assets/icons/others/google-badge.svg"
                 alt="Google Play"
                 className="h-14 object-contain"
               />
             </a>
             <a href="#">
               <img
-                src="/assets/icons/apple-badge.svg"
+                src="/assets/icons/others/apple-badge.svg"
                 alt="App Store"
                 className="h-14 object-contain"
               />

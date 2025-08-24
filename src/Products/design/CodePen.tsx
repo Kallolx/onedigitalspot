@@ -107,7 +107,7 @@ export default function CodePenSubscription() {
           setPriceList([
             {
               title: "CodePen Pro Subscription",
-              categoryIcon: "/assets/icons/tools/codepen.svg",
+              categoryIcon: "/assets/icons/design/codepen.svg",
               items,
             },
           ]);

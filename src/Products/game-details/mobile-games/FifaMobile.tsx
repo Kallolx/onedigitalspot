@@ -10,8 +10,8 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  "Passes & Vouchers": "/assets/icons/battle-pass.svg",
-  "FIFA Points Packages": "/assets/icons/fifa-points.svg",
+  "Passes & Vouchers": "/assets/icons/games/voucher.svg",
+  "FIFA Points Packages": "/assets/icons/games/fifa.svg",
 };
 
 function groupPriceList(priceList) {

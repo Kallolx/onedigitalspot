@@ -87,7 +87,7 @@ export default function NotionSubscription() {
           setPriceList([
             {
               title: "Notion Subscription",
-              categoryIcon: "/assets/icons/tools/notion.svg",
+              categoryIcon: "/assets/icons/design/notion.svg",
               items,
             },
           ]);

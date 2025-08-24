@@ -65,8 +65,7 @@ const Sidebar = ({ adminNav, activeRoute, setActiveRoute, sidebarOpen, onClose }
       <aside 
         className={`
           fixed lg:static top-0 left-0 z-50 w-72 h-screen 
-          bg-white dark:bg-gray-900 
-          border-r border-gray-200 dark:border-gray-800
+          bg-background border-r
           shadow-xl lg:shadow-none
           flex flex-col 
           transition-all duration-300 ease-in-out
@@ -77,7 +76,7 @@ const Sidebar = ({ adminNav, activeRoute, setActiveRoute, sidebarOpen, onClose }
       >
         
         {/* Header Section */}
-        <div className="flex-shrink-0 px-6 py-6 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex-shrink-0 px-6 py-6 border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">

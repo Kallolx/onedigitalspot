@@ -108,7 +108,7 @@ export default function iCloudPlusSubscription() {
           setPriceList([
             {
               title: "iCloud+ Subscription",
-              categoryIcon: "/assets/icons/tools/icloud.svg",
+              categoryIcon: "/assets/icons/subscriptions/apple.svg",
               items,
             },
           ]);

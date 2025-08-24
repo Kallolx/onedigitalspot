@@ -107,7 +107,7 @@ export default function TinderPlus() {
           setPriceList([
             {
               title: "Tinder Plus Subscription",
-              categoryIcon: "/assets/icons/tools/tinder.svg",
+              categoryIcon: "/assets/icons/design/tinder.svg",
               items,
             },
           ]);
