@@ -291,17 +291,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
-  // Reset submenu when menu closes
-  useEffect(() => {
-    if (isOpen) {
-      // Expand the top menu by default when the mobile menu opens
-      const first =
-        MENU_SECTIONS && MENU_SECTIONS.length > 0 ? MENU_SECTIONS[0].id : null;
-      setActiveSubmenu(first);
-    } else {
-      setActiveSubmenu(null);
-    }
-  }, [isOpen]);
+
 
   return (
     <>
