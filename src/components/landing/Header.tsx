@@ -309,7 +309,7 @@ const UserMenu = ({
               <p className="text-sm font-medium text-foreground">
                 {user.name || "User"}
               </p>
-              <p className="text-xs text-muted-foreground">{user.email}</p>
+              <p className="whitespace-nowrap truncate text-xs text-secondary">{user.email}</p>
             </div>
 
             {/* Verify Account (for unverified users) */}

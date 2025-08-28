@@ -4,21 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Eye, 
-  EyeOff, 
-  Trash2, 
-  Search, 
-  Filter, 
-  Star, 
-  User, 
+import {
+  Eye,
+  EyeOff,
+  Trash2,
+  Search,
+  Filter,
+  Star,
+  User,
   Calendar,
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
-import { databases, ID } from "@/lib/appwrite";
+import { databases } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite";
 
 interface Review {
@@ -44,6 +44,9 @@ const ReviewsManagement: React.FC = () => {
   const [selectedRating, setSelectedRating] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [selectedReviews, setSelectedReviews] = useState<string[]>([]);
+  const [selectedReviewForModal, setSelectedReviewForModal] =
+    useState<Review | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   // Fetch all reviews
   const fetchReviews = async () => {
@@ -53,8 +56,8 @@ const ReviewsManagement: React.FC = () => {
         appwriteConfig.databaseId,
         appwriteConfig.reviewsCollectionId
       );
-      setReviews(response.documents as Review[]);
-      setFilteredReviews(response.documents as Review[]);
+      setReviews(response.documents as unknown as Review[]);
+      setFilteredReviews(response.documents as unknown as Review[]);
     } catch (error) {
       console.error("Error fetching reviews:", error);
       toast.error("Failed to fetch reviews");
@@ -73,30 +76,33 @@ const ReviewsManagement: React.FC = () => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(review =>
-        review.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.userName?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (review) =>
+          review.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          review.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          review.userName?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Category filter
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(review => review.category === selectedCategory);
+      filtered = filtered.filter(
+        (review) => review.category === selectedCategory
+      );
     }
 
     // Rating filter
     if (selectedRating !== "all") {
       const rating = parseInt(selectedRating);
-      filtered = filtered.filter(review => review.rating === rating);
+      filtered = filtered.filter((review) => review.rating === rating);
     }
 
     // Status filter
     if (selectedStatus !== "all") {
       if (selectedStatus === "hidden") {
-        filtered = filtered.filter(review => review.isHidden);
+        filtered = filtered.filter((review) => review.isHidden);
       } else if (selectedStatus === "visible") {
-        filtered = filtered.filter(review => !review.isHidden);
+        filtered = filtered.filter((review) => !review.isHidden);
       }
     }
 
@@ -104,18 +110,23 @@ const ReviewsManagement: React.FC = () => {
   }, [reviews, searchTerm, selectedCategory, selectedRating, selectedStatus]);
 
   // Toggle review visibility
-  const toggleReviewVisibility = async (reviewId: string, currentStatus: boolean) => {
+  const toggleReviewVisibility = async (
+    reviewId: string,
+    currentStatus: boolean
+  ) => {
     try {
       await databases.updateDocument(
         appwriteConfig.databaseId,
         appwriteConfig.reviewsCollectionId,
         reviewId,
         {
-          isHidden: !currentStatus
+          isHidden: !currentStatus,
         }
       );
-      
-      toast.success(`Review ${currentStatus ? 'hidden' : 'shown'} successfully`);
+
+      toast.success(
+        `Review ${currentStatus ? "hidden" : "shown"} successfully`
+      );
       fetchReviews(); // Refresh the list
     } catch (error) {
       console.error("Error updating review:", error);
@@ -125,7 +136,11 @@ const ReviewsManagement: React.FC = () => {
 
   // Delete review
   const deleteReview = async (reviewId: string) => {
-    if (!confirm("Are you sure you want to delete this review? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this review? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -135,7 +150,7 @@ const ReviewsManagement: React.FC = () => {
         appwriteConfig.reviewsCollectionId,
         reviewId
       );
-      
+
       toast.success("Review deleted successfully");
       fetchReviews(); // Refresh the list
     } catch (error) {
@@ -145,19 +160,24 @@ const ReviewsManagement: React.FC = () => {
   };
 
   // Bulk actions
-  const handleBulkAction = async (action: 'hide' | 'show' | 'delete') => {
+  const handleBulkAction = async (action: "hide" | "show" | "delete") => {
     if (selectedReviews.length === 0) {
       toast.error("Please select reviews first");
       return;
     }
 
-    if (action === 'delete' && !confirm(`Are you sure you want to delete ${selectedReviews.length} review(s)? This action cannot be undone.`)) {
+    if (
+      action === "delete" &&
+      !confirm(
+        `Are you sure you want to delete ${selectedReviews.length} review(s)? This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
     try {
       for (const reviewId of selectedReviews) {
-        if (action === 'delete') {
+        if (action === "delete") {
           await databases.deleteDocument(
             appwriteConfig.databaseId,
             appwriteConfig.reviewsCollectionId,
@@ -169,15 +189,22 @@ const ReviewsManagement: React.FC = () => {
             appwriteConfig.reviewsCollectionId,
             reviewId,
             {
-              isHidden: action === 'hide'
+              isHidden: action === "hide",
             }
           );
         }
       }
 
-      const actionText = action === 'delete' ? 'deleted' : action === 'hide' ? 'hidden' : 'shown';
-      toast.success(`${selectedReviews.length} review(s) ${actionText} successfully`);
-      
+      const actionText =
+        action === "delete"
+          ? "deleted"
+          : action === "hide"
+          ? "hidden"
+          : "shown";
+      toast.success(
+        `${selectedReviews.length} review(s) ${actionText} successfully`
+      );
+
       setSelectedReviews([]);
       fetchReviews(); // Refresh the list
     } catch (error) {
@@ -187,7 +214,7 @@ const ReviewsManagement: React.FC = () => {
   };
 
   // Get unique categories
-  const categories = [...new Set(reviews.map(review => review.category))];
+  const categories = [...new Set(reviews.map((review) => review.category))];
 
   // Render star rating
   const renderStars = (rating: number) => {
@@ -198,24 +225,23 @@ const ReviewsManagement: React.FC = () => {
             key={star}
             className={`w-4 h-4 ${
               star <= rating
-                ? "text-yellow-400 fill-yellow-400"
-                : "text-gray-300"
+                ? "text-retro-yellow fill-retro-yellow"
+                : "text-muted-foreground"
             }`}
           />
         ))}
-        <span className="ml-1 text-sm text-gray-600">({rating})</span>
       </div>
     );
   };
 
   // Format date
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -232,7 +258,9 @@ const ReviewsManagement: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Reviews Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Reviews Management
+          </h1>
           <p className="text-gray-600 mt-2">
             Manage and moderate product reviews across all categories
           </p>
@@ -242,212 +270,300 @@ const ReviewsManagement: React.FC = () => {
             Total: {reviews.length}
           </Badge>
           <Badge variant="outline" className="text-sm">
-            Visible: {reviews.filter(r => !r.isHidden).length}
+            Visible: {reviews.filter((r) => !r.isHidden).length}
           </Badge>
           <Badge variant="destructive" className="text-sm">
-            Hidden: {reviews.filter(r => r.isHidden).length}
+            Hidden: {reviews.filter((r) => r.isHidden).length}
           </Badge>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
-            Filters & Search
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search reviews..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All Categories</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-
-            {/* Rating Filter */}
-            <select
-              value={selectedRating}
-              onChange={(e) => setSelectedRating(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All Ratings</option>
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
-            </select>
-
-            {/* Status Filter */}
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All Status</option>
-              <option value="visible">Visible</option>
-              <option value="hidden">Hidden</option>
-            </select>
+      <div className="bg-background rounded-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search reviews..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
 
-          {/* Bulk Actions */}
-          {selectedReviews.length > 0 && (
-            <div className="flex items-center gap-2 pt-4 border-t">
-              <span className="text-sm text-gray-600">
-                {selectedReviews.length} review(s) selected
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkAction('show')}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Show All
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkAction('hide')}
-              >
-                <EyeOff className="w-4 h-4 mr-2" />
-                Hide All
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleBulkAction('delete')}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete All
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          {/* Rating Filter */}
+          <select
+            value={selectedRating}
+            onChange={(e) => setSelectedRating(e.target.value)}
+            className="px-3 py-2 border bg-background rounded-md"
+          >
+            <option value="all">All Ratings</option>
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="2">2 Stars</option>
+            <option value="1">1 Star</option>
+          </select>
 
-      {/* Reviews List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Reviews ({filteredReviews.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {filteredReviews.map((review) => (
-              <div
-                key={review.$id}
-                className={`p-4 border rounded-lg ${
-                  review.isHidden ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-200'
-                }`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedReviews.includes(review.$id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedReviews([...selectedReviews, review.$id]);
-                          } else {
-                            setSelectedReviews(selectedReviews.filter(id => id !== review.$id));
-                          }
+          {/* Status Filter */}
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="px-3 py-2 border bg-background rounded-md"
+          >
+            <option value="all">All Status</option>
+            <option value="visible">Visible</option>
+            <option value="hidden">Hidden</option>
+          </select>
+        </div>
+
+        {/* Bulk Actions */}
+        {selectedReviews.length > 0 && (
+          <div className="flex items-center gap-2 pt-4 border-t">
+            <span className="text-sm text-gray-600">
+              {selectedReviews.length} review(s) selected
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkAction("show")}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              Show All
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkAction("hide")}
+            >
+              <EyeOff className="w-4 h-4 mr-2" />
+              Hide All
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleBulkAction("delete")}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete All
+            </Button>
+          </div>
+        )}
+        {/* Reviews List */}
+        <div className="bg-background">
+          <CardHeader>
+            <CardTitle>Reviews ({filteredReviews.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredReviews.map((review) => (
+                <div
+                  key={review.$id}
+                  className={`p-4 border rounded-lg h-fit ${
+                    review.isHidden
+                      ? "bg-gray-50 border-gray-200"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedReviews.includes(review.$id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedReviews([
+                                  ...selectedReviews,
+                                  review.$id,
+                                ]);
+                              } else {
+                                setSelectedReviews(
+                                  selectedReviews.filter(
+                                    (id) => id !== review.$id
+                                  )
+                                );
+                              }
+                            }}
+                            className="rounded border-gray-300"
+                          />
+
+                          <h3 className="font-semibold text-gray-900 text-sm truncate">
+                            {review.productName}
+                          </h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            {review.isVerified && (
+                              <Badge
+                                variant="default"
+                                className="bg-green-100 text-green-800 text-xs"
+                              >
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Verified
+                              </Badge>
+                            )}
+
+                            {review.isHidden && (
+                              <Badge variant="destructive" className="text-xs">
+                                <EyeOff className="w-3 h-3 mr-1" />
+                                Hidden
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        <span className="truncate">
+                          {review.userName || "Anonymous"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mb-2">{renderStars(review.rating)}</div>
+
+                    <p className="text-gray-700 text-sm line-clamp-3 leading-relaxed">
+                      {review.comment}
+                    </p>
+
+                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedReviewForModal(review);
+                          setIsReviewModalOpen(true);
                         }}
-                        className="rounded border-gray-300"
-                      />
-                      
-                      <h3 className="font-semibold text-gray-900">
-                        {review.productName}
-                      </h3>
-                      
-                      <Badge variant="outline">{review.category}</Badge>
-                      
-                      {review.isVerified && (
-                        <Badge variant="default" className="bg-green-100 text-green-800">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Verified
-                        </Badge>
-                      )}
-                      
-                      {review.isHidden && (
-                        <Badge variant="secondary">
-                          <EyeOff className="w-3 h-3 mr-1" />
-                          Hidden
-                        </Badge>
-                      )}
+                        title="View Review Details"
+                        className="flex-1 h-8 text-xs"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        View Details
+                      </Button>
+
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => deleteReview(review.$id)}
+                        title="Delete Review"
+                        className="h-8 w-8 p-0"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
                     </div>
-
-                    <div className="flex items-center gap-4 mb-3 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        {review.userName || 'Anonymous'}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {formatDate(review.createdAt)}
-                      </div>
-                    </div>
-
-                    <div className="mb-3">
-                      {renderStars(review.rating)}
-                    </div>
-
-                    <p className="text-gray-700">{review.comment}</p>
-                  </div>
-
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleReviewVisibility(review.$id, review.isHidden)}
-                      title={review.isHidden ? 'Show Review' : 'Hide Review'}
-                    >
-                      {review.isHidden ? (
-                        <Eye className="w-4 h-4" />
-                      ) : (
-                        <EyeOff className="w-4 h-4" />
-                      )}
-                    </Button>
-                    
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deleteReview(review.$id)}
-                      title="Delete Review"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {filteredReviews.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                No reviews found matching your criteria
+              {filteredReviews.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No reviews found matching your criteria
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </div>
+      </div>
+
+      {/* Review Detail Modal */}
+      {selectedReviewForModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-background border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Review Details
+                </h2>
+                <button
+                  onClick={() => {
+                    setIsReviewModalOpen(false);
+                    setSelectedReviewForModal(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XCircle className="w-6 h-6" />
+                </button>
               </div>
-            )}
+
+              {/* User Info */}
+              <div className="mb-6 p-4 bg-gray-50 border rounded-lg">
+                <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <span className="flex items-center gap-1">
+                    <User className="w-4 h-4" />
+                    {selectedReviewForModal.userName || "Anonymous"}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    ID: {selectedReviewForModal.userId}
+                  </span>
+                </div>
+              </div>
+
+              {/* Rating */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2">
+                  {renderStars(selectedReviewForModal.rating)}
+                  <span className="text-lg font-semibold text-gray-900 ml-2">
+                    {selectedReviewForModal.rating}/5
+                  </span>
+                </div>
+              </div>
+
+              {/* Comment */}
+              <div className="mb-6">
+                <h4 className="font-medium underline text-muted-foreground mb-2">
+                  Review Comment
+                </h4>
+                <p className="text-gray-700 leading-relaxed">
+                  {selectedReviewForModal.comment}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    toggleReviewVisibility(
+                      selectedReviewForModal.$id,
+                      selectedReviewForModal.isHidden
+                    );
+                    setIsReviewModalOpen(false);
+                  }}
+                  className="flex-1"
+                >
+                  {selectedReviewForModal.isHidden ? (
+                    <>
+                      <Eye className="w-4 h-4 mr-2" />
+                      Show Review
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="w-4 h-4 mr-2" />
+                      Hide Review
+                    </>
+                  )}
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    deleteReview(selectedReviewForModal.$id);
+                    setIsReviewModalOpen(false);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Review
+                </Button>
+              </div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   );
 };

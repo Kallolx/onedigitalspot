@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import MainLayout from "./layouts/MainLayout";
 import NotFound from "./pages/NotFound";
@@ -42,6 +42,7 @@ import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
 import Products from "./admin/Products";
 import ReviewsManagement from "./admin/ReviewsManagement";
+import AdsManagement from "./admin/AdsManagement";
 import Users from "./admin/Users";
 import Subscriptions from "./pages/routes/Subscriptions";
 import Settings from "./admin/Settings";
@@ -109,8 +110,35 @@ import Bumble from "./Products/design/Bumble";
 import TelegramStars from "./Products/design/Telegram";
 import Checkout from "./pages/Checkout";
 import CartPage from "./pages/Cart";
+import Battlefield6 from "./Products/game-details/pc-games/BF6";
+import AssassinsShadows from "./Products/game-details/pc-games/AssassinsShadows";
+import CODBO7 from "./Products/game-details/pc-games/CODBO7";
+import GTAV from "./Products/game-details/pc-games/GTAV";
+import RDR2 from "./Products/game-details/pc-games/RDR2";
+import Cyberpunk2077 from "./Products/game-details/pc-games/Cyberpunk2077";
+import CODMW2 from "./Products/game-details/pc-games/CODMW2";
+import FIFA25 from "./Products/game-details/pc-games/FIFA25";
+import PUBGPC from "./Products/game-details/pc-games/PUBGPC";
+import ACMirage from "./Products/game-details/pc-games/ACMirage";
+import EldenRing from "./Products/game-details/pc-games/EldenRing";
+import SpiderMan2 from "./Products/game-details/pc-games/SpiderMan2";
+import Witcher3 from "./Products/game-details/pc-games/Witcher3";
+import ApexLegends from "./Products/game-details/pc-games/ApexLegends";
+import AdIntegration from "./components/custom/AdIntegration";
 
 const queryClient = new QueryClient();
+
+// Conditional Ad Integration component
+const ConditionalAdIntegration = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  
+  if (isAdminRoute) {
+    return null;
+  }
+  
+  return <AdIntegration />;
+};
 
 const App = () => {
   return (
@@ -120,6 +148,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ConditionalAdIntegration />
           <Routes>
             {/* Authentication Routes */}
             <Route path="/auth/login" element={<Login />} />
@@ -199,6 +228,20 @@ const App = () => {
 
               {/* PC Games Routes */}
               <Route path="/pc-games/valorant" element={<Valorant />} />
+              <Route path="/pc-games/battlefield-6" element={<Battlefield6 />} />
+              <Route path="/pc-games/assassins-creed-shadows" element={<AssassinsShadows />} />
+              <Route path="/pc-games/cod-black-ops-7" element={<CODBO7 />} />
+              <Route path="/pc-games/gta-v" element={<GTAV />} />
+              <Route path="/pc-games/red-dead-redemption-2" element={<RDR2 />} />
+              <Route path="/pc-games/cyberpunk-2077" element={<Cyberpunk2077 />} />
+              <Route path="/pc-games/cod-modern-warfare-2" element={<CODMW2 />} />
+              <Route path="/pc-games/fifa-24" element={<FIFA25 />} />
+              <Route path="/pc-games/pubg-pc" element={<PUBGPC />} />
+              <Route path="/pc-games/assassins-creed-mirage" element={<ACMirage />} />
+              <Route path="/pc-games/elden-ring" element={<EldenRing />} />
+              <Route path="/pc-games/spiderman-2" element={<SpiderMan2 />} />
+              <Route path="/pc-games/witcher-3" element={<Witcher3 />} />
+              <Route path="/pc-games/apex-legends" element={<ApexLegends />} />
 
               {/* Gift Cards Routes */}
               <Route
@@ -309,6 +352,7 @@ const App = () => {
                 <Route path="products" element={<Products />} />
                 <Route path="users" element={<Users />} />
                 <Route path="reviews" element={<ReviewsManagement />} />
+                <Route path="ads" element={<AdsManagement />} />
                 <Route path="hero-banners" element={
                   <React.Suspense fallback={<div>Loading...</div>}>
                     <AdminHeroBanners />

@@ -4,11 +4,7 @@ import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
-import {
-  getUserOrders,
-  getCurrentUser,
-  OrderData,
-} from "../lib/orders";
+import { getUserOrders, getCurrentUser, OrderData } from "../lib/orders";
 import {
   mobileGames,
   pcGames,
@@ -133,9 +129,7 @@ const DeliveryTimer = ({
 
   return (
     <div className="flex items-center gap-2 text-sm font-bold text-green-600">
-      <ClockIcon className="w-4 h-4" />
-      <span className="text-xs">Delivery</span>
-      <span className="font-mono text-lg font-black">
+      <span className="font-sans text-lg font-bold text-secondary">
         {formatTime(timeLeft.minutes, timeLeft.seconds)}
       </span>
     </div>
@@ -155,7 +149,9 @@ const MyOrders = () => {
   const [completedOrdersToReview, setCompletedOrdersToReview] = useState<
     OrderData[]
   >([]);
-  const [orderReviewStatus, setOrderReviewStatus] = useState<{[key: string]: boolean}>({});
+  const [orderReviewStatus, setOrderReviewStatus] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [page, setPage] = useState(1);
 
   // Check review status for completed orders
@@ -164,15 +160,15 @@ const MyOrders = () => {
       const currentUser = await account.get();
       if (currentUser) {
         const userReviews = await getUserReviews(currentUser.$id);
-        const reviewStatus: {[key: string]: boolean} = {};
-        
-        completedOrdersToReview.forEach(order => {
+        const reviewStatus: { [key: string]: boolean } = {};
+
+        completedOrdersToReview.forEach((order) => {
           const hasReviewed = userReviews.some(
             (review: any) => review.productName === order.productName
           );
-          reviewStatus[order.$id || order.id || ''] = hasReviewed;
+          reviewStatus[order.$id || order.id || ""] = hasReviewed;
         });
-        
+
         setOrderReviewStatus(reviewStatus);
       }
     } catch (error) {
@@ -250,7 +246,6 @@ const MyOrders = () => {
             status
           )} flex items-center gap-1 w-fit mt-2`}
         >
-          {getStatusIcon(status)}
           <span className="capitalize">{status}</span>
         </Badge>
       );
@@ -259,8 +254,7 @@ const MyOrders = () => {
     // If pending but over 30 minutes, show processing badge
     if (!showTimer) {
       return (
-        <Badge className="bg-blue-100 text-blue-800 border-blue-200 flex items-center gap-1 w-fit mt-2">
-          <TruckIcon className="w-4 h-4" />
+        <Badge className="text-[hsl(var(--retro-yellow))] border-[hsl(var(--retro-yellow))] flex items-center gap-1 w-fit mt-2">
           <span>Processing</span>
         </Badge>
       );
@@ -285,7 +279,10 @@ const MyOrders = () => {
     // Remove the current order from the review queue
     if (reviewOrder) {
       setCompletedOrdersToReview((prev) =>
-        prev.filter((order) => (order.$id || order.id) !== (reviewOrder.$id || reviewOrder.id))
+        prev.filter(
+          (order) =>
+            (order.$id || order.id) !== (reviewOrder.$id || reviewOrder.id)
+        )
       );
     }
 
@@ -298,7 +295,8 @@ const MyOrders = () => {
     // Show next review modal if there are more
     if (completedOrdersToReview.length > 1) {
       const nextOrder = completedOrdersToReview.find(
-        (order) => (order.$id || order.id) !== (reviewOrder?.$id || reviewOrder?.id)
+        (order) =>
+          (order.$id || order.id) !== (reviewOrder?.$id || reviewOrder?.id)
       );
       if (nextOrder) {
         setTimeout(() => setReviewOrder(nextOrder), 500);
@@ -401,35 +399,20 @@ const MyOrders = () => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "text-[hsl(var(--retro-yellow))] border-[hsl(var(--retro-yellow))]";
       case "confirmed":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-[hsl(var(--retro-blue))]/20 text-[hsl(var(--retro-blue))] border-[hsl(var(--retro-blue))]";
       case "completed":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-[hsl(var(--retro-mint))] text-foreground border-[hsl(var(--retro-mint))]";
       case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-[hsl(var(--destructive))] text-foreground border-[hsl(var(--destructive))]";
       case "processing":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "text-[hsl(var(--retro-yellow))] border-[hsl(var(--retro-yellow))]";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-muted text-muted-foreground border-border";
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
-        return <ClockIcon className="w-4 h-4" />;
-      case "confirmed":
-      case "processing":
-        return <TruckIcon className="w-4 h-4" />;
-      case "completed":
-        return <CheckCircleIcon className="w-4 h-4" />;
-      case "cancelled":
-        return <XCircleIcon className="w-4 h-4" />;
-      default:
-        return <ShoppingBagIcon className="w-4 h-4" />;
-    }
-  };
 
   const getStatusDisplay = (order: OrderData) => {
     // Check if it's pending and within 30 minutes
@@ -447,8 +430,7 @@ const MyOrders = () => {
       } else {
         // Show processing badge for pending orders over 30 minutes
         return (
-          <Badge className="bg-blue-100 text-blue-800 border-blue-200 flex items-center gap-1 w-fit">
-            <TruckIcon className="w-4 h-4" />
+          <Badge className="bg-retro-yellow/20 text-foreground border-[hsl(var(--retro-yellow))] flex items-center gap-1 w-fit">
             <span>Processing</span>
           </Badge>
         );
@@ -462,7 +444,6 @@ const MyOrders = () => {
           order.status
         )} flex items-center gap-1 w-fit`}
       >
-        {getStatusIcon(order.status)}
         <span className="capitalize">{order.status}</span>
       </Badge>
     );
@@ -542,18 +523,18 @@ const MyOrders = () => {
             </div>
             {/* Search and Filter Bar */}
             {!loading && !error && orders.length > 0 && (
-              <div className="flex flex-row gap-2 items-end w-full md:w-auto md:max-w-xl">
-                <div className="relative flex-1 max-w-[220px]">
+              <div className="flex flex-row gap-2 items-end w-full md:w-auto md:max-w-2xl">
+                <div className="relative flex-1 md:min-w-[320px]">
                   <SearchIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
                     placeholder="search here..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-2 py-2 text-sm border bg-background rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    className="pl-10 pr-4 py-3 text-base border bg-background rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-full"
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <select
+                <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background"
@@ -627,8 +608,8 @@ const MyOrders = () => {
                   <p className="text-sm font-medium text-foreground/70">
                     Total Spent
                   </p>
-                  <p className="text-xl sm:text-2xl font-bold font-pixel text-foreground">
-                    {summary.totalAmount}৳
+                  <p className="text-xl sm:text-2xl font-bold font-anekbangla text-secondary">
+                    {toBanglaNumber(summary.totalAmount)}৳
                   </p>
                 </div>
               </Card>
@@ -653,7 +634,7 @@ const MyOrders = () => {
               />
               <CompactStat
                 title="Spent"
-                value={<>{summary.totalAmount}৳</>}
+                value={<span className="text-secondary">{toBanglaNumber(summary.totalAmount)}৳</span>}
                 icon={<Coins className="w-5 h-5 text-yellow-400" />}
               />
             </div>
@@ -661,7 +642,7 @@ const MyOrders = () => {
 
           {/* Loading State */}
           {loading && (
-            <Card className="p-12">
+            <Card className="p-12 bg-background rounded-2xl">
               <div className="flex flex-col items-center justify-center">
                 <RotateLoader color="#22c55e" size={15} />
                 <p className="text-gray-600 mt-4">Loading your orders...</p>
@@ -707,7 +688,7 @@ const MyOrders = () => {
           {/* Orders Table - Desktop */}
           {!loading && !error && filteredOrders.length > 0 && (
             <>
-              <Card className="hidden lg:block overflow-hidden shadow-md rounded-2xl">
+              <Card className="hidden lg:block overflow-hidden bg-background rounded-2xl">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-gray-700">
                     <thead className="bg-gray-50 border-b">
@@ -761,9 +742,6 @@ const MyOrders = () => {
                                 </span>
                                 <span className="text-gray-500 text-xs">
                                   {order.itemLabel} × {order.quantity}
-                                </span>
-                                <span className="text-gray-400 text-xs">
-                                  {order.orderID || "N/A"}
                                 </span>
                               </div>
                             </div>
@@ -822,10 +800,10 @@ const MyOrders = () => {
 
                           {/* Payment */}
                           <td className="px-6 py-4">
-                            <p className="text-gray-900 font-medium">
+                            <p className="text-foreground font-medium">
                               {order.paymentMethod}
                             </p>
-                            <p className="text-gray-400 text-xs">
+                            <p className="text-muted-foreground text-xs">
                               TRX: {order.transactionId}
                             </p>
                           </td>
@@ -837,11 +815,11 @@ const MyOrders = () => {
 
                           {/* Amount */}
                           <td className="px-6 py-4 text-right">
-                            <p className="text-gray-900 font-bold font-pixel">
-                              {order.totalAmount}৳
+                            <p className="text-secondary font-bold font-anekbangla text-lg">
+                              {toBanglaNumber(order.totalAmount)}৳
                             </p>
-                            <p className="text-gray-400 text-xs">
-                              {order.unitPrice}৳ × {order.quantity}
+                            <p className="text-muted-foreground font-bold font-anekbangla text-xs">
+                              {toBanglaNumber(order.unitPrice)}৳ × {order.quantity}
                             </p>
                           </td>
 
@@ -941,7 +919,7 @@ const MyOrders = () => {
                 {filteredOrders.map((order) => (
                   <Card
                     key={order.id}
-                    className="p-4 hover:shadow-lg transition-shadow rounded-2xl"
+                    className="p-4 bg-background rounded-2xl"
                   >
                     {/* Header */}
                     <div className="flex items-start gap-3 mb-3">
@@ -974,20 +952,20 @@ const MyOrders = () => {
                       {/* Left Column */}
                       <div className="border-r border-gray-200 pr-3">
                         <p className="text-gray-500 font-medium">Amount</p>
-                        <p className="text-secondary font-pixel font-bold">
-                          ৳{order.totalAmount}
+                        <p className="text-secondary text-lg font-anekbangla font-bold">
+                          {toBanglaNumber(order.totalAmount)}৳
                         </p>
 
-                        <p className="text-gray-500 font-medium mt-2">Date</p>
-                        <p className="text-gray-900">
+                        <p className="text-foreground font-medium mt-2">Date</p>
+                        <p className="text-muted-foreground text-sm">
                           {formatDate(order.createdAt, "date")}
                         </p>
                       </div>
 
                       {/* Right Column */}
                       <div className="pl-3">
-                        <p className="text-gray-500 font-medium">Payment</p>
-                        <p className="text-gray-900">{order.paymentMethod}</p>
+                        <p className="text-foreground font-medium">Payment</p>
+                        <p className="text-secondary text-lg font-anekbangla font-bold">{order.paymentMethod}</p>
 
                         <p className="text-gray-500 font-medium mt-2">
                           Product
@@ -1368,7 +1346,11 @@ const MyOrders = () => {
                       className="flex-1 text-xs h-9"
                       onClick={() => setReviewOrder(selectedOrder)}
                     >
-                                             {orderReviewStatus[selectedOrder.$id || selectedOrder.id || ''] ? "Edit Review" : "Write Review"}
+                      {orderReviewStatus[
+                        selectedOrder.$id || selectedOrder.id || ""
+                      ]
+                        ? "Edit Review"
+                        : "Write Review"}
                     </Button>
 
                     <Button
@@ -1412,7 +1394,7 @@ const MyOrders = () => {
               setTimeout(() => setReviewOrder(remainingReviews[0]), 500);
             }
           }}
-                     onReviewSubmitted={handleReviewSubmitted}
+          onReviewSubmitted={handleReviewSubmitted}
         />
       )}
 

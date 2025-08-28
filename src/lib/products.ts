@@ -161,7 +161,7 @@ export const pcGames: Product[] = [
     popular: true,
   },
   {
-    title: "Assassin’s Creed Shadows",
+    title: "AC Shadows",
     image: "/products/pc-games/assassins-shadows.avif",
     price: "2999",
     rating: 5,
@@ -170,7 +170,7 @@ export const pcGames: Product[] = [
     route: "/pc-games/assassins-creed-shadows",
   },
   {
-    title: "Call of Duty: Black Ops 7",
+    title: "CoD-Black Ops 7",
     image: "/products/pc-games/cod-bo-7.avif",
     price: "2999",
     rating: 5,
@@ -227,7 +227,7 @@ export const pcGames: Product[] = [
     route: "/pc-games/cyberpunk-2077",
   },
   {
-    title: "Call of Duty: Modern Warfare II",
+    title: "CoD-Modern Warfare II",
     image: "/products/pc-games/cod-mw-2.avif",
     price: "2499",
     rating: 5,
@@ -255,7 +255,7 @@ export const pcGames: Product[] = [
     route: "/pc-games/pubg-pc",
   },
   {
-    title: "Assassin’s Creed Mirage",
+    title: "AC Mirage",
     image: "/products/pc-games/ac-mirage.avif",
     price: "2399",
     rating: 5,

@@ -494,6 +494,7 @@ const Checkout: React.FC = () => {
           transactionId: trxId,
           status: "Pending",
           deliveryInfo: JSON.stringify(checkoutData.deliveryInfo),
+          reviews: undefined
         };
 
         return createOrder(orderData);

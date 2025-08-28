@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-primary border-2 hover:text-accent-foreground",
         link: "hover:bg-primary hover:text-accent-foreground",
         retro: "hover:bg-primary bg-muted hover:text-accent-foreground",
-        pixel: "bg-retro-mint text-primary-foreground hover:bg-retro-mint/90 shadow-button font-pixel text-xs",
+        pixel: "bg-retro-yellow text-primary hover:bg-retro-yellow/90 font-sans text-md font-semibold",
       },
       size: {
         default: "h-12 px-6 py-3",

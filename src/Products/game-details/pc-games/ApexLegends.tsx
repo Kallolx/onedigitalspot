@@ -12,7 +12,7 @@ interface SelectedItem {
 
 const categoryIcons = {
   "Passes & Vouchers": "/assets/icons/voucher.svg",
-  "Diamonds": "/assets/icons/gift-cards/valorant.svg",
+  "Diamonds": "/assets/icons/gift-cards/apex.svg",
 };
 
 function groupPriceList(priceList) {
@@ -29,12 +29,12 @@ function groupPriceList(priceList) {
   });
   return [
     {
-      title: "Valorant Passes",
+      title: "Apex Legends Passes",
       categoryIcon: categoryIcons["Passes & Vouchers"],
       items: passes,
     },
     {
-      title: "Valorant Points",
+      title: "Apex Coins",
       categoryIcon: categoryIcons["Diamonds"],
       items: diamonds,
     },
@@ -46,35 +46,35 @@ const infoSections = [
     title: "How to Buy",
     content: (
       <ul className="list-disc pl-5 text-base mb-4">
-        <li>Select your desired Valorant Points package above.</li>
-        <li>Enter your Riot ID.</li>
+        <li>Select your desired Apex Coins package above.</li>
+        <li>Enter your Origin/EA Account email.</li>
         <li>Choose quantity and proceed to payment.</li>
       </ul>
     ),
   },
   {
-    title: "How to Find Riot ID",
+    title: "How to Find Origin/EA Account",
     content: (
       <div className="mb-2">
         <p className="mb-2">
-          Open Valorant, click on your profile in the top-right corner. Your Riot ID is displayed below your username.
+          Open Apex Legends, go to the main menu. Your Origin/EA Account email is the one you use to log into the game.
         </p>
       </div>
     ),
   },
 ];
 
-export default function Valorant() {
+export default function ApexLegends() {
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState("");
-  const [valorant, setValorant] = useState(null);
+  const [apexLegends, setApexLegends] = useState(null);
   const [priceList, setPriceList] = useState([]);
   const [similar, setSimilar] = useState([]);
-  const [isSignedIn, setIsSignedIn] = useState(false); // <-- Add this state
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
-    // Use image from subscriptions array
-    const valorantProduct = pcGames.find(p => p.title === "Valorant");
-    const infoImage = valorantProduct?.image;
+  // Use image from subscriptions array
+  const apexLegendsProduct = pcGames.find(p => p.title === "Apex Legends");
+  const infoImage = apexLegendsProduct?.image;
 
   useEffect(() => {
     async function fetchProduct() {
@@ -84,17 +84,17 @@ export default function Valorant() {
         // Get all PC games
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
-        // Find Valorant (case-insensitive)
-        const valorantProduct = products.find((g) => g.title && g.title.toLowerCase() === "valorant");
-        setValorant(valorantProduct);
+        // Find Apex Legends (case-insensitive)
+        const apexLegendsProduct = products.find((g) => g.title && g.title.toLowerCase() === "apex legends");
+        setApexLegends(apexLegendsProduct);
         // Group priceList
-        if (valorantProduct && Array.isArray(valorantProduct.priceList)) {
-          setPriceList(groupPriceList(valorantProduct.priceList));
+        if (apexLegendsProduct && Array.isArray(apexLegendsProduct.priceList)) {
+          setPriceList(groupPriceList(apexLegendsProduct.priceList));
         }
         // Get similar products
-        setSimilar(pcGames.filter((g) => g.title !== "Valorant").slice(0, 4));
+        setSimilar(pcGames.filter((g) => g.title !== "Apex Legends").slice(0, 4));
       } catch (err) {
-        setValorant(null);
+        setApexLegends(null);
         setPriceList([]);
         setSimilar([]);
       }
@@ -110,14 +110,14 @@ export default function Valorant() {
     }
 
     fetchProduct();
-    checkAuth(); // <-- Check Appwrite auth
+    checkAuth();
   }, []);
 
   return (
     <GameDetailsLayout
       isSignedIn={isSignedIn}
-      title="Valorant"
-      image={valorantProduct?.image}
+      title="Apex Legends"
+      image={apexLegendsProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
