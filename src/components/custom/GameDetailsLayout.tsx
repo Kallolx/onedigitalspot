@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ServiceCard from "@/components/custom/ServiceCard";
 import OrderStatusModal from "@/components/custom/OrderStatusModal";
+import ReviewsModal from "@/components/custom/ReviewsModal";
 import React, { useState, useEffect, useRef } from "react";
-import { Info, X, ArrowLeft } from "lucide-react";
+import { Info, X, ArrowLeft, Star, MessageCircle } from "lucide-react";
 import { LockKeyIcon, SentIcon, ShoppingCart02Icon } from "hugeicons-react";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "@/components/ui/sonner";
@@ -11,6 +12,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { RotateLoader } from "react-spinners";
 import Footer from "../landing/Footer";
 import { Input } from "../ui/input";
+import { useProductReviews } from "@/hooks/useProductReviews";
 
 interface PriceItem {
   label: string;
@@ -93,10 +95,15 @@ const GameDetailsLayout: React.FC<
     status: "success",
   });
 
+  const [showReviewsModal, setShowReviewsModal] = useState(false);
+
   const imgRef = useRef<HTMLImageElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { addItem, setOpen } = useCart();
+
+  // Fetch product reviews
+  const { reviews, stats } = useProductReviews(title);
 
   // Calculate total amount from all selected items
   const totalAmount = selectedItems.reduce((total, item) => {
@@ -230,7 +237,7 @@ const GameDetailsLayout: React.FC<
             type="button"
             aria-label="Go back"
             onClick={() => navigate(-1)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-transparent border hover:bg-muted/60 rounded-full p-2"
+            className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 bg-transparent border hover:bg-muted/60 rounded-full p-2"
           >
             <span className="sr-only">Go back</span>
             <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -271,26 +278,26 @@ const GameDetailsLayout: React.FC<
               </h2>
               {/* Review text under title */}
               <div className="flex justify-center mt-4">
-                <div className="flex items-center gap-2  px-3 py-1 ">
-                  {/* 5 Star icons */}
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      className="w-4 h-4 text-yellow-400 drop-shadow"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" />
-                    </svg>
-                  ))}
-                  <span
-                    className="text-md text-gray-700 font-semibold font-sans cursor-pointer transition border-b-2 hover:text-foreground px-1"
-                    title="See all reviews"
-                  >
-                    Reviews{" "}
-                    <span className="text-foreground font-bold">(123)</span>
+                <button
+                  onClick={() => setShowReviewsModal(true)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer group"
+                  title="See all reviews"
+                >
+                  {/* 5 Stars */}
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="w-4 h-4 text-retro-yellow fill-retro-yellow drop-shadow"
+                      />
+                    ))}
+                  </div>
+
+                  {/* Reviews text with hover underline */}
+                  <span className="text-md text-gray-700 font-semibold font-sans group-hover:underline transition-all">
+                    Reviews ({stats.totalReviews || 0})
                   </span>
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -372,7 +379,8 @@ const GameDetailsLayout: React.FC<
                             className="block bg-background font-pixel text-base text-foreground mb-1"
                             htmlFor="playerId"
                           >
-                            {playerIdLabel} <span className="text-red-500">*</span>
+                            {playerIdLabel}{" "}
+                            <span className="text-red-500">*</span>
                           </label>
                           <div className="relative flex items-center">
                             <Input
@@ -447,7 +455,12 @@ const GameDetailsLayout: React.FC<
                       </button>
                       <h3 className="font-pixel text-lg text-foreground mb-2 text-center">
                         Where to find{" "}
-                        {showInfo === "player" ? playerIdLabel : showInfo === "zone" ? "Zone ID" : "UUID"}?
+                        {showInfo === "player"
+                          ? playerIdLabel
+                          : showInfo === "zone"
+                          ? "Zone ID"
+                          : "UUID"}
+                        ?
                       </h3>
                       {infoImage && (
                         <img
@@ -462,68 +475,68 @@ const GameDetailsLayout: React.FC<
 
                 {/* Order Summary */}
                 {selectedItems.length > 0 && (
-                <div className="mb-4">
-                  <span className="font-sans text-lg text-foreground font-medium">
-                    Order Summary
-                  </span>
-                  <div className="space-y-2 max-h-40 mt-2 overflow-y-auto">
-                    {selectedItems.map((selectedItem, index) => {
-                      const item =
-                        priceList[selectedItem.categoryIdx]?.items[
-                          selectedItem.itemIdx
-                        ];
-                      if (!item) return null;
+                  <div className="mb-4">
+                    <span className="font-sans text-lg text-foreground font-medium">
+                      Order Summary
+                    </span>
+                    <div className="space-y-2 max-h-40 mt-2 overflow-y-auto">
+                      {selectedItems.map((selectedItem, index) => {
+                        const item =
+                          priceList[selectedItem.categoryIdx]?.items[
+                            selectedItem.itemIdx
+                          ];
+                        if (!item) return null;
 
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center border justify-between rounded-lg p-2"
-                        >
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-3">
-                              <span className="font-medium text-gray-900 ml-2 whitespace-normal">
-                                <span className="w-auto" title={item.label}>
-                                  {item.label}
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center border justify-between rounded-lg p-2"
+                          >
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium text-gray-900 ml-2 whitespace-normal">
+                                  <span className="w-auto" title={item.label}>
+                                    {item.label}
+                                  </span>
                                 </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center">
+                              <button
+                                type="button"
+                                className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
+                                onClick={() =>
+                                  updateItemQuantity(
+                                    selectedItem.categoryIdx,
+                                    selectedItem.itemIdx,
+                                    selectedItem.quantity - 1
+                                  )
+                                }
+                              >
+                                -
+                              </button>
+                              <span className="w-8 text-center font-medium text-sm">
+                                {selectedItem.quantity}
                               </span>
+                              <button
+                                type="button"
+                                className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
+                                onClick={() =>
+                                  updateItemQuantity(
+                                    selectedItem.categoryIdx,
+                                    selectedItem.itemIdx,
+                                    selectedItem.quantity + 1
+                                  )
+                                }
+                              >
+                                +
+                              </button>
                             </div>
                           </div>
-                          <div className="flex items-center">
-                            <button
-                              type="button"
-                              className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
-                              onClick={() =>
-                                updateItemQuantity(
-                                  selectedItem.categoryIdx,
-                                  selectedItem.itemIdx,
-                                  selectedItem.quantity - 1
-                                )
-                              }
-                            >
-                              -
-                            </button>
-                            <span className="w-8 text-center font-medium text-sm">
-                              {selectedItem.quantity}
-                            </span>
-                            <button
-                              type="button"
-                              className="w-8 h-8 border rounded-full flex items-center justify-center hover:bg-primary transition-colors text-md"
-                              onClick={() =>
-                                updateItemQuantity(
-                                  selectedItem.categoryIdx,
-                                  selectedItem.itemIdx,
-                                  selectedItem.quantity + 1
-                                )
-                              }
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
                 )}
 
                 {/* Total */}
@@ -638,40 +651,49 @@ const GameDetailsLayout: React.FC<
                       (typeof playerId !== "undefined" && !playerId) ||
                       (typeof zoneId !== "undefined" && !zoneId)
                     }
-                      onClick={() => {
-                        // convert selectedItems to cart items with game info
-                          selectedItems.forEach((si) => {
-                          const item = priceList[si.categoryIdx]?.items[si.itemIdx];
-                          if (!item) return;
-                          addItem({
-                            productName: title,
-                            productImage: image,
-                            label: item.label,
-                            price: typeof item.price === "number" ? item.price : 0,
-                            quantity: si.quantity,
-                            productType: "Games",
-                            gameInfo: {
-                              playerId,
-                              zoneId,
-                            },
-                          });
+                    onClick={() => {
+                      // convert selectedItems to cart items with game info
+                      selectedItems.forEach((si) => {
+                        const item =
+                          priceList[si.categoryIdx]?.items[si.itemIdx];
+                        if (!item) return;
+                        addItem({
+                          productName: title,
+                          productImage: image,
+                          label: item.label,
+                          price:
+                            typeof item.price === "number" ? item.price : 0,
+                          quantity: si.quantity,
+                          productType: "Games",
+                          gameInfo: {
+                            playerId,
+                            zoneId,
+                          },
                         });
-                          setOpen(true);
-                          // Build a short summary for the toast
-                          const addedSummary = selectedItems
-                            .map((si) => {
-                              const it = priceList[si.categoryIdx]?.items[si.itemIdx];
-                              if (!it) return null;
-                              return `${it.label}${si.quantity && si.quantity > 1 ? ` x${si.quantity}` : ""}`;
-                            })
-                            .filter(Boolean)
-                            .slice(0, 3)
-                            .join(", ");
+                      });
+                      setOpen(true);
+                      // Build a short summary for the toast
+                      const addedSummary = selectedItems
+                        .map((si) => {
+                          const it =
+                            priceList[si.categoryIdx]?.items[si.itemIdx];
+                          if (!it) return null;
+                          return `${it.label}${
+                            si.quantity && si.quantity > 1
+                              ? ` x${si.quantity}`
+                              : ""
+                          }`;
+                        })
+                        .filter(Boolean)
+                        .slice(0, 3)
+                        .join(", ");
 
-                          const moreCount = Math.max(0, selectedItems.length - 3);
-                          const message = `${addedSummary}${moreCount > 0 ? ` and ${moreCount} more` : ""} added to cart`;
-                          toast.success(message);
-                      }}
+                      const moreCount = Math.max(0, selectedItems.length - 3);
+                      const message = `${addedSummary}${
+                        moreCount > 0 ? ` and ${moreCount} more` : ""
+                      } added to cart`;
+                      toast.success(message);
+                    }}
                   >
                     <ShoppingCart02Icon className="w-6 h-6 sm:w-7 sm:h-7" />
                     Add to Cart
@@ -706,7 +728,6 @@ const GameDetailsLayout: React.FC<
         </div>
       </main>
 
-
       {/* Order Status Modal */}
       <OrderStatusModal
         isOpen={orderModal.isOpen}
@@ -722,6 +743,14 @@ const GameDetailsLayout: React.FC<
           // Reset is now handled in the checkout page
         }}
       />
+
+      {/* Reviews Modal */}
+      <ReviewsModal
+        productName={title}
+        isOpen={showReviewsModal}
+        onClose={() => setShowReviewsModal(false)}
+      />
+
       <Footer />
     </div>
   );

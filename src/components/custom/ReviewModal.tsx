@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Star, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "../ui/textarea";
+import { createReview, updateReview, getUserReviews } from "@/lib/reviews";
+import { account } from "@/lib/appwrite";
+import { toast } from "@/components/ui/sonner";
 
 interface OrderData {
   id?: string;
@@ -19,36 +22,89 @@ interface ReviewModalProps {
   order: OrderData;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (orderId: string, rating: number, comment: string) => Promise<void>;
+  onReviewSubmitted?: () => void; // Optional callback to refresh reviews
 }
 
 const ReviewModal: React.FC<ReviewModalProps> = ({
   order,
   isOpen,
   onClose,
-  onSubmit,
+  onReviewSubmitted,
 }) => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingReview, setExistingReview] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check if user already reviewed this product
+  useEffect(() => {
+    const checkExistingReview = async () => {
+      try {
+        const currentUser = await account.get();
+        if (currentUser) {
+          const userReviews = await getUserReviews(currentUser.$id);
+          const existing = userReviews.find(
+            (review: any) => review.productName === order.productName
+          );
+          if (existing) {
+            setExistingReview(existing);
+            setRating(existing.rating);
+            setComment(existing.comment || "");
+          }
+        }
+      } catch (error) {
+        console.error("Error checking existing review:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      checkExistingReview();
+    }
+  }, [isOpen, order.productName]);
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      alert("Please select a rating before submitting.");
+      toast.error("Please select a rating before submitting.");
       return;
     }
 
-
     setIsSubmitting(true);
     try {
-      await onSubmit(order.$id || order.id || "", rating, comment);
+      if (existingReview) {
+        // Update existing review
+        await updateReview(existingReview.$id, {
+          rating,
+          comment: comment.trim(),
+        });
+        toast.success("Review updated successfully!");
+      } else {
+        // Create new review
+        await createReview({
+          productName: order.productName,
+          category: "Games", // You can make this dynamic based on your needs
+          rating,
+          comment: comment.trim(),
+          orderId: order.$id || order.id, // Link to the order for verification
+        });
+        toast.success("Review submitted successfully!");
+      }
+      
+      // Call the callback to refresh reviews if provided
+      if (onReviewSubmitted) {
+        onReviewSubmitted();
+      }
+      
       onClose();
       setRating(0);
       setComment("");
+      setExistingReview(null);
     } catch (error) {
       console.error("Error submitting review:", error);
-      alert("Failed to submit review. Please try again.");
+      toast.error("Failed to submit review. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -56,12 +112,27 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
 
   if (!isOpen) return null;
 
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <Card className="w-full max-w-md p-8">
+          <div className="flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <span className="ml-2">Loading...</span>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <Card className="w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-bold text-gray-900">Rate Your Order</h2>
+          <h2 className="text-lg font-bold text-gray-900">
+            {existingReview ? "Edit Your Review" : "Rate Your Order"}
+          </h2>
 
           <Button
             variant="ghost"
@@ -199,7 +270,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
               ) : (
                 <div className="flex items-center space-x-2">
                   <Send className="w-4 h-4" />
-                  <span>Submit Review</span>
+                  <span>{existingReview ? "Update Review" : "Submit Review"}</span>
                 </div>
               )}
             </Button>

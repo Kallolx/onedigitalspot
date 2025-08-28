@@ -38,7 +38,6 @@ export const mobileGames: Product[] = [
     category: "Battle Royale",
     buttonText: "Buy UC",
     route: "/mobile-games/pubg-mobile",
-    popular: true,
   },
   {
     title: "Free Fire",
@@ -48,7 +47,6 @@ export const mobileGames: Product[] = [
     category: "Battle Royale",
     buttonText: "Buy Diamonds",
     route: "/mobile-games/free-fire",
-    popular: true,
   },
   {
     title: "Delta Force",
@@ -152,7 +150,6 @@ export const mobileGames: Product[] = [
 ];
 
 export const pcGames: Product[] = [
-    // 🔥 Latest / 2025 Popular Games
   {
     title: "Battlefield 6",
     image: "/products/pc-games/battlefield.avif",
@@ -190,7 +187,6 @@ export const pcGames: Product[] = [
     category: "FPS",
     buttonText: "Buy VP",
     route: "/pc-games/valorant",
-    popular: true,
   },
   {
     title: "Apex Legends",
@@ -238,7 +234,6 @@ export const pcGames: Product[] = [
     category: "FPS",
     buttonText: "Buy Now",
     route: "/pc-games/cod-modern-warfare-2",
-    popular: true,
   },
   {
     title: "FIFA 25",
@@ -248,6 +243,7 @@ export const pcGames: Product[] = [
     category: "Sports",
     buttonText: "Buy Points",
     route: "/pc-games/fifa-24",
+    popular: true,
   },
   {
     title: "PUBG: Battlegrounds",
@@ -325,6 +321,7 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/steam-wallet",
+    popular: true,
   },
   {
     title: "PlayStation",
@@ -352,7 +349,6 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/amazon",
-    popular: true,
   },
   {
     title: "GameStop Gift Card",
@@ -371,6 +367,7 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/discord-nitro",
+    popular: true,
   },
   {
     title: "Roblox Gift Cards",
@@ -449,7 +446,6 @@ export const aiTools: Product[] = [
     rating: 5,
     category: "AI Coding",
     buttonText: "Subscribe",
-    popular: true,
     route: "/ai-tools/github",
   },
   {
@@ -520,7 +516,6 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
-    popular: true,
     route: "/subscriptions/zee5",
   },
   {
@@ -530,7 +525,6 @@ export const subscriptions: Product[] = [
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
-    popular: true,
     route: "/subscriptions/SonyLiv",
   },
   {
@@ -658,7 +652,6 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    popular: true,
     route: "/subscriptions/quillbot",
   },
   {
@@ -717,7 +710,6 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    popular: true,
     route: "/subscriptions/notion-pro",
   },
   {
@@ -756,7 +748,6 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Security",
     buttonText: "Subscribe",
-    popular: true,
     route: "/subscriptions/nordvpn",
   },
   {
@@ -797,7 +788,6 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Social",
     buttonText: "Buy Stars",
-    popular: true,
     route: "/subscriptions/telegram-stars",
   },
   {
@@ -817,7 +807,6 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Social",
     buttonText: "Subscribe",
-    popular: true,
     route: "/subscriptions/linkedin",
   },
 ];

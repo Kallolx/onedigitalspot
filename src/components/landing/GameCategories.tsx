@@ -33,6 +33,19 @@ const allProducts = [
 // Filter popular products
 const popularProducts = allProducts.filter((item) => item.popular);
 
+// Function to shuffle array (Fisher-Yates algorithm)
+const shuffleArray = (array: any[]) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// Shuffle popular products for random display
+const shuffledPopularProducts = shuffleArray(popularProducts);
+
 const GameCategories = () => (
   <section className="">
     <div className="container px-4 md:px-6">
@@ -72,7 +85,7 @@ const GameCategories = () => (
             </div>
           </div>
           <CategorySwiper
-            items={popularProducts}
+            items={shuffledPopularProducts}
             navigationPrevClass=".swiper-popular-prev"
             navigationNextClass=".swiper-popular-next"
             autoplay={true}

@@ -41,6 +41,7 @@ import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/Dashboard";
 import Orders from "./admin/Orders";
 import Products from "./admin/Products";
+import ReviewsManagement from "./admin/ReviewsManagement";
 import Users from "./admin/Users";
 import Subscriptions from "./pages/routes/Subscriptions";
 import Settings from "./admin/Settings";
@@ -307,6 +308,7 @@ const App = () => {
                 <Route path="orders" element={<Orders />} />
                 <Route path="products" element={<Products />} />
                 <Route path="users" element={<Users />} />
+                <Route path="reviews" element={<ReviewsManagement />} />
                 <Route path="hero-banners" element={
                   <React.Suspense fallback={<div>Loading...</div>}>
                     <AdminHeroBanners />

@@ -2,6 +2,7 @@ export const adminNavConfig = [
   { key: "dashboard", name: "Dashboard", path: "/admin" },
   { key: "orders", name: "Orders", path: "/admin/orders" },
   { key: "products", name: "Products", path: "/admin/products" },
+  { key: "reviews", name: "Reviews", path: "/admin/reviews" },
   { key: "users", name: "Users", path: "/admin/users" },
   { key: "hero_banners", name: "Hero Banners", path: "/admin/hero-banners" },
   { key: "settings", name: "Settings", path: "/admin/settings" },

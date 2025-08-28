@@ -8,7 +8,6 @@ import {
   getUserOrders,
   getCurrentUser,
   OrderData,
-  updateOrderReview,
 } from "../lib/orders";
 import {
   mobileGames,
@@ -19,6 +18,8 @@ import {
   productivity,
 } from "../lib/products";
 import ReviewModal from "../components/custom/ReviewModal";
+import { getUserReviews } from "../lib/reviews";
+import { account } from "../lib/appwrite";
 import {
   ClockIcon,
   CheckCircleIcon,
@@ -54,11 +55,7 @@ const getProductImage = (productName: string): string => {
   // Try exact match, then fuzzy includes (both directions)
   const product = allProducts.find((p) => {
     const title = p.title.toLowerCase();
-    return (
-      title === name ||
-      title.includes(name) ||
-      name.includes(title)
-    );
+    return title === name || title.includes(name) || name.includes(title);
   });
 
   if (!product) {
@@ -123,7 +120,7 @@ const DeliveryTimer = ({
     return `${mins}:${secs}`;
   };
 
-    // Utility to convert English digits to Bangla digits
+  // Utility to convert English digits to Bangla digits
   const toBanglaNumber = (num: string | number) => {
     const en = "0123456789";
     const bn = "০১২৩৪৫৬৭৮৯";
@@ -158,20 +155,45 @@ const MyOrders = () => {
   const [completedOrdersToReview, setCompletedOrdersToReview] = useState<
     OrderData[]
   >([]);
+  const [orderReviewStatus, setOrderReviewStatus] = useState<{[key: string]: boolean}>({});
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [processedOrderIds, setProcessedOrderIds] = useState<Set<string>>(() => {
+
+  // Check review status for completed orders
+  const checkOrderReviewStatus = async () => {
     try {
-      const raw = localStorage.getItem("processedOrderIds");
-      if (raw) {
-        const arr = JSON.parse(raw) as string[];
-        return new Set(arr.filter(Boolean));
+      const currentUser = await account.get();
+      if (currentUser) {
+        const userReviews = await getUserReviews(currentUser.$id);
+        const reviewStatus: {[key: string]: boolean} = {};
+        
+        completedOrdersToReview.forEach(order => {
+          const hasReviewed = userReviews.some(
+            (review: any) => review.productName === order.productName
+          );
+          reviewStatus[order.$id || order.id || ''] = hasReviewed;
+        });
+        
+        setOrderReviewStatus(reviewStatus);
       }
-    } catch (e) {
-      // ignore
+    } catch (error) {
+      console.error("Error checking review status:", error);
     }
-    return new Set();
-  });
+  };
+  const [pageSize, setPageSize] = useState(10);
+  const [processedOrderIds, setProcessedOrderIds] = useState<Set<string>>(
+    () => {
+      try {
+        const raw = localStorage.getItem("processedOrderIds");
+        if (raw) {
+          const arr = JSON.parse(raw) as string[];
+          return new Set(arr.filter(Boolean));
+        }
+      } catch (e) {
+        // ignore
+      }
+      return new Set();
+    }
+  );
   const navigate = useNavigate();
   const { toast } = useToast();
   const receiptRef = useRef<{ download: () => Promise<void> } | null>(null);
@@ -258,81 +280,65 @@ const MyOrders = () => {
     );
   };
 
-  // Handle review submission
-  const handleReviewSubmit = async (
-    orderId: string,
-    rating: number,
-    comment: string
-  ) => {
-    try {
-      await updateOrderReview(orderId, { rating, comment });
-
-      // Update the local orders state to reflect the review
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          (order.$id || order.id) === orderId
-            ? {
-                ...order,
-                reviews: JSON.stringify({
-                  rating,
-                  comment,
-                  submittedAt: new Date().toISOString(),
-                }),
-              }
-            : order
-        )
-      );
-
-      // Remove from completed orders to review
+  // Handle review submission from ReviewModal
+  const handleReviewSubmitted = () => {
+    // Remove the current order from the review queue
+    if (reviewOrder) {
       setCompletedOrdersToReview((prev) =>
-        prev.filter((order) => (order.$id || order.id) !== orderId)
+        prev.filter((order) => (order.$id || order.id) !== (reviewOrder.$id || reviewOrder.id))
       );
+    }
 
-      setReviewOrder(null);
+    // Close the review modal
+    setReviewOrder(null);
 
-      // Show next review modal if there are more
-      if (completedOrdersToReview.length > 1) {
-        const nextOrder = completedOrdersToReview.find(
-          (order) => (order.$id || order.id) !== orderId
-        );
-        if (nextOrder) {
-          setTimeout(() => setReviewOrder(nextOrder), 500);
-        }
+    // Refresh review status
+    checkOrderReviewStatus();
+
+    // Show next review modal if there are more
+    if (completedOrdersToReview.length > 1) {
+      const nextOrder = completedOrdersToReview.find(
+        (order) => (order.$id || order.id) !== (reviewOrder?.$id || reviewOrder?.id)
+      );
+      if (nextOrder) {
+        setTimeout(() => setReviewOrder(nextOrder), 500);
       }
-    } catch (error) {
-      console.error("Error submitting review:", error);
-      throw error;
     }
   };
 
   // Check for completed orders that need reviews
   useEffect(() => {
     if (orders.length > 0) {
-      const completedWithoutReviews = orders.filter(
+      const completedOrders = orders.filter(
         (order) =>
           order.status.toLowerCase() === "completed" &&
-          !order.reviews &&
           !processedOrderIds.has(order.$id || order.id || "")
       );
 
-      if (completedWithoutReviews.length > 0) {
-        setCompletedOrdersToReview(completedWithoutReviews);
-        setReviewOrder(completedWithoutReviews[0]);
+      if (completedOrders.length > 0) {
+        setCompletedOrdersToReview(completedOrders);
+        setReviewOrder(completedOrders[0]);
 
         // Mark these orders as processed so modal doesn't show again (persisted)
         setProcessedOrderIds((prev) => {
           const newSet = new Set(prev);
-          completedWithoutReviews.forEach((order) => {
+          completedOrders.forEach((order) => {
             const id = order.$id || order.id || "";
             if (id) newSet.add(id);
           });
           try {
-            localStorage.setItem("processedOrderIds", JSON.stringify(Array.from(newSet)));
+            localStorage.setItem(
+              "processedOrderIds",
+              JSON.stringify(Array.from(newSet))
+            );
           } catch (e) {
             // ignore storage errors
           }
           return newSet;
         });
+
+        // Check review status for these orders
+        checkOrderReviewStatus();
       }
     }
   }, [orders, processedOrderIds]);
@@ -495,7 +501,10 @@ const MyOrders = () => {
 
   // Pagination for desktop table
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
-  const paginatedOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize);
+  const paginatedOrders = filteredOrders.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
 
   // Ensure current page is valid when filters/pageSize change
   useEffect(() => {
@@ -513,9 +522,9 @@ const MyOrders = () => {
       .join("");
   }
 
-    useEffect(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    }, []);
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
 
   // normalize selected order status to avoid casing/whitespace issues
   const selectedStatus = selectedOrder?.status?.toLowerCase().trim() ?? "";
@@ -566,7 +575,7 @@ const MyOrders = () => {
             <div className="hidden lg:grid grid-cols-4 gap-4 md:gap-6">
               {/* Total Orders */}
               <Card className="flex items-center p-3 sm:p-4 bg-background rounded-2xl justify-center sm:justify-start">
-                <div className="p-3 sm:p-4 flex items-center justify-center hidden sm:flex">
+                <div className="p-3 sm:p-4 items-center justify-center hidden sm:flex">
                   <PackageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-foreground" />
                 </div>
                 <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
@@ -581,7 +590,7 @@ const MyOrders = () => {
 
               {/* Pending */}
               <Card className="flex items-center p-3 sm:p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
-                <div className="p-3 sm:p-4 flex items-center justify-center hidden sm:flex">
+                <div className="p-3 sm:p-4 items-center justify-center hidden sm:flex">
                   <ClockIcon className="w-6 h-6 sm:w-8 sm:h-8 text-foreground" />
                 </div>
                 <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
@@ -596,7 +605,7 @@ const MyOrders = () => {
 
               {/* Completed */}
               <Card className="flex items-center p-3 sm:p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
-                <div className="p-3 sm:p-4 flex items-center justify-center hidden sm:flex">
+                <div className="p-3 sm:p-4 items-center justify-center hidden sm:flex">
                   <CheckCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-foreground" />
                 </div>
                 <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
@@ -611,7 +620,7 @@ const MyOrders = () => {
 
               {/* Total Spent */}
               <Card className="flex items-center p-3 sm:p-4 bg-background/30 backdrop-blur-md rounded-2xl shadow-lg justify-center sm:justify-start">
-                <div className="p-3 sm:p-4 bg-yellow-500/20 rounded-full flex items-center justify-center hidden sm:flex">
+                <div className="p-3 sm:p-4 bg-yellow-500/20 rounded-full items-center justify-center hidden sm:flex">
                   <Coins className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
                 </div>
                 <div className="ml-0 sm:ml-4 flex flex-col text-center sm:text-left">
@@ -734,7 +743,10 @@ const MyOrders = () => {
                             <div className="flex items-center gap-4">
                               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                 <img
-                                  src={order.productImage || getProductImage(order.productName)}
+                                  src={
+                                    order.productImage ||
+                                    getProductImage(order.productName)
+                                  }
                                   alt={order.productName}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
@@ -772,20 +784,31 @@ const MyOrders = () => {
                                   onClick={async () => {
                                     const text = order.orderID || "";
                                     try {
-                                      if (navigator.clipboard && navigator.clipboard.writeText) {
-                                        await navigator.clipboard.writeText(text);
+                                      if (
+                                        navigator.clipboard &&
+                                        navigator.clipboard.writeText
+                                      ) {
+                                        await navigator.clipboard.writeText(
+                                          text
+                                        );
                                       } else {
-                                        const ta = document.createElement("textarea");
+                                        const ta =
+                                          document.createElement("textarea");
                                         ta.value = text;
                                         document.body.appendChild(ta);
                                         ta.select();
                                         document.execCommand("copy");
                                         document.body.removeChild(ta);
                                       }
-                                      toast({ title: "Order ID copied to clipboard." });
+                                      toast({
+                                        title: "Order ID copied to clipboard.",
+                                      });
                                     } catch (err) {
                                       console.error("Copy failed", err);
-                                      toast({ title: "Copy failed", description: "Unable to copy order ID." });
+                                      toast({
+                                        title: "Copy failed",
+                                        description: "Unable to copy order ID.",
+                                      });
                                     }
                                   }}
                                   className="p-2 rounded-md hover:bg-gray-100"
@@ -869,7 +892,9 @@ const MyOrders = () => {
               <div className="hidden lg:flex flex-col md:flex-row md:items-center md:justify-between bg-background gap-4 mt-4">
                 <div className="flex items-center gap-2">
                   <span className="font-pixel text-sm text-gray-600">
-                    Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, filteredOrders.length)} of {filteredOrders.length} orders
+                    Showing {(page - 1) * pageSize + 1}-
+                    {Math.min(page * pageSize, filteredOrders.length)} of{" "}
+                    {filteredOrders.length} orders
                   </span>
                   {filteredOrders.length !== orders.length && (
                     <span className="text-xs text-gray-500">
@@ -895,9 +920,12 @@ const MyOrders = () => {
                   >
                     Next
                   </button>
-                  <select 
-                    value={pageSize} 
-                    onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }} 
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setPage(1);
+                    }}
                     className="font-pixel text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value={5}>5 per page</option>
@@ -919,7 +947,10 @@ const MyOrders = () => {
                     <div className="flex items-start gap-3 mb-3">
                       <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                         <img
-                          src={order.productImage || getProductImage(order.productName)}
+                          src={
+                            order.productImage ||
+                            getProductImage(order.productName)
+                          }
                           alt={order.productName}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -1090,7 +1121,9 @@ const MyOrders = () => {
                   <div className="flex-1 min-w-0">
                     <p className="text-lg font-anekbangla text-gray-600 flex items-center gap-3">
                       <span>অর্ডার নম্বর :</span>
-                      <span className="font-bold font-mono text-secondary">{selectedOrder.orderID}</span>
+                      <span className="font-bold font-mono text-secondary">
+                        {selectedOrder.orderID}
+                      </span>
                       {copied && (
                         <span className="text-sm text-green-600">Copied</span>
                       )}
@@ -1103,7 +1136,10 @@ const MyOrders = () => {
                       onClick={async () => {
                         const text = selectedOrder.orderID || "";
                         try {
-                          if (navigator.clipboard && navigator.clipboard.writeText) {
+                          if (
+                            navigator.clipboard &&
+                            navigator.clipboard.writeText
+                          ) {
                             await navigator.clipboard.writeText(text);
                           } else {
                             const ta = document.createElement("textarea");
@@ -1118,7 +1154,10 @@ const MyOrders = () => {
                           setTimeout(() => setCopied(false), 1500);
                         } catch (err) {
                           console.error("Copy failed", err);
-                          toast({ title: "Copy failed", description: "Unable to copy order ID." });
+                          toast({
+                            title: "Copy failed",
+                            description: "Unable to copy order ID.",
+                          });
                         }
                       }}
                       className="text-xs text-foreground/80 hover:text-foreground p-2 rounded-full"
@@ -1135,7 +1174,10 @@ const MyOrders = () => {
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                     <img
-                      src={selectedOrder.productImage || getProductImage(selectedOrder.productName)}
+                      src={
+                        selectedOrder.productImage ||
+                        getProductImage(selectedOrder.productName)
+                      }
                       alt={selectedOrder.productName}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -1153,29 +1195,47 @@ const MyOrders = () => {
                     </p>
                   </div>
                   <div className="text-right flex items-center gap-3">
-                    <p className="text-xl font-bold font-anekbangla text-secondary">৳{toBanglaNumber(selectedOrder.totalAmount)} টাকা</p>
+                    <p className="text-xl font-bold font-anekbangla text-secondary">
+                      ৳{toBanglaNumber(selectedOrder.totalAmount)} টাকা
+                    </p>
                     <button
                       type="button"
                       onClick={async () => {
                         try {
                           const r = receiptRef.current;
-                          if (r && typeof r.download === 'function') {
+                          if (r && typeof r.download === "function") {
                             await r.download();
                           } else {
-                            const btn = document.querySelector('button[title="Download Receipt"]') as HTMLButtonElement | null;
+                            const btn = document.querySelector(
+                              'button[title="Download Receipt"]'
+                            ) as HTMLButtonElement | null;
                             if (btn) btn.click();
                           }
                         } catch (err) {
-                          console.error('Receipt download failed', err);
-                          toast({ title: 'Download failed', description: 'Could not download receipt.' });
+                          console.error("Receipt download failed", err);
+                          toast({
+                            title: "Download failed",
+                            description: "Could not download receipt.",
+                          });
                         }
                       }}
                       className="h-8 w-8 flex items-center justify-center rounded-full border border-transparent hover:bg-gray-100"
                       aria-label="Download receipt"
                       title="Download Receipt"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v12m0 0l4-4m-4 4l-4-4M21 21H3" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 3v12m0 0l4-4m-4 4l-4-4M21 21H3"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -1233,7 +1293,9 @@ const MyOrders = () => {
                 </div>
 
                 {/* Game Details (if applicable) */}
-                {(selectedOrder.playerId || selectedOrder.zoneId || selectedOrder.uuid) && (
+                {(selectedOrder.playerId ||
+                  selectedOrder.zoneId ||
+                  selectedOrder.uuid) && (
                   <div>
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">
                       Game Account
@@ -1282,7 +1344,8 @@ const MyOrders = () => {
                         if (!api) return;
                         if (typeof api.maximize === "function") api.maximize();
                         else if (typeof api.toggle === "function") api.toggle();
-                        else if (typeof api.showWidget === "function") api.showWidget();
+                        else if (typeof api.showWidget === "function")
+                          api.showWidget();
                         else if (typeof api.popup === "function") api.popup();
                       }}
                     >
@@ -1305,7 +1368,7 @@ const MyOrders = () => {
                       className="flex-1 text-xs h-9"
                       onClick={() => setReviewOrder(selectedOrder)}
                     >
-                      {selectedOrder.reviews ? "Edit Review" : "Write Review"}
+                                             {orderReviewStatus[selectedOrder.$id || selectedOrder.id || ''] ? "Edit Review" : "Write Review"}
                     </Button>
 
                     <Button
@@ -1349,11 +1412,11 @@ const MyOrders = () => {
               setTimeout(() => setReviewOrder(remainingReviews[0]), 500);
             }
           }}
-          onSubmit={handleReviewSubmit}
+                     onReviewSubmitted={handleReviewSubmitted}
         />
       )}
 
-     <Footer />
+      <Footer />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { adminNavConfig } from "../lib/adminNavConfig";
-import { Home, ShoppingCart, Package,Users, Settings, Menu } from "lucide-react";
+import { Home, ShoppingCart, Package, Users, Settings, Menu, MessageSquare } from "lucide-react";
 import { ShopSignIcon } from "hugeicons-react";
 import { NotificationProvider } from "../contexts/NotificationContext";
 import NotificationDropdown from "../components/custom/NotificationDropdown";
@@ -12,6 +12,7 @@ const iconMap = {
   dashboard: Home,
   orders: ShoppingCart,
   products: Package,
+  reviews: MessageSquare,
   users: Users,
   settings: Settings,
   main: ShopSignIcon,

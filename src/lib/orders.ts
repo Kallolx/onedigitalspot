@@ -2,6 +2,7 @@ import { databases, account } from "./appwrite";
 import { ID, Query } from "appwrite";
 
 export interface OrderData {
+  reviews: any;
   deliveryInfo: string; // JSON string of delivery information
   id?: string;
   $id?: string; // Appwrite document ID
@@ -23,7 +24,6 @@ export interface OrderData {
   paymentAccountNumber: string;
   transactionId: string;
   status: string;
-  reviews?: string; // JSON string containing review data
   createdAt: string;
   updatedAt: string;
 }
@@ -225,6 +225,51 @@ export const getCurrentUser = async () => {
     return user;
   } catch (error) {
     console.error("Error getting current user:", error);
+    throw error;
+  }
+};
+
+export const getProductReviews = async (productName: string) => {
+  try {
+    if (!DATABASE_ID || !ORDERS_COLLECTION_ID) {
+      throw new Error('Database configuration is missing');
+    }
+
+    // Query orders by product name and filter those with reviews
+    const orders = await databases.listDocuments(
+      DATABASE_ID,
+      ORDERS_COLLECTION_ID,
+      [
+        Query.equal('productName', productName),
+        Query.equal('status', 'completed'),
+        Query.isNotNull('reviews')
+      ]
+    );
+
+    // Parse reviews and return them
+    const reviews = orders.documents
+      .filter(order => order.reviews)
+      .map(order => {
+        try {
+          const reviewData = JSON.parse(order.reviews);
+          return {
+            rating: reviewData.rating,
+            comment: reviewData.comment,
+            submittedAt: reviewData.submittedAt,
+            orderId: order.$id,
+            customerName: order.userName
+          };
+        } catch (parseError) {
+          console.error('Error parsing review data:', parseError);
+          return null;
+        }
+      })
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()); // Sort by newest first
+
+    return reviews;
+  } catch (error) {
+    console.error("Error fetching product reviews:", error);
     throw error;
   }
 };

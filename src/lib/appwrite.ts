@@ -7,4 +7,9 @@ const client = new Client()
 const account = new Account(client);
 const databases = new Databases(client);
 
+export const appwriteConfig = {
+    databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    reviewsCollectionId: 'reviews',
+};
+
 export { client, account, databases };

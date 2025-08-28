@@ -172,7 +172,7 @@ const DropdownLink = ({ item }: { item: DropdownItem }) => {
   return (
     <a
       href={item.path}
-      className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+      className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
     >
       {!isMore && (
         <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0">
@@ -316,7 +316,7 @@ const UserMenu = ({
             {!user.emailVerification && (
               <button
                 onClick={onSendVerification}
-                className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-orange-600 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm font-medium text-orange-600 flex items-center gap-2"
               >
                 <MailValidation01Icon className="w-4 h-4" />
                 Verify Account
@@ -327,7 +327,7 @@ const UserMenu = ({
             {isAdmin && (
               <a
                 href="/admin"
-                className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-blue-600 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm font-medium text-blue-600 flex items-center gap-2"
               >
                 <Settings02Icon className="w-4 h-4" />
                 Admin Panel
@@ -337,7 +337,7 @@ const UserMenu = ({
             {/* My Orders */}
             <a
               href="/my-orders"
-              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2 relative"
+              className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2 relative"
             >
               <ShoppingCart02Icon className="w-4 h-4" />
               My Orders
@@ -351,7 +351,7 @@ const UserMenu = ({
             {/* My Profile */}
             <a
               href="/my-profile"
-              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
+              className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm font-medium text-foreground flex items-center gap-2"
             >
               <UserIcon className="w-4 h-4" />
               Profile
@@ -360,7 +360,7 @@ const UserMenu = ({
             {/* Logout */}
             <button
               onClick={onLogout}
-              className="w-full text-left block px-3 py-2 rounded hover:bg-muted text-sm font-medium text-red-600 flex items-center gap-2"
+              className="w-full text-left px-3 py-2 rounded hover:bg-muted text-sm font-medium text-red-600 flex items-center gap-2"
             >
               <Logout03Icon className="w-4 h-4" />
               Logout
