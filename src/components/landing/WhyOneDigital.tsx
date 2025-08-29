@@ -6,17 +6,17 @@ const WhyOneDigital: React.FC = () => {
 
 const features = [
   {
-    icon: <img src="/assets/icons/fast.svg" alt="Lightning Fast" className="w-10 h-10" />,
+    icon: <img src="/assets/icons/others/fast.svg" alt="Lightning Fast" className="w-10 h-10" />,
     title: "দ্রুত ডেলিভারি",
     description: "কয়েক সেকেন্ডের মধ্যে অর্ডার পৌঁছে যায়, সময় বাঁচান সহজভাবে।",
   },
   {
-    icon: <img src="/assets/icons/shield.svg" alt="100% Secure" className="w-10 h-10" />,
+    icon: <img src="/assets/icons/others/shield.svg" alt="100% Secure" className="w-10 h-10" />,
     title: "পূর্ণ নিরাপত্তা",
     description: "এনক্রিপশন নিশ্চিত করে আপনার তথ্য সম্পূর্ণ সুরক্ষিত।",
   },
   {
-    icon: <img src="/assets/icons/clock.svg" alt="24/7 Support" className="w-10 h-10" />,
+    icon: <img src="/assets/icons/others/clock.svg" alt="24/7 Support" className="w-10 h-10" />,
     title: "২৪/৭ সহায়তা",
     description: "যেকোনো সময় সমস্যার জন্য আমাদের সাথে সহজে যোগাযোগ করুন।",
   },
@@ -51,7 +51,7 @@ const features = [
         {/* Mobile Features Grid */}
         <div className="grid grid-cols-2 gap-4">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border">
+            <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${feature} flex items-center justify-center text-white mb-3`}>
                 {feature.icon}
               </div>
@@ -82,7 +82,7 @@ const features = [
               {/* Lightning Fast Card */}
               <div className="rounded-2xl p-8 border flex-1 flex flex-col justify-between bg-white/80 dark:bg-gray-900/80">
                 <div className="mb-4">
-                  <img src="/assets/icons/fast.svg" alt="Lightning Fast" className="w-20 h-20" />
+                  <img src="/assets/icons/others/fast.svg" alt="Lightning Fast" className="w-20 h-20" />
                 </div>
                 <h3 className="font-semibold font-anekbangla text-2xl text-foreground mb-2">{features[0].title}</h3>
                 <p className="text-base font-anekbangla md:text-lg text-muted-foreground">{features[0].description}</p>
@@ -91,7 +91,7 @@ const features = [
               {/* 100% Secure Card */}
               <div className="rounded-2xl p-8 border flex-1 flex flex-col justify-between bg-white/80 dark:bg-gray-900/80">
                 <div className="mb-4">
-                  <img src="/assets/icons/shield.svg" alt="100% Secure" className="w-20 h-20" />
+                  <img src="/assets/icons/others/shield.svg" alt="100% Secure" className="w-20 h-20" />
                 </div>
                 <h3 className="font-semibold text-2xl font-anekbangla text-foreground mb-2">{features[1].title}</h3>
                 <p className="text-base md:text-lg font-anekbangla text-muted-foreground">{features[1].description}</p>
@@ -108,7 +108,7 @@ const features = [
               {/* 24/7 Support Card */}
               <div className="rounded-2xl p-8 border flex-1 flex flex-col justify-between bg-white/80 dark:bg-gray-900/80">
                 <div className="mb-4">
-                  <img src="/assets/icons/clock.svg" alt="24/7 Support" className="w-20 h-20" />
+                  <img src="/assets/icons/others/clock.svg" alt="24/7 Support" className="w-20 h-20" />
                 </div>
                 <h3 className="font-semibold text-2xl font-anekbangla text-foreground mb-2">{features[2].title}</h3>
                 <p className="text-base md:text-lg font-anekbangla text-muted-foreground">{features[2].description}</p>

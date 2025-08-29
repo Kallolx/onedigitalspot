@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ShopSignIcon,
-  AiMagicIcon,
-  GiftCardIcon,
   Tv01Icon,
   ShoppingCart02Icon,
   Logout03Icon,
@@ -14,14 +12,29 @@ import {
   UserIcon,
   MailValidation01Icon,
   WebDesign01Icon,
-  GameController03Icon,
-  GiftIcon,
 } from "hugeicons-react";
 import { account } from "@/lib/appwrite";
 import { getUserOrders } from "@/lib/orders";
 import MobileMenu from "../custom/MobileMenu";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+
+// Custom Icon Components
+const GamingIcon = () => (
+  <img src="/assets/icons/menu/game.svg" alt="Gaming" className="w-5 h-5" />
+);
+
+const AiToolsIcon = () => (
+  <img src="/assets/icons/menu/ai.svg" alt="AI Tools" className="w-5 h-5" />
+);
+
+const GiftCardsIcon = () => (
+  <img src="/assets/icons/menu/gift.svg" alt="Gift Cards" className="w-5 h-5" />
+);
+
+const SubscriptionsIcon = () => (
+  <img src="/assets/icons/menu/video.svg" alt="Subscriptions" className="w-5 h-5" />
+);
 
 // Types
 interface DropdownItem {
@@ -83,7 +96,8 @@ const PRODUCT_IMAGES = {
 const NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Gaming",
-    icon: GameController03Icon,
+    path: "/mobile-games",
+    icon: GamingIcon,
     dropdown: [
       { name: "PUBG Mobile", path: "/mobile-games/pubg-mobile" },
       { name: "Free Fire", path: "/mobile-games/free-fire" },
@@ -96,7 +110,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "AI Tools",
     path: "/ai-tools",
-    icon: AiMagicIcon,
+    icon: AiToolsIcon,
     dropdown: [
       { name: "ChatGPT", path: "/ai-tools/chatgpt" },
       { name: "Claude Pro", path: "/ai-tools/claude" },
@@ -113,7 +127,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Gift Cards",
     path: "/gift-cards",
-    icon: GiftIcon,
+    icon: GiftCardsIcon,
     dropdown: [
       { name: "Steam", path: "/gift-cards/steam-wallet" },
       { name: "Google Play", path: "/gift-cards/google-play" },
@@ -125,7 +139,7 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
   {
     name: "Subscriptions",
     path: "/subscriptions",
-    icon: Tv01Icon,
+    icon: SubscriptionsIcon,
     dropdown: [
       { name: "Netflix", path: "/subscriptions/netflix" },
       { name: "Crunchyroll", path: "/subscriptions/crunchyroll" },
@@ -251,7 +265,7 @@ const NavigationItem = ({
         className={`px-4 py-2 font-sans font-medium rounded-md transition-colors inline-flex items-center gap-2 ${
           isActive
             ? "text-primary-foreground bg-primary"
-            : "text-foreground hover:bg-muted"
+            : "text-foreground"
         }`}
       >
         <Icon className="w-5 h-5" />
