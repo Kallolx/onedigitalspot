@@ -31,7 +31,7 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { ReloadIcon } from "hugeicons-react";
+import { NoteIcon, ReloadIcon } from "hugeicons-react";
 import Footer from "@/components/landing/Footer";
 import { DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/sonner";
@@ -494,7 +494,7 @@ const Checkout: React.FC = () => {
           transactionId: trxId,
           status: "Pending",
           deliveryInfo: JSON.stringify(checkoutData.deliveryInfo),
-          reviews: undefined
+          reviews: undefined,
         };
 
         return createOrder(orderData);
@@ -641,7 +641,6 @@ const Checkout: React.FC = () => {
     },
   ];
 
-  // Show empty state if checkoutData is null after order completion
   if (!checkoutData) {
     return (
       <div className="min-h-screen flex items-start justify-center px-4 pt-12 md:pt-20">
@@ -676,7 +675,6 @@ const Checkout: React.FC = () => {
     );
   }
 
-  // If checkout data exists but no items, show empty cart message
   if (checkoutData && checkoutData.items.length === 0) {
     return (
       <div className="min-h-screen flex items-start justify-center bg-gray-50 px-4 pt-12 md:pt-20">
@@ -880,9 +878,12 @@ const Checkout: React.FC = () => {
 
                 {/* Delivery Method Selection */}
                 <div className="pt-4" id="delivery-section">
-                  <h3 className="font-medium text-gray-900 mb-3">
+                  <h3 className="font-medium text-muted-foreground mb-1">
                     Delivery Method
                   </h3>
+                  <p className="text-secondary font-anekbangla mb-3 text-sm">
+                    দ্রুত ডেলিভারি পেতে হোয়াটসঅ্যাপ সিলেক্ট করুন
+                  </p>
 
                   {!checkoutData.deliveryInfo ? (
                     <div className="space-y-4">
@@ -1129,7 +1130,7 @@ const Checkout: React.FC = () => {
               <Card className="bg-background hidden lg:block">
                 <div className="text-white rounded-md p-4 lg:p-6">
                   <h3 className="text-lg font-bold flex items-center gap-2">
-                    <ShoppingBag className="w-8 h-8" />
+                    <NoteIcon className="w-8 h-8" />
                     Order Summary
                   </h3>
                 </div>
@@ -1303,9 +1304,8 @@ const Checkout: React.FC = () => {
 
           {selectedDeliveryMethod === "email" ? (
             <div>
-              <p className="text-gray-600 mb-4">
-                We'll send your order details and activation codes to this email
-                address:
+              <p className="text-secondary text-center text-lg font-anekbangla mb-4">
+                আপনার অর্ডারের সম্পূর্ণ তথ্য আপনার ইমেইলে পৌঁছে যাবে
               </p>
               <div className="space-y-3">
                 {isEditingDelivery ? (
@@ -1371,9 +1371,8 @@ const Checkout: React.FC = () => {
             </div>
           ) : (
             <div>
-              <p className="text-gray-600 mb-4">
-                We'll send your order details and activation codes to this
-                WhatsApp number:
+              <p className="text-secondary text-center text-lg font-anekbangla mb-4">
+                আপনার অর্ডারের সম্পূর্ণ তথ্য আপনার ওয়াটসঅ্যাপে পৌঁছে যাবে
               </p>
               <div className="space-y-3">
                 {isEditingDelivery ? (
@@ -1417,10 +1416,9 @@ const Checkout: React.FC = () => {
                         </span>
                       </div>
                     ) : (
-                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <span className="text-yellow-700">
-                          No phone number found. Please add your WhatsApp
-                          number.
+                      <div className="p-3 border rounded-lg">
+                        <span className="text-muted-foreground font-anekbangla">
+                          হোয়াটসঅ্যাপ নম্বর দেওয়া হয়নি
                         </span>
                       </div>
                     )}
@@ -1439,7 +1437,7 @@ const Checkout: React.FC = () => {
                         variant="outline"
                         onClick={() => setIsEditingDelivery(true)}
                       >
-                        {deliveryPhone ? "Change" : "Add"}
+                        {deliveryPhone ? "Change" : "+ Add"}
                       </Button>
                     </div>
                   </>
@@ -1659,7 +1657,7 @@ const Checkout: React.FC = () => {
           <div className="bg-accent border rounded-lg shadow-lg p-4 space-y-3">
             {/* Order Summary Title (mobile) */}
             <div className="flex items-center gap-2 mb-2">
-              <ShoppingBag className="w-4 h-4 text-foreground" />
+              <NoteIcon className="w-4 h-4 text-foreground" />
               <span className="text-base font-bold text-foreground">
                 Order Summary
               </span>

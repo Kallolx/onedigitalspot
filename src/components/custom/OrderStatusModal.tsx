@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,7 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
   onViewOrders,
   onRetry,
 }) => {
+  const navigate = useNavigate();
   const isSuccess = status === "success";
 
   const defaultTitle = isSuccess
@@ -138,11 +140,16 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
                   <ArrowRightIcon className="w-4 h-4" />
                 </Button>
               )}
-              <DialogClose asChild>
-                <Button variant="outline" className="w-full font-pixel">
-                  Continue Shopping
-                </Button>
-              </DialogClose>
+              <Button 
+                variant="outline" 
+                className="w-full font-pixel"
+                onClick={() => {
+                  onClose();
+                  navigate('/');
+                }}
+              >
+                Continue Shopping
+              </Button>
             </>
           ) : (
             <>

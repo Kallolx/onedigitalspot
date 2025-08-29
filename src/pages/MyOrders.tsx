@@ -668,7 +668,7 @@ const MyOrders = () => {
 
           {/* Empty State */}
           {!loading && !error && orders.length === 0 && (
-            <Card className="p-12">
+            <Card className="p-12 bg-background">
               <div className="text-center">
                 <ShoppingBagIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
