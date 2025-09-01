@@ -170,7 +170,7 @@ export const pcGames: Product[] = [
     route: "/pc-games/assassins-creed-shadows",
   },
   {
-    title: "CoD-Black Ops 7",
+    title: "Black Ops 7",
     image: "/products/pc-games/cod-bo-7.avif",
     price: "2999",
     rating: 5,
@@ -227,7 +227,7 @@ export const pcGames: Product[] = [
     route: "/pc-games/cyberpunk-2077",
   },
   {
-    title: "CoD-Modern Warfare II",
+    title: "Modern Warfare 2",
     image: "/products/pc-games/cod-mw-2.avif",
     price: "2499",
     rating: 5,

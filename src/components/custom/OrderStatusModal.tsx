@@ -144,7 +144,7 @@ const OrderStatusModal: React.FC<OrderStatusModalProps> = ({
                 variant="outline" 
                 className="w-full font-pixel"
                 onClick={() => {
-                  onClose();
+                  // Close modal and redirect to home
                   navigate('/');
                 }}
               >

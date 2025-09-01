@@ -11,23 +11,23 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  Diamonds: "/assets/icons/gift-cards/fifa.svg", // FIFA-specific icon
+  Diamonds: "/assets/icons/games/fifa.svg", // FIFA-specific icon
 };
 
 function groupPriceList(priceList: string[]) {
-  const diamonds: any[] = [];
+  const pc: any[] = [];
   priceList.forEach((item) => {
     const [label, price, hot, type] = item.split("|");
     const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "diamond") {
-      diamonds.push(obj);
+    if (type === "pc") {
+      pc.push(obj);
     }
   });
   return [
     {
       title: "FIFA 25",
       categoryIcon: categoryIcons["Diamonds"],
-      items: diamonds,
+      items: pc,
     },
   ];
 }

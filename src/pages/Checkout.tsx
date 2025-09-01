@@ -132,6 +132,68 @@ const Checkout: React.FC = () => {
       .join("");
   };
 
+  // Send WhatsApp notification to admin
+  const sendWhatsAppNotification = (
+    orders: any[],
+    checkoutData: CheckoutData,
+    totalAmount: number,
+    transactionId: string
+  ) => {
+    // Admin WhatsApp number - you can change this to your number
+    const adminWhatsAppNumber = "+8801831624571"; // Replace with your actual number
+
+    // Format the message template
+    const orderDetails = orders
+      .map(
+        (order) =>
+          `• ${order.itemLabel} (${order.quantity}x) - ৳${order.unitPrice}`
+      )
+      .join("\n");
+
+    const customerInfo =
+      checkoutData.deliveryInfo?.method === "email"
+        ? `Email: ${checkoutData.deliveryInfo.email || "N/A"}`
+        : `Phone: ${checkoutData.deliveryInfo?.phone || "N/A"}`;
+
+    const message = `*NEW ORDER RECEIVED*
+
+*Order Details:*
+${orderDetails}
+
+*Order Summary:*
+• Total Amount: ৳${totalAmount}
+• Transaction ID: ${transactionId}
+• Delivery Method: ${
+      checkoutData.deliveryInfo?.method === "email"
+        ? "Email Delivery"
+        : "WhatsApp Delivery"
+    }
+• Customer Contact: ${customerInfo}
+
+*Game Information:*
+• Player ID: ${
+      checkoutData.gameInfo?.playerId || "N/A"
+    }
+• Zone ID: ${
+      checkoutData.gameInfo?.zoneId || "N/A"
+    }
+
+*Order Details:*
+• Order Time: ${new Date().toLocaleString("en-BD")}
+• Status: Pending
+
+Please process this order as soon as possible.`;
+
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${adminWhatsAppNumber}?text=${encodedMessage}`;
+
+    // Open WhatsApp in new tab
+    window.open(whatsappUrl, "_blank");
+  };
+
   // Load checkout data on component mount
   useEffect(() => {
     // Always prefer navigation state over everything else (direct product checkout)
@@ -567,6 +629,16 @@ const Checkout: React.FC = () => {
           }
         }
 
+        // Send WhatsApp notification to admin
+        if (successfulOrders.length > 0) {
+          sendWhatsAppNotification(
+            successfulOrders,
+            checkoutData,
+            totalAmount,
+            trxId
+          );
+        }
+
         // Don't clear checkoutData immediately — keep it until the user closes the modal
         // to avoid showing the loading placeholder underneath the modal.
       } else {
@@ -591,7 +663,7 @@ const Checkout: React.FC = () => {
     {
       id: "bkash" as const,
       name: "bKash",
-      icon: "/assets/icons/bKash.svg",
+      icon: "/assets/icons/payments/bKash.svg",
       account: "01831624571",
       type: "সেন্ড মানি",
       description: "বাংলাদেশের সবচেয়ে জনপ্রিয় মোবাইল ব্যাংকিং",
@@ -608,7 +680,7 @@ const Checkout: React.FC = () => {
     {
       id: "nagad" as const,
       name: "Nagad",
-      icon: "/assets/icons/nagad.svg",
+      icon: "/assets/icons/payments/nagad.svg",
       account: "01831624571",
       type: "সেন্ড মানি",
       description: "বাংলাদেশ ডাক বিভাগের ডিজিটাল ফিনান্সিয়াল সার্ভিস",
@@ -625,7 +697,7 @@ const Checkout: React.FC = () => {
     {
       id: "Rocket" as const,
       name: "Rocket",
-      icon: "/assets/icons/rocket.png",
+      icon: "/assets/icons/payments/rocket.png",
       account: "01831624571",
       type: "সেন্ড মানি",
       description: "ডাচ-বাংলা ব্যাংকের মোবাইল ফিনান্সিয়াল সার্ভিস",
@@ -646,7 +718,7 @@ const Checkout: React.FC = () => {
       <div className="min-h-screen flex items-start justify-center px-4 pt-12 md:pt-20">
         <div className="max-w-md w-full p-8 text-center shadow">
           <img
-            src="/assets/icons/error.svg"
+            src="/assets/icons/others/empty.svg"
             alt="Empty checkout"
             className="mx-auto mb-6"
           />
@@ -899,7 +971,7 @@ const Checkout: React.FC = () => {
                             }
                           >
                             <img
-                              src={`/assets/icons/${
+                              src={`/assets/icons/social/${
                                 method.icon || method.id
                               }.svg`}
                               alt={method.name}
@@ -918,7 +990,7 @@ const Checkout: React.FC = () => {
                         {checkoutData.deliveryInfo.method === "email" ? (
                           <>
                             <img
-                              src="/assets/icons/email.svg"
+                              src="/assets/icons/social/email.svg"
                               alt="Email"
                               className="w-8 h-8 flex-shrink-0"
                             />
@@ -936,7 +1008,7 @@ const Checkout: React.FC = () => {
                         ) : (
                           <>
                             <img
-                              src="/assets/icons/whatsapp.svg"
+                              src="/assets/icons/social/whatsapp.svg"
                               alt="WhatsApp"
                               className="w-8 h-8 flex-shrink-0"
                             />
@@ -995,12 +1067,12 @@ const Checkout: React.FC = () => {
                         paymentMethod === method.id ? "outline" : "ghost"
                       }
                       onClick={() => setPaymentMethod(method.id)}
-                      className="flex flex-col items-center p-3 rounded-lg"
+                      className="flex flex-col items-center p-4 rounded-lg"
                     >
                       <img
                         src={method.icon}
                         alt={method.name}
-                        className="w-auto h-14 mx-auto mb-2"
+                        className="w-auto h-14 mx-auto"
                       />
                     </Button>
                   ))}
@@ -1177,7 +1249,7 @@ const Checkout: React.FC = () => {
                           {checkoutData.deliveryInfo?.method === "email" ? (
                             <>
                               <img
-                                src="/assets/icons/email.svg"
+                                src="/assets/icons/social/email.svg"
                                 alt="Email"
                                 className="w-5 h-5"
                               />
@@ -1189,7 +1261,7 @@ const Checkout: React.FC = () => {
                             "whatsapp" ? (
                             <>
                               <img
-                                src="/assets/icons/whatsapp.svg"
+                                src="/assets/icons/social/whatsapp.svg"
                                 alt="WhatsApp"
                                 className="w-5 h-5"
                               />
@@ -1613,36 +1685,30 @@ const Checkout: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Order Status Modal */}
-      <OrderStatusModal
-        isOpen={orderModal.isOpen}
-        onClose={() => {
-          setOrderModal({ ...orderModal, isOpen: false });
-          // Only clear checkout data if order was successful
-          if (orderModal.status === "success") {
-            setCheckoutData(null);
-            setPaymentMethod(null);
-            setUserAccount("");
-            setTrxId("");
-          }
-        }}
-        status={orderModal.status}
-        title={orderModal.title}
-        message={orderModal.message}
-        orderData={orderModal.orderData}
-        onViewOrders={() => {
-          setOrderModal({ ...orderModal, isOpen: false });
-          setCheckoutData(null);
-          navigate("/my-orders");
-        }}
-        onRetry={() => {
-          setOrderModal({ ...orderModal, isOpen: false });
-          // allow user to retry without losing delivery selection
-          setPaymentMethod(null);
-          setUserAccount("");
-          setTrxId("");
-        }}
-      />
+             {/* Order Status Modal */}
+       <OrderStatusModal
+         isOpen={orderModal.isOpen}
+         onClose={() => {
+           setOrderModal({ ...orderModal, isOpen: false });
+           // Don't clear data when just closing the modal
+         }}
+         status={orderModal.status}
+         title={orderModal.title}
+         message={orderModal.message}
+         orderData={orderModal.orderData}
+         onViewOrders={() => {
+           setOrderModal({ ...orderModal, isOpen: false });
+           setCheckoutData(null);
+           navigate("/my-orders");
+         }}
+         onRetry={() => {
+           setOrderModal({ ...orderModal, isOpen: false });
+           // allow user to retry without losing delivery selection
+           setPaymentMethod(null);
+           setUserAccount("");
+           setTrxId("");
+         }}
+       />
 
       {/* Mobile sticky summary (Cart-like) */}
       <div className="lg:hidden">
@@ -1702,7 +1768,7 @@ const Checkout: React.FC = () => {
                   ) : checkoutData.deliveryInfo?.method === "whatsapp" ? (
                     <>
                       <img
-                        src="/assets/icons/whatsapp.svg"
+                        src="/assets/icons/social/whatsapp.svg"
                         alt="WhatsApp"
                         className="w-5 h-5"
                       />

@@ -5,11 +5,12 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { databases } from "@/lib/appwrite";
 import { Query } from "appwrite";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Camera } from "lucide-react";
 
 import { Button } from "../ui/button";
 import {
@@ -20,13 +21,14 @@ import {
 } from "@/components/ui/tooltip";
 import SearchComponent from "../custom/SearchComponent";
 
-
 const fetchHeroBanners = async () => {
   const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
   const HERO_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_BANNER_ID;
   if (!DATABASE_ID || !HERO_COLLECTION_ID) return [];
   try {
-    const res = await databases.listDocuments(DATABASE_ID, HERO_COLLECTION_ID, [Query.orderAsc("order")]);
+    const res = await databases.listDocuments(DATABASE_ID, HERO_COLLECTION_ID, [
+      Query.orderAsc("order"),
+    ]);
     return res.documents.map((d: any) => {
       // Cloudinary upload responses or admin save may store the URL under different keys.
       const imageUrl =
@@ -51,14 +53,19 @@ const fetchHeroBanners = async () => {
 
 const HeroSection = () => {
   const [api, setApi] = React.useState<CarouselApi>();
-  const { data: dynamicSlides = [] } = useQuery<any[], Error>({ queryKey: ["hero-banners-public"], queryFn: fetchHeroBanners });
+  const { data: dynamicSlides = [] } = useQuery<any[], Error>({
+    queryKey: ["hero-banners-public"],
+    queryFn: fetchHeroBanners,
+  });
 
   React.useEffect(() => {
     // Helpful debug log when slides are fetched; remove in production if noisy.
     console.debug("HeroSection - dynamicSlides:", dynamicSlides);
   }, [dynamicSlides]);
 
-  const [loadStatus, setLoadStatus] = React.useState<Record<number, string>>({});
+  const [loadStatus, setLoadStatus] = React.useState<Record<number, string>>(
+    {}
+  );
 
   React.useEffect(() => {
     if (!api) return;
@@ -74,7 +81,6 @@ const HeroSection = () => {
         <div className="flex flex-col md:flex-row gap-8 items-stretch">
           {/* Aspect ratio wrapper for both columns */}
           <div className="w-full flex aspect-[2/1] max-h-[400px]">
-
             <div className="hide-1250 hidden md:flex p-2 w-2/5 h-full">
               <div className="w-full h-full rounded-xl flex flex-col -ml-8 justify-center items-start px-4 lg:px-8">
                 <h1 className="flex flex-wrap gap-2 text-3xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-black mb-2 text-left leading-tight">
@@ -87,7 +93,9 @@ const HeroSection = () => {
                   <span className="whitespace-nowrap text-secondary">all</span>
                 </h1>
                 <h1 className="flex flex-wrap gap-2 text-3xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-black mb-2 text-left leading-tight">
-                  <span className="text-secondary whitespace-nowrap">Digital</span>{" "}
+                  <span className="text-secondary whitespace-nowrap">
+                    Digital
+                  </span>{" "}
                   <span className="whitespace-nowrap">Products</span>
                 </h1>
                 <p className="text-sm lg:text-base tracking-tight leading-tight text-muted-foreground mb-4 lg:mb-5 text-left max-w-sm lg:max-w-md mt-2">
@@ -116,7 +124,7 @@ const HeroSection = () => {
                             className="hover:scale-110 transition-transform"
                           >
                             <img
-                              src="/assets/facebook.svg"
+                              src="/assets/icons/social/facebook.svg"
                               alt="Facebook"
                               className="w-8 lg:w-10 h-8 lg:h-10"
                             />
@@ -133,7 +141,7 @@ const HeroSection = () => {
                             className="hover:scale-110 transition-transform"
                           >
                             <img
-                              src="/assets/instagram.svg"
+                              src="/assets/icons/social/instagram.svg"
                               alt="Instagram"
                               className="w-8 lg:w-10 h-8 lg:h-10"
                             />
@@ -150,7 +158,7 @@ const HeroSection = () => {
                             className="hover:scale-110 transition-transform"
                           >
                             <img
-                              src="/assets/tiktok.svg"
+                              src="/assets/icons/social/tiktok.svg"
                               alt="TikTok"
                               className="w-8 lg:w-10 h-8 lg:h-10"
                             />
@@ -167,7 +175,7 @@ const HeroSection = () => {
                             className="hover:scale-110 transition-transform"
                           >
                             <img
-                              src="/assets/whatsapp.svg"
+                              src="/assets/icons/social/whatsapp.svg"
                               alt="WhatsApp"
                               className="w-8 lg:w-10 h-8 lg:h-10"
                             />
@@ -180,16 +188,14 @@ const HeroSection = () => {
                 </div>
                 {/* Add search input and button below */}
                 <div className="mt-1 lg:mt-2 w-full max-w-sm lg:max-w-md">
-                  <SearchComponent                   
-                    className="w-full"
-                  />
+                  <SearchComponent className="w-full" />
                 </div>
               </div>
             </div>
             {/* Right: Carousel section */}
             <div className="w-full md:w-3/5 h-full flex items-center grow-1250 pt-0 md:pt-8">
               <div className="w-full h-full">
-                {dynamicSlides.length > 0 && (
+                {dynamicSlides.length > 0 ? (
                   <Carousel
                     setApi={setApi}
                     className="w-full h-full rounded-xl overflow-hidden"
@@ -207,11 +213,22 @@ const HeroSection = () => {
                               alt={slide.title}
                               className="w-full h-full object-cover"
                               loading="lazy"
-                              onLoad={() => setLoadStatus(prev => ({ ...prev, [index]: "ok" }))}
+                              onLoad={() =>
+                                setLoadStatus((prev) => ({
+                                  ...prev,
+                                  [index]: "ok",
+                                }))
+                              }
                               onError={(e) => {
                                 const img = e.currentTarget as HTMLImageElement;
-                                console.warn("Hero image failed to load, falling back:", img.src);
-                                setLoadStatus(prev => ({ ...prev, [index]: "error" }));
+                                console.warn(
+                                  "Hero image failed to load, falling back:",
+                                  img.src
+                                );
+                                setLoadStatus((prev) => ({
+                                  ...prev,
+                                  [index]: "error",
+                                }));
                                 img.onerror = null;
                                 img.src = "/assets/banners/welcome.avif";
                               }}
@@ -223,6 +240,16 @@ const HeroSection = () => {
                       ))}
                     </CarouselContent>
                   </Carousel>
+                ) : (
+                                     // Custom skeleton loader with image placeholder and pulsing animation
+                   <div className="w-full h-full md:h-[320px] pt-4 md:pt-0">
+                     <div className="w-full h-full rounded-lg md:rounded-xl overflow-hidden bg-muted-foreground/20 relative flex items-center justify-center animate-pulse">
+                       {/* Image placeholder icon */}
+                       <div className="text-muted-foreground/40">
+                           <img src="/assets/only-icon-green.svg" alt="Hero placeholder" className="h-10" />
+                       </div>
+                     </div>
+                   </div>
                 )}
               </div>
             </div>

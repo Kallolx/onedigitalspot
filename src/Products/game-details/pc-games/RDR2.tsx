@@ -11,23 +11,23 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  Diamonds: "/assets/icons/gift-cards/rdr.svg", // RDR-specific icon
+  Diamonds: "/assets/icons/games/rdr.svg", // RDR-specific icon
 };
 
 function groupPriceList(priceList: string[]) {
-  const diamonds: any[] = [];
+  const pc: any[] = [];
   priceList.forEach((item) => {
     const [label, price, hot, type] = item.split("|");
     const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "diamond") {
-      diamonds.push(obj);
+    if (type === "pc") {
+      pc.push(obj);
     }
   });
   return [
     {
       title: "Red Dead Redemption 2",
       categoryIcon: categoryIcons["Diamonds"],
-      items: diamonds,
+      items: pc,
     },
   ];
 }

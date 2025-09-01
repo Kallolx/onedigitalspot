@@ -184,7 +184,7 @@ const MenuItemLink = ({
   <Link
     to={item.path}
     onClick={onClose}
-    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/50 transition-all duration-150"
+    className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-150"
   >
     {item.icon && item.name !== "More" && (
       <img
@@ -233,7 +233,7 @@ const MenuSection = ({
         <div className="flex-1">
           <button
             onClick={() => onToggleSubmenu(section.id)}
-            className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-muted/30 transition-all duration-200 group"
+            className="w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 group"
           >
             <div className="flex items-center gap-3">
               <span className="font-medium tracking-tighter text-foreground">
@@ -315,7 +315,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           <div className="flex items-center justify-start">
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-full flex items-center justify-center border border-border bg-transparent hover:bg-muted/10 text-foreground transition-all duration-200"
+              className="w-10 h-10 rounded-full flex items-center justify-center border border-border bg-transparent text-foreground transition-all duration-200"
               aria-label="Close menu"
             >
               <Cancel01Icon className="w-5 h-5" />

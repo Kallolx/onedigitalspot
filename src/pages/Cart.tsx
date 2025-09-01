@@ -205,7 +205,7 @@ const CartPage: React.FC = () => {
       <div className="min-h-screen flex items-start justify-center px-4 pt-12 md:pt-20">
         <div className="max-w-md w-full border rounded-lg p-8 text-center">
           <img
-            src="/assets/icons/empty.svg"
+            src="/assets/icons/others/empty.svg"
             alt="Empty cart"
             className="mx-auto h-24 mb-6"
           />

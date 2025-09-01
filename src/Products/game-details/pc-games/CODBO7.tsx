@@ -11,23 +11,23 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  Diamonds: "/assets/icons/gift-cards/cod.svg", // COD-specific icon
+  Diamonds: "/assets/icons/games/bo.svg",
 };
 
-function groupPriceList(priceList: string[]) {
-  const diamonds: any[] = [];
+function groupPriceList(priceList) {
+  const pc: any[] = [];
   priceList.forEach((item) => {
     const [label, price, hot, type] = item.split("|");
     const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "diamond") {
-      diamonds.push(obj);
+    if (type === "pc") {
+      pc.push(obj);
     }
   });
   return [
     {
-      title: "Call of Duty: Black Ops 7",
+      title: "Steam  Epic Games",
       categoryIcon: categoryIcons["Diamonds"],
-      items: diamonds,
+      items: pc,
     },
   ];
 }
@@ -37,8 +37,9 @@ const infoSections = [
     title: "How to Buy",
     content: (
       <ul className="list-disc pl-5 text-base mb-4">
-        <li>Select your desired Call of Duty: Black Ops 7 Points package above.</li>
+        <li>Select your desired COD BO7 package above.</li>
         <li>Choose quantity and proceed to payment.</li>
+        <li>Receive your items instantly after successful payment.</li>
       </ul>
     ),
   },
@@ -51,36 +52,33 @@ export default function CODBO7() {
   const [similar, setSimilar] = useState<any[]>([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
-  // Use image from subscriptions array
-  const codBO7Product = pcGames.find((p) => p.title === "CoD-Black Ops 7");
+  // Use image from pcGames array
+  const codBO7Product = pcGames.find((p) => p.title === "Black Ops 7");
   const infoImage = codBO7Product?.image;
 
   useEffect(() => {
     async function fetchProduct() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId =
-          import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID;
 
-        // Get all PC games
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
 
-        // Find Call of Duty: Black Ops 7 (case-insensitive)
-        const codBO7Product = products.find(
-          (g) => g.title && g.title.toLowerCase() === "call of duty: black ops 7"
+        // Match COD BO7 product (exact match)
+        const codGame = products.find(
+          (g) => g.title?.toLowerCase() === "black ops 7"
         );
+        setCodBO7(codGame);
 
-        setCodBO7(codBO7Product);
-
-        // Group priceList
-        if (codBO7Product && Array.isArray(codBO7Product.priceList)) {
-          setPriceList(groupPriceList(codBO7Product.priceList));
+        if (codGame && Array.isArray(codGame.priceList)) {
+          setPriceList(groupPriceList(codGame.priceList));
         }
 
-        // Get similar products
-        setSimilar(pcGames.filter((g) => g.title !== "Call of Duty: Black Ops 7").slice(0, 4));
-      } catch (err) {
+        setSimilar(
+          pcGames.filter((g) => g.title !== "Black Ops 7").slice(0, 4)
+        );
+      } catch {
         setCodBO7(null);
         setPriceList([]);
         setSimilar([]);

@@ -336,9 +336,9 @@ const GameDetailsLayout: React.FC<
                             {item.hot && (
                               <span className="ml-1">
                                 <img
-                                  src="/assets/icons/fire.svg"
+                                  src="/assets/icons/others/badge.svg"
                                   alt="Popular"
-                                  className="inline-block mr-1 w-4 h-4"
+                                  className="inline-block mr-1 w-5 h-5"
                                 />
                               </span>
                             )}

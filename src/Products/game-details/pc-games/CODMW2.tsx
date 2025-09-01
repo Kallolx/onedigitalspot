@@ -11,23 +11,23 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  Diamonds: "/assets/icons/gift-cards/cod.svg", // COD-specific icon
+  Diamonds: "/assets/icons/games/mw.svg", // COD-specific icon
 };
 
 function groupPriceList(priceList: string[]) {
-  const diamonds: any[] = [];
+  const pc: any[] = [];
   priceList.forEach((item) => {
     const [label, price, hot, type] = item.split("|");
     const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "diamond") {
-      diamonds.push(obj);
+    if (type === "pc") {
+      pc.push(obj);
     }
   });
   return [
     {
       title: "Call of Duty: Modern Warfare II",
       categoryIcon: categoryIcons["Diamonds"],
-      items: diamonds,
+      items: pc,
     },
   ];
 }
@@ -52,7 +52,7 @@ export default function CODMW2() {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   // Use image from subscriptions array
-  const codMW2Product = pcGames.find((p) => p.title === "Call of Duty: Modern Warfare II");
+  const codMW2Product = pcGames.find((p) => p.title === "Modern Warfare 2");
   const infoImage = codMW2Product?.image;
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function CODMW2() {
 
         // Find Call of Duty: Modern Warfare II (case-insensitive)
         const codMW2Product = products.find(
-          (g) => g.title && g.title.toLowerCase() === "call of duty: modern warfare ii"
+          (g) => g.title && g.title.toLowerCase() === "modern warfare 2"
         );
 
         setCodMW2(codMW2Product);
@@ -79,7 +79,7 @@ export default function CODMW2() {
         }
 
         // Get similar products
-        setSimilar(pcGames.filter((g) => g.title !== "Call of Duty: Modern Warfare II").slice(0, 4));
+        setSimilar(pcGames.filter((g) => g.title !== "Modern Warfare 2").slice(0, 4));
       } catch (err) {
         setCodMW2(null);
         setPriceList([]);

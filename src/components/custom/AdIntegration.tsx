@@ -27,6 +27,22 @@ const AdIntegration: React.FC = () => {
   const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_ADS_ID;
 
   useEffect(() => {
+    // Check if user has already closed the ad in this session
+    const adClosed = localStorage.getItem('adClosed');
+    const adClosedTimestamp = localStorage.getItem('adClosedTimestamp');
+    const currentTime = Date.now();
+    
+    // If ad was closed more than 24 hours ago, reset the flag
+    if (adClosedTimestamp && (currentTime - parseInt(adClosedTimestamp)) > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem('adClosed');
+      localStorage.removeItem('adClosedTimestamp');
+    }
+    
+    if (adClosed === 'true') {
+      setIsLoading(false);
+      return;
+    }
+    
     fetchActiveAd();
   }, []);
 
@@ -55,15 +71,22 @@ const AdIntegration: React.FC = () => {
       const activeAds = ads.filter(ad => ad.isActive);
 
       if (activeAds.length > 0) {
-        // Select the first active ad (you can implement more complex logic later)
-        const selectedAd = activeAds[0];
-        setCurrentAd(selectedAd);
+        // Find an ad that hasn't exceeded its maxShows
+        const availableAd = activeAds.find(ad => {
+          const adShownKey = `adShown_${ad.$id}`;
+          const currentShows = parseInt(localStorage.getItem(adShownKey) || '0');
+          return currentShows < ad.maxShows;
+        });
         
-        // Show ad after 2 seconds
-        setTimeout(() => {
-          setCurrentAd(selectedAd);
-          setIsVisible(true);
-        }, 2000);
+        if (availableAd) {
+          setCurrentAd(availableAd);
+          
+          // Show ad after 2 seconds
+          setTimeout(() => {
+            setCurrentAd(availableAd);
+            setIsVisible(true);
+          }, 2000);
+        }
       }
     } catch (error) {
       console.error("Error fetching ads:", error);
@@ -74,6 +97,31 @@ const AdIntegration: React.FC = () => {
 
   const handleClose = () => {
     setIsVisible(false);
+    
+    if (currentAd) {
+      // Track how many times this specific ad has been shown
+      const adShownKey = `adShown_${currentAd.$id}`;
+      const currentShows = parseInt(localStorage.getItem(adShownKey) || '0');
+      localStorage.setItem(adShownKey, (currentShows + 1).toString());
+      
+      // If showOnce is true, mark this ad as closed permanently
+      if (currentAd.showOnce) {
+        localStorage.setItem('adClosed', 'true');
+        localStorage.setItem('adClosedTimestamp', Date.now().toString());
+      }
+    }
+  };
+
+  // Function to clear ad tracking (for testing purposes)
+  const clearAdTracking = () => {
+    localStorage.removeItem('adClosed');
+    localStorage.removeItem('adClosedTimestamp');
+    // Clear all ad shown counters
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('adShown_')) {
+        localStorage.removeItem(key);
+      }
+    });
   };
 
   // Don't render anything if no ad is available or not visible
@@ -82,11 +130,24 @@ const AdIntegration: React.FC = () => {
   }
 
   return (
-    <AdComponent
-      adData={currentAd}
-      onClose={handleClose}
-      delay={0} // No delay since we're already managing visibility
-    />
+    <>
+      <AdComponent
+        adData={currentAd}
+        onClose={handleClose}
+        delay={0} // No delay since we're already managing visibility
+      />
+      
+      {/* Debug button - only show in development */}
+      {import.meta.env.DEV && (
+        <button
+          onClick={clearAdTracking}
+          className="fixed bottom-4 right-4 bg-red-500 text-white p-2 rounded-full text-xs z-50"
+          title="Clear ad tracking (dev only)"
+        >
+          🗑️
+        </button>
+      )}
+    </>
   );
 };
 

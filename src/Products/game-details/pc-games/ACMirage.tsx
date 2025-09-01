@@ -11,24 +11,21 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  Diamonds: "/assets/icons/gift-cards/assassins-creed.svg", // Assassin's Creed-specific icon
+  "AC Mirage": "/assets/icons/games/ac.svg", // AC Mirage icon
 };
 
-function groupPriceList(priceList: string[]) {
-  const diamonds: any[] = [];
+function groupPriceList(priceList) {
+  const acMirage = [];
   priceList.forEach((item) => {
-    const [label, price, hot, type] = item.split("|");
-    const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "diamond") {
-      diamonds.push(obj);
+    if (typeof item === "string") {
+      const [label, price, hot] = item.split("|");
+      acMirage.push({ label, price: Number(price), hot: hot === "true" });
+    } else if (item.label && item.price) {
+      acMirage.push(item);
     }
   });
   return [
-    {
-      title: "Assassin's Creed Mirage",
-      categoryIcon: categoryIcons["Diamonds"],
-      items: diamonds,
-    },
+    { title: "Steam | Epic Games", categoryIcon: categoryIcons["AC Mirage"], items: acMirage },
   ];
 }
 
@@ -37,8 +34,9 @@ const infoSections = [
     title: "How to Buy",
     content: (
       <ul className="list-disc pl-5 text-base mb-4">
-        <li>Select your desired Assassin's Creed Mirage Points package above.</li>
+        <li>Select your desired AC Mirage package above.</li>
         <li>Choose quantity and proceed to payment.</li>
+        <li>Receive your items instantly after successful payment.</li>
       </ul>
     ),
   },
@@ -59,28 +57,17 @@ export default function ACMirage() {
     async function fetchProduct() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId =
-          import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID;
-
-        // Get all PC games
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
 
-        // Find Assassin's Creed Mirage (case-insensitive)
-        const acMirageProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "assassin's creed mirage"
-        );
+        const acMirageGame = products.find((g) => g.title?.toLowerCase() === "ac mirage");
+        setAcMirage(acMirageGame);
 
-        setAcMirage(acMirageProduct);
+        if (acMirageGame && Array.isArray(acMirageGame.priceList)) setPriceList(groupPriceList(acMirageGame.priceList));
 
-        // Group priceList
-        if (acMirageProduct && Array.isArray(acMirageProduct.priceList)) {
-          setPriceList(groupPriceList(acMirageProduct.priceList));
-        }
-
-        // Get similar products
-        setSimilar(pcGames.filter((g) => g.title !== "Assassin's Creed Mirage").slice(0, 4));
-      } catch (err) {
+        setSimilar(pcGames.filter((g) => g.title !== "AC Mirage").slice(0, 4));
+      } catch {
         setAcMirage(null);
         setPriceList([]);
         setSimilar([]);
@@ -88,12 +75,8 @@ export default function ACMirage() {
     }
 
     async function checkAuth() {
-      try {
-        await account.get();
-        setIsSignedIn(true);
-      } catch {
-        setIsSignedIn(false);
-      }
+      try { await account.get(); setIsSignedIn(true); }
+      catch { setIsSignedIn(false); }
     }
 
     fetchProduct();

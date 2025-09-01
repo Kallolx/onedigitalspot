@@ -6,7 +6,10 @@ function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("rounded-md bg-muted", className)}
+      className={cn(
+        "relative overflow-hidden rounded-md bg-muted-foreground/20",
+        className
+      )}
       {...props}
     />
   )

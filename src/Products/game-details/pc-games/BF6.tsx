@@ -11,23 +11,24 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  Diamonds: "/assets/icons/gift-cards/battlefield.svg", // Battlefield-specific icon
+  BF6: "/assets/icons/games/pass.svg", // BF6 icon
 };
 
-function groupPriceList(priceList: string[]) {
-  const diamonds: any[] = [];
+function groupPriceList(priceList) {
+  const bf6 = [];
   priceList.forEach((item) => {
-    const [label, price, hot, type] = item.split("|");
-    const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "diamond") {
-      diamonds.push(obj);
+    if (typeof item === "string") {
+      const [label, price, hot] = item.split("|");
+      bf6.push({ label, price: Number(price), hot: hot === "true" });
+    } else if (item.label && item.price) {
+      bf6.push(item);
     }
   });
   return [
     {
-      title: "Battlefield 6",
-      categoryIcon: categoryIcons["Diamonds"],
-      items: diamonds,
+      title: "Steam | Epic Games | EA Games",
+      categoryIcon: categoryIcons["BF6"],
+      items: bf6,
     },
   ];
 }
@@ -37,8 +38,9 @@ const infoSections = [
     title: "How to Buy",
     content: (
       <ul className="list-disc pl-5 text-base mb-4">
-        <li>Select your desired Battlefield 6 Points package above.</li>
+        <li>Select your desired BF6 package above.</li>
         <li>Choose quantity and proceed to payment.</li>
+        <li>Receive your items instantly after successful payment.</li>
       </ul>
     ),
   },
@@ -59,28 +61,22 @@ export default function Battlefield6() {
     async function fetchProduct() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId =
-          import.meta.env.VITE_APPWRITE_COLLECTION_PC_GAMES_ID;
-
-        // Get all PC games
-        const response = await databases.listDocuments(databaseId, collectionId);
+        const collectionId = import.meta.env
+          .VITE_APPWRITE_COLLECTION_PC_GAMES_ID;
+        const response = await databases.listDocuments(
+          databaseId,
+          collectionId
+        );
         const products = response.documents;
 
-        // Find Battlefield 6 (case-insensitive)
-        const battlefieldProduct = products.find(
-          (g) => g.title && g.title.toLowerCase() === "battlefield 6"
-        );
+        const bf6Game = products.find((g) => g.title?.toLowerCase() === "battlefield 6");
+        setBattlefield(bf6Game);
 
-        setBattlefield(battlefieldProduct);
+        if (bf6Game && Array.isArray(bf6Game.priceList))
+          setPriceList(groupPriceList(bf6Game.priceList));
 
-        // Group priceList
-        if (battlefieldProduct && Array.isArray(battlefieldProduct.priceList)) {
-          setPriceList(groupPriceList(battlefieldProduct.priceList));
-        }
-
-        // Get similar products
-        setSimilar(pcGames.filter((g) => g.title !== "Battlefield 6").slice(0, 4));
-      } catch (err) {
+        setSimilar(pcGames.filter((g) => g.title !== "BF6").slice(0, 4));
+      } catch {
         setBattlefield(null);
         setPriceList([]);
         setSimilar([]);

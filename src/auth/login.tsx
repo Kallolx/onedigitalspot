@@ -214,7 +214,7 @@ export default function LoginPage() {
                     type="button"
                   >
                     <img
-                      src="/assets/icons/google.svg"
+                      src="/assets/icons/social/google.svg"
                       alt="Google logo"
                       className="w-5 h-5"
                     />
@@ -226,7 +226,7 @@ export default function LoginPage() {
                     type="button"
                   >
                     <img
-                      src="/assets/facebook.svg"
+                      src="/assets/icons/social/facebook.svg"
                       alt="Facebook logo"
                       className="w-5 h-5"
                     />

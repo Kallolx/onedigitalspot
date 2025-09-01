@@ -17,7 +17,7 @@ const NotFound = () => {
     <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
       {/* Error SVG Illustration */}
       <img
-        src="/assets/icons/error.svg"
+        src="/assets/icons/others/error.svg"
         alt="404 Not Found"
         className="w-40 sm:w-56 md:w-72 lg:w-80 mb-6 drop-shadow-lg"
         onError={(e) => (e.currentTarget.style.display = "none")}

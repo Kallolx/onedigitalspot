@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {  Download, Trash2,  CheckCircle, XCircle, Clock, Package, ShieldCheck, Search, Eye, Edit, RefreshCw } from "lucide-react";
+import {  Download, Trash2,  CheckCircle, XCircle, Clock, Package, ShieldCheck, Search, Eye, Edit, RefreshCw, MessageCircle, Mail, Send } from "lucide-react";
 import { getAllOrders, updateOrderStatus, OrderData, deleteOrder } from "../lib/orders";
 import { mobileGames, pcGames, giftCards, aiTools, subscriptions, productivity } from "../lib/products";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
@@ -231,6 +231,60 @@ const Orders = () => {
     if (s.startsWith('880')) return '+' + s;
     // fallback: add + if looks international length
     return s.length >= 10 ? '+' + s : s;
+  };
+
+  // Handle delivery method redirection based on method type
+  const handleDeliveryRedirect = (deliveryInfo: any) => {
+    if (!deliveryInfo) return;
+    
+    const info = parseDeliveryInfo(deliveryInfo);
+    if (!info.method || !info.contact) return;
+    
+    const method = info.method.toLowerCase();
+    const contact = info.contact;
+    
+    if (method.includes('whatsapp') || method.includes('wa')) {
+      // Format phone number for WhatsApp
+      let phoneNumber = contact.replace(/[^0-9+]/g, '');
+      if (phoneNumber.startsWith('0') && phoneNumber.length >= 10) {
+        phoneNumber = '+88' + phoneNumber.slice(1); // Bangladesh format
+      } else if (phoneNumber.startsWith('880')) {
+        phoneNumber = '+' + phoneNumber;
+      } else if (!phoneNumber.startsWith('+')) {
+        phoneNumber = '+' + phoneNumber;
+      }
+      window.open(`https://wa.me/${phoneNumber}`, '_blank');
+    } else if (method.includes('email') || method.includes('mail')) {
+      // Open default email client
+      window.open(`mailto:${contact}`, '_blank');
+    } else if (method.includes('telegram') || method.includes('tg')) {
+      // Handle Telegram (if contact is username)
+      const username = contact.startsWith('@') ? contact.slice(1) : contact;
+      window.open(`https://t.me/${username}`, '_blank');
+    } else if (method.includes('facebook') || method.includes('fb')) {
+      // Handle Facebook (if contact is profile URL or username)
+      if (contact.includes('facebook.com')) {
+        window.open(contact, '_blank');
+      } else {
+        window.open(`https://facebook.com/${contact}`, '_blank');
+      }
+    } else {
+      // For other methods, try to detect if it's a phone number and open WhatsApp
+      if (/^[0-9+\-\s()]+$/.test(contact)) {
+        let phoneNumber = contact.replace(/[^0-9+]/g, '');
+        if (phoneNumber.startsWith('0') && phoneNumber.length >= 10) {
+          phoneNumber = '+88' + phoneNumber.slice(1);
+        } else if (phoneNumber.startsWith('880')) {
+          phoneNumber = '+' + phoneNumber;
+        } else if (!phoneNumber.startsWith('+')) {
+          phoneNumber = '+' + phoneNumber;
+        }
+        window.open(`https://wa.me/${phoneNumber}`, '_blank');
+      } else {
+        // Fallback: show alert with contact info
+        alert(`Contact: ${contact}\nMethod: ${info.method}`);
+      }
+    }
   };
 
   // Extract playerId and zoneId from various shapes (top-level, payload, details, stringified JSON)
@@ -817,9 +871,6 @@ const Orders = () => {
                   <h3 className="font-pixel text-2xl text-foreground mb-2">
                     {viewOrder.productName}
                   </h3>
-                  <Badge variant="secondary" className="font-pixel">
-                    {viewOrder.productType}
-                  </Badge>
                 </div>
 
                 {/* Order Information */}
@@ -827,7 +878,7 @@ const Orders = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <span className="font-pixel text-xs text-muted-foreground">Order ID:</span>
-                      <div className="font-mono font-bold text-foreground">{viewOrder.orderID}</div>
+                      <div className="font-sans font-bold text-secondary">{viewOrder.orderID}</div>
                     </div>
                     <div>
                       <span className="font-pixel text-xs text-muted-foreground">Status:</span>
@@ -842,8 +893,9 @@ const Orders = () => {
                       <div className="text-sm text-muted-foreground">{viewOrder.userEmail}</div>
                     </div>
                     <div>
-                      <span className="font-pixel text-xs text-muted-foreground">Created:</span>
-                      <div className="text-sm text-foreground">{new Date(viewOrder.createdAt).toLocaleString()}</div>
+                      <span className="font-pixel text-xs text-muted-foreground">Payment Method:</span>
+                      <div className="font-medium text-foreground">{viewOrder.paymentMethod}</div>
+                      <div className="text-xs text-muted-foreground font-mono">Transaction: {viewOrder.transactionId}</div>
                     </div>
                   </div>
 
@@ -862,9 +914,8 @@ const Orders = () => {
 
                   <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <span className="font-pixel text-xs text-muted-foreground">Payment Method:</span>
-                      <div className="font-medium text-foreground">{viewOrder.paymentMethod}</div>
-                      <div className="text-xs text-muted-foreground font-mono">Transaction: {viewOrder.transactionId}</div>
+                      <span className="font-pixel text-xs text-muted-foreground">Created:</span>
+                      <div className="text-sm text-foreground">{new Date(viewOrder.createdAt).toLocaleString()}</div>
                     </div>
                   </div>
 
@@ -875,8 +926,8 @@ const Orders = () => {
                         <span className="font-sans text-xs text-muted-foreground">Delivery Information:</span>
                         <div className="text-sm text-foreground bg-muted p-3 rounded-lg mt-1 flex items-center justify-between">
                           <div>
-                            <div><strong>Method:</strong> {info.method ? info.method.toUpperCase() : '—'}</div>
-                            <div><strong>Contact:</strong> {info.contact ? formatDeliveryContact(info.contact) : '—'}</div>
+                            <div><strong>Method:</strong> {info.method ? info.method : '—'}</div>
+                            <div><strong>Contact:</strong> {info.contact || '—'}</div>
                           </div>
                         </div>
                       </div>
@@ -904,21 +955,40 @@ const Orders = () => {
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
                   <Button 
-                    variant="outline"
-                    onClick={() => setViewOrder(null)}
-                    className="font-pixel"
-                  >
-                    Close
-                  </Button>
-                  <Button 
                     variant="default"
                     onClick={() => { 
-                      window.open('/admin/receipt-verifier', '_blank');
+                      if (viewOrder.deliveryInfo) {
+                        handleDeliveryRedirect(viewOrder.deliveryInfo);
+                      } else {
+                        alert('No delivery information available for this order.');
+                      }
                     }}
                     className="font-pixel"
+                    title={`Send item via ${(() => {
+                      const info = parseDeliveryInfo(viewOrder.deliveryInfo);
+                      return info.method || 'delivery method';
+                    })()}`}
                   >
-                    <ShieldCheck className="w-4 h-4 mr-2" />
-                    Send Item
+                    {(() => {
+                      const info = parseDeliveryInfo(viewOrder.deliveryInfo);
+                      if (info.method) {
+                        if (info.method.toLowerCase().includes('whatsapp')) return <MessageCircle className="w-4 h-4 mr-2" />;
+                        if (info.method.toLowerCase().includes('email')) return <Mail className="w-4 h-4 mr-2" />;
+                        if (info.method.toLowerCase().includes('telegram')) return <MessageCircle className="w-4 h-4 mr-2" />;
+                        return <Send className="w-4 h-4 mr-2" />;
+                      }
+                      return <ShieldCheck className="w-4 h-4 mr-2" />;
+                    })()}
+                    {(() => {
+                      const info = parseDeliveryInfo(viewOrder.deliveryInfo);
+                      if (info.method) {
+                        if (info.method.toLowerCase().includes('whatsapp')) return 'Send via WhatsApp';
+                        if (info.method.toLowerCase().includes('email')) return 'Send via Email';
+                        if (info.method.toLowerCase().includes('telegram')) return 'Send via Telegram';
+                        return `Send via ${info.method}`;
+                      }
+                      return 'Send Item';
+                    })()}
                   </Button>
                   <Button 
                     variant="default"

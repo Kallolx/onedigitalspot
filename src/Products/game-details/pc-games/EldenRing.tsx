@@ -11,23 +11,23 @@ interface SelectedItem {
 }
 
 const categoryIcons = {
-  Diamonds: "/assets/icons/gift-cards/elden-ring.svg", // Elden Ring-specific icon
+  Diamonds: "/assets/icons/games/elden.svg", // Elden Ring-specific icon
 };
 
 function groupPriceList(priceList: string[]) {
-  const diamonds: any[] = [];
+  const pc: any[] = [];
   priceList.forEach((item) => {
     const [label, price, hot, type] = item.split("|");
     const obj = { label, price: Number(price), hot: hot === "true" };
-    if (type === "diamond") {
-      diamonds.push(obj);
+    if (type === "pc") {
+      pc.push(obj);
     }
   });
   return [
     {
-      title: "Elden Ring",
+      title: "Steam | Epic Games",
       categoryIcon: categoryIcons["Diamonds"],
-      items: diamonds,
+      items: pc,
     },
   ];
 }

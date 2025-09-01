@@ -9,11 +9,11 @@ const Footer: React.FC = () => {
     "Terms of Service",
   ];
   const payments = [
-    { name: "Visa", src: "/assets/icons/visa.svg" },
-    { name: "Mastercard", src: "/assets/icons/master.svg" },
-    { name: "bKash", src: "/assets/icons/bKash.svg" },
-    { name: "Nagad", src: "/assets/icons/nagad.svg" },
-    { name: "Rocket", src: "/assets/icons/rocket.png" },
+    { name: "Visa", src: "/assets/icons/payments/visa.svg" },
+    { name: "Mastercard", src: "/assets/icons/payments/master.svg" },
+    { name: "bKash", src: "/assets/icons/payments/bKash.svg" },
+    { name: "Nagad", src: "/assets/icons/payments/nagad.svg" },
+    { name: "Rocket", src: "/assets/icons/payments/rocket.png" },
   ];
 
   return (
@@ -41,7 +41,7 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
             >
               <img
-                src="/assets/facebook.svg"
+                src="/assets/icons/social/facebook.svg"
                 alt="Facebook"
                 className="w-12 h-12 hover:opacity-80 transition"
               />
@@ -52,7 +52,7 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
             >
               <img
-                src="/assets/instagram.svg"
+                src="/assets/icons/social/instagram.svg"
                 alt="Instagram"
                 className="w-12 h-12 hover:opacity-80 transition"
               />
@@ -63,14 +63,14 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
             >
               <img
-                src="/assets/tiktok.svg"
+                src="/assets/icons/social/tiktok.svg"
                 alt="TikTok"
                 className="w-12 h-12 hover:opacity-80 transition"
               />
             </a>
             <a href="https://wa.me/8801234567890">
               <img
-                src="/assets/whatsapp.svg"
+                src="/assets/icons/social/whatsapp.svg"
                 alt="WhatsApp"
                 className="w-12 h-12 hover:opacity-80 transition"
               />
@@ -123,7 +123,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Center: Payment icons */}
-          <div className="w-full sm:w-auto flex items-center gap-3 flex-wrap justify-center">
+          <div className="w-full sm:w-auto flex items-center gap-3 flex-wrap justify-between">
             {payments.map((p) => (
               <img
                 key={p.name}

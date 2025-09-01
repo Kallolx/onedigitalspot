@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
 import {
   Download,
   Plus,
@@ -14,8 +13,6 @@ import {
   X,
   Save,
   AlertTriangle,
-  Upload,
-  Link,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -24,10 +21,7 @@ import {
   ArrowUp,
   ArrowDown,
   Grid3X3,
-  List,
-  MoreHorizontal,
-  Filter,
-  Settings,
+  List
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,7 +42,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -1503,7 +1496,7 @@ const Products = () => {
                               <option value="voucher">Voucher</option>
                               <option value="other">Shared</option>
                               <option value="subscription">Personal</option>
-                              <option value="codes">Codes</option>
+                              <option value="pc">PC</option>
                               <option value="uc">Uc</option>
                               <option value="team">Team</option>
                             </select>
@@ -1685,7 +1678,7 @@ const Products = () => {
                           <option value="voucher">Voucher</option>
                           <option value="shared">Shared</option>
                           <option value="personal">Personal</option>
-                          <option value="codes">Codes</option>
+                          <option value="pc">PC</option>
                           <option value="uc">Uc</option>
                           <option value="team">Team</option>
                         </select>

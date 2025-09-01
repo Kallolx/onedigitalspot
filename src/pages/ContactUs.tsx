@@ -6,25 +6,25 @@ import Footer from "@/components/landing/Footer";
 const contacts = [
   {
     name: "Email",
-    image: "/assets/gmail.svg",
+    image: "/assets/icons/social/gmail.svg",
     url: "mailto:support@onedigitalspot.com",
     description: "Reach us anytime via email",
   },
   {
     name: "WhatsApp",
-    image: "/assets/whatsapp.svg",
+    image: "/assets/icons/social/whatsapp.svg",
     url: "https://wa.me/8801234567890",
     description: "Call or message us directly",
   },
   {
     name: "Facebook",
-    image: "/assets/facebook.svg",
+    image: "/assets/icons/social/facebook.svg",
     url: "https://facebook.com/onedigitalspot",
     description: "Follow us & send a message",
   },
   {
     name: "Instagram",
-    image: "/assets/instagram.svg",
+    image: "/assets/icons/social/instagram.svg",
     url: "https://instagram.com/onedigitalspot",
     description: "DM us on Instagram",
   },
@@ -36,7 +36,7 @@ const contacts = [
   },
   {
     name: "Twitter",
-    image: "/assets/x.svg",
+    image: "/assets/icons/social/x.svg",
     url: "https://twitter.com/onedigitalspot",
     description: "Stay updated on Twitter",
   },
