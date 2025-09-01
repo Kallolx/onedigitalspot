@@ -237,7 +237,7 @@ const GameDetailsLayout: React.FC<
             type="button"
             aria-label="Go back"
             onClick={() => navigate(-1)}
-            className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 bg-transparent border hover:bg-muted/60 rounded-full p-2"
+            className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 bg-transparent border hover:bg-primary/20/60 rounded-full p-2"
           >
             <span className="sr-only">Go back</span>
             <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -304,8 +304,28 @@ const GameDetailsLayout: React.FC<
           <div className="flex-1">
             {/* Price List with Categories */}
             <Card className="mb-6 p-4 bg-transparent order-1 lg:order-0">
-              <div className="flex flex-col gap-6">
-                {priceList.map((category, catIdx) => (
+              {!priceList || priceList.length === 0 ? (
+                <div className="flex flex-col gap-6">
+                  {/* Skeleton for 2 categories */}
+                  {[1, 2].map((catIdx) => (
+                    <div key={catIdx}>
+                      {/* Category title skeleton */}
+                      <div className="h-5 bg-primary/20 rounded mb-2 w-32 animate-pulse"></div>
+                      {/* Items grid skeleton */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {[1, 2, 3, 4].map((itemIdx) => (
+                          <div
+                            key={itemIdx}
+                            className="h-14 bg-primary/20 rounded animate-pulse"
+                          ></div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  {priceList.map((category, catIdx) => (
                   <div key={catIdx}>
                     <h3 className="font-pixel text-base text-foreground mb-2 pl-1 opacity-80">
                       {category.title}
@@ -364,11 +384,28 @@ const GameDetailsLayout: React.FC<
                   </div>
                 ))}
               </div>
+              )}
             </Card>
 
             {/* Purchase Form */}
             <Card className="mb-8 p-4 bg-transparent order-0 lg:order-1">
-              <form onSubmit={onSubmit || ((e) => e.preventDefault())}>
+              {!priceList || priceList.length === 0 ? (
+                <div className="space-y-4">
+                  {/* Player ID field skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-5 bg-primary/20 rounded w-24 animate-pulse"></div>
+                    <div className="h-12 bg-primary/20 rounded animate-pulse"></div>
+                  </div>
+                  {/* Zone ID field skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-5 bg-primary/20 rounded w-20 animate-pulse"></div>
+                    <div className="h-12 bg-primary/20 rounded animate-pulse"></div>
+                  </div>
+                  {/* Submit button skeleton */}
+                  <div className="h-12 bg-primary/20 rounded animate-pulse"></div>
+                </div>
+              ) : (
+                <form onSubmit={onSubmit || ((e) => e.preventDefault())}>
                 <div className="mb-4">
                   <div className="flex flex-col sm:flex-row gap-4">
                     {/* Player ID Field */}
@@ -541,7 +578,7 @@ const GameDetailsLayout: React.FC<
 
                 {/* Total */}
                 {selectedItems.length > 0 && (
-                  <div className="rounded-xl border bg-muted px-4 py-3 mb-3 shadow-sm">
+                  <div className="rounded-xl border bg-primary/20 px-4 py-3 mb-3 shadow-sm">
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-between items-center">
                         <span className="font-pixel text-lg text-foreground font-bold">
@@ -700,17 +737,33 @@ const GameDetailsLayout: React.FC<
                   </Button>
                 </div>
               </form>
+              )}
             </Card>
 
             {/* Info Section */}
-            {infoSections.map((section, i) => (
-              <Card key={i} className="mb-8 p-4 bg-background">
-                <h2 className="font-semibold text-lg mb-2 font-pixel text-foreground">
-                  {section.title}
-                </h2>
-                <div>{section.content}</div>
-              </Card>
-            ))}
+            {!priceList || priceList.length === 0 ? (
+              <div className="space-y-6">
+                {[1, 2].map((i) => (
+                  <Card key={i} className="mb-8 p-4 bg-background">
+                    <div className="h-6 bg-primary/20 rounded w-32 mb-2 animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-primary/20 rounded w-full animate-pulse"></div>
+                      <div className="h-4 bg-primary/20 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-4 bg-primary/20 rounded w-1/2 animate-pulse"></div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              infoSections.map((section, i) => (
+                <Card key={i} className="mb-8 p-4 bg-background">
+                  <h2 className="font-semibold text-lg mb-2 font-pixel text-foreground">
+                    {section.title}
+                  </h2>
+                  <div>{section.content}</div>
+                </Card>
+              ))
+            )}
             {children}
           </div>
         </div>
@@ -720,11 +773,23 @@ const GameDetailsLayout: React.FC<
           <h2 className="font-bold text-xl mb-4 font-pixel text-foreground">
             Similar Products
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {similarProducts.map((prod, i) => (
-              <ServiceCard key={i} {...prod} />
-            ))}
-          </div>
+          {!priceList || priceList.length === 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="space-y-3">
+                  <div className="h-32 bg-primary/20 rounded animate-pulse"></div>
+                  <div className="h-4 bg-primary/20 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-primary/20 rounded w-1/2 animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {similarProducts.map((prod, i) => (
+                <ServiceCard key={i} {...prod} />
+              ))}
+            </div>
+          )}
         </div>
       </main>
 
