@@ -101,11 +101,6 @@ export default function ChatGPT() {
           });
           setPriceList([
             {
-              title: "ChatGPT Pro Shared Account",
-              categoryIcon: categoryIcons.Shared,
-              items: shared,
-            },
-            {
               title: "ChatGPT Pro Personal Account",
               categoryIcon: categoryIcons.Personal,
               items: personal,

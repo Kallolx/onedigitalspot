@@ -13,7 +13,9 @@ const infoSections = [
     content: (
       <div className="text-base">
         <p className="mb-2">
-          Windsurf IDE is a cutting-edge AI-powered integrated development environment designed to boost your coding productivity with smart assistance and a sleek interface.
+          Windsurf IDE is a cutting-edge AI-powered integrated development
+          environment designed to boost your coding productivity with smart
+          assistance and a sleek interface.
         </p>
         <ul className="list-disc pl-5">
           <li>AI-assisted code completion and error detection.</li>
@@ -29,7 +31,9 @@ const infoSections = [
       <ol className="list-decimal pl-5 text-base mb-4">
         <li>Select your Windsurf IDE subscription plan.</li>
         <li>Provide your email address for account activation.</li>
-        <li>Complete payment and follow the instructions sent to your email.</li>
+        <li>
+          Complete payment and follow the instructions sent to your email.
+        </li>
         <li>Download and activate Windsurf IDE with your credentials.</li>
       </ol>
     ),
@@ -42,8 +46,12 @@ const infoSections = [
           Please provide the following information for activation:
         </p>
         <ul className="list-disc pl-5 text-base mb-4">
-          <li><strong>Email Address:</strong> For account creation and activation</li>
-          <li>Account credentials and setup instructions will be sent via email</li>
+          <li>
+            <strong>Email Address:</strong> For account creation and activation
+          </li>
+          <li>
+            Account credentials and setup instructions will be sent via email
+          </li>
         </ul>
       </div>
     ),
@@ -51,7 +59,11 @@ const infoSections = [
 ];
 
 export default function WindsurfIDE() {
-  type SelectedItem = { categoryIdx: number; itemIdx: number; quantity: number };
+  type SelectedItem = {
+    categoryIdx: number;
+    itemIdx: number;
+    quantity: number;
+  };
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [playerId, setPlayerId] = useState(""); // Email address
   const [zoneId, setZoneId] = useState(""); // Not applicable here
@@ -60,18 +72,24 @@ export default function WindsurfIDE() {
   const [similar, setSimilar] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   // Use image from subscriptions array
-  const windsurfProduct = aiTools.find(p => p.title === "Windsurf IDE");
+  const windsurfProduct = aiTools.find((p) => p.title === "Windsurf IDE");
   const infoImage = windsurfProduct?.image;
 
   useEffect(() => {
     async function fetchAiTools() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID;
-        const response = await databases.listDocuments(databaseId, collectionId);
+        const collectionId = import.meta.env
+          .VITE_APPWRITE_COLLECTION_AI_TOOLS_ID;
+        const response = await databases.listDocuments(
+          databaseId,
+          collectionId
+        );
         const products = response.documents;
 
-        const windsurfProduct = products.find((g) => g.title && g.title.toLowerCase() === "windsurf ide");
+        const windsurfProduct = products.find(
+          (g) => g.title && g.title.toLowerCase() === "windsurf ide"
+        );
         setWindsurf(windsurfProduct);
 
         if (windsurfProduct && Array.isArray(windsurfProduct.priceList)) {
@@ -90,7 +108,9 @@ export default function WindsurfIDE() {
           ]);
         }
 
-        setSimilar(aiTools.filter((g) => g.title !== "Windsurf IDE").slice(0, 4));
+        setSimilar(
+          aiTools.filter((g) => g.title !== "Windsurf IDE").slice(0, 4)
+        );
       } catch (err) {
         setWindsurf(null);
         setPriceList([]);
@@ -112,15 +132,15 @@ export default function WindsurfIDE() {
   }, []);
 
   return (
-    <GameDetailsLayout  
+    <GameDetailsLayout
       isSignedIn={isSignedIn}
       title="Windsurf IDE"
       image={windsurfProduct?.image}
       priceList={priceList}
       infoSections={infoSections}
       similarProducts={similar}
-  selectedItems={selectedItems}
-  setSelectedItems={setSelectedItems}
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
     />
   );
 }

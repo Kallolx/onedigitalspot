@@ -98,11 +98,6 @@ export default function PerplexityAI() {
           });
           setPriceList([
             {
-              title: "Perplexity AI Pro Shared Account",
-              categoryIcon: categoryIcons.Shared,
-              items: shared,
-            },
-            {
               title: "Perplexity AI Pro Personal Account",
               categoryIcon: categoryIcons.Personal,
               items: personal,

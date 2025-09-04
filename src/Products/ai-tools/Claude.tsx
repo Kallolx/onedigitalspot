@@ -117,11 +117,6 @@ export default function Claude() {
           });
           setPriceList([
             {
-              title: "Claude Pro Shared Account",
-              categoryIcon: categoryIcons.Shared,
-              items: shared,
-            },
-            {
               title: "Claude Pro Personal Account",
               categoryIcon: categoryIcons.Personal,
               items: personal,

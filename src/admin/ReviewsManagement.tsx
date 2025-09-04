@@ -9,11 +9,8 @@ import {
   EyeOff,
   Trash2,
   Search,
-  Filter,
   Star,
   User,
-  Calendar,
-  AlertTriangle,
   CheckCircle,
   XCircle,
 } from "lucide-react";
@@ -47,6 +44,10 @@ const ReviewsManagement: React.FC = () => {
   const [selectedReviewForModal, setSelectedReviewForModal] =
     useState<Review | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Fetch all reviews
   const fetchReviews = async () => {
@@ -107,7 +108,14 @@ const ReviewsManagement: React.FC = () => {
     }
 
     setFilteredReviews(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [reviews, searchTerm, selectedCategory, selectedRating, selectedStatus]);
+
+  // Get paginated reviews
+  const totalPages = Math.ceil(filteredReviews.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedReviews = filteredReviews.slice(startIndex, endIndex);
 
   // Toggle review visibility
   const toggleReviewVisibility = async (
@@ -254,9 +262,9 @@ const ReviewsManagement: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-background">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             Reviews Management
@@ -266,208 +274,326 @@ const ReviewsManagement: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="text-sm">
+          <Badge variant="outline" className="text-sm">
             Total: {reviews.length}
           </Badge>
           <Badge variant="outline" className="text-sm">
             Visible: {reviews.filter((r) => !r.isHidden).length}
           </Badge>
-          <Badge variant="destructive" className="text-sm">
+          <Badge variant="outline" className="text-sm">
             Hidden: {reviews.filter((r) => r.isHidden).length}
           </Badge>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-background rounded-2xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Search reviews..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+      <Card className="bg-background">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search reviews..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-background"
+              />
+            </div>
+
+            {/* Rating Filter */}
+            <select
+              value={selectedRating}
+              onChange={(e) => setSelectedRating(e.target.value)}
+              className="px-3 py-2 border bg-background rounded-md"
+            >
+              <option value="all">All Ratings</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+
+            {/* Status Filter */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 py-2 border bg-background rounded-md"
+            >
+              <option value="all">All Status</option>
+              <option value="visible">Visible</option>
+              <option value="hidden">Hidden</option>
+            </select>
+
+            {/* Items per page */}
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(parseInt(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 py-2 border bg-background rounded-md"
+            >
+              <option value="5">5 per page</option>
+              <option value="10">10 per page</option>
+              <option value="25">25 per page</option>
+              <option value="50">50 per page</option>
+            </select>
           </div>
 
-          {/* Rating Filter */}
-          <select
-            value={selectedRating}
-            onChange={(e) => setSelectedRating(e.target.value)}
-            className="px-3 py-2 border bg-background rounded-md"
-          >
-            <option value="all">All Ratings</option>
-            <option value="5">5 Stars</option>
-            <option value="4">4 Stars</option>
-            <option value="3">3 Stars</option>
-            <option value="2">2 Stars</option>
-            <option value="1">1 Star</option>
-          </select>
-
-          {/* Status Filter */}
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 border bg-background rounded-md"
-          >
-            <option value="all">All Status</option>
-            <option value="visible">Visible</option>
-            <option value="hidden">Hidden</option>
-          </select>
-        </div>
-
-        {/* Bulk Actions */}
-        {selectedReviews.length > 0 && (
-          <div className="flex items-center gap-2 pt-4 border-t">
-            <span className="text-sm text-gray-600">
-              {selectedReviews.length} review(s) selected
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleBulkAction("show")}
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              Show All
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleBulkAction("hide")}
-            >
-              <EyeOff className="w-4 h-4 mr-2" />
-              Hide All
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => handleBulkAction("delete")}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete All
-            </Button>
-          </div>
-        )}
-        {/* Reviews List */}
-        <div className="bg-background">
+          {/* Bulk Actions */}
+          {selectedReviews.length > 0 && (
+            <div className="flex items-center gap-2 pt-4 border-t mt-4">
+              <span className="text-sm text-gray-600">
+                {selectedReviews.length} review(s) selected
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleBulkAction("show")}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Show All
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleBulkAction("hide")}
+              >
+                <EyeOff className="w-4 h-4 mr-2" />
+                Hide All
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleBulkAction("delete")}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete All
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+        {/* Reviews Table */}
+        <Card className="bg-background">
           <CardHeader>
             <CardTitle>Reviews ({filteredReviews.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredReviews.map((review) => (
-                <div
-                  key={review.$id}
-                  className={`p-4 border rounded-lg h-fit ${
-                    review.isHidden
-                      ? "bg-gray-50 border-gray-200"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <input
-                            type="checkbox"
-                            checked={selectedReviews.includes(review.$id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedReviews([
-                                  ...selectedReviews,
-                                  review.$id,
-                                ]);
-                              } else {
-                                setSelectedReviews(
-                                  selectedReviews.filter(
-                                    (id) => id !== review.$id
-                                  )
-                                );
-                              }
-                            }}
-                            className="rounded border-gray-300"
-                          />
-
-                          <h3 className="font-semibold text-gray-900 text-sm truncate">
-                            {review.productName}
-                          </h3>
-                          <div className="flex items-center gap-2 mb-2">
-                            {review.isVerified && (
-                              <Badge
-                                variant="default"
-                                className="bg-green-100 text-green-800 text-xs"
-                              >
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Verified
-                              </Badge>
-                            )}
-
-                            {review.isHidden && (
-                              <Badge variant="destructive" className="text-xs">
-                                <EyeOff className="w-3 h-3 mr-1" />
-                                Hidden
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-xs text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        <span className="truncate">
-                          {review.userName || "Anonymous"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mb-2">{renderStars(review.rating)}</div>
-
-                    <p className="text-gray-700 text-sm line-clamp-3 leading-relaxed">
-                      {review.comment}
-                    </p>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedReviewForModal(review);
-                          setIsReviewModalOpen(true);
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left p-3 font-medium text-gray-900">
+                      <input
+                        type="checkbox"
+                        checked={selectedReviews.length === paginatedReviews.length && paginatedReviews.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedReviews(paginatedReviews.map(r => r.$id));
+                          } else {
+                            setSelectedReviews([]);
+                          }
                         }}
-                        title="View Review Details"
-                        className="flex-1 h-8 text-xs"
-                      >
-                        <Eye className="w-3 h-3 mr-1" />
-                        View Details
-                      </Button>
-
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => deleteReview(review.$id)}
-                        title="Delete Review"
-                        className="h-8 w-8 p-0"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
+                        className="rounded border-gray-300"
+                      />
+                    </th>
+                    <th className="text-left p-3 font-medium text-gray-900">Product</th>
+                    <th className="text-left p-3 font-medium text-gray-900">User</th>
+                    <th className="text-left p-3 font-medium text-gray-900">Rating</th>
+                    <th className="text-left p-3 font-medium text-gray-900">Comment</th>
+                    <th className="text-left p-3 font-medium text-gray-900">Status</th>
+                    <th className="text-left p-3 font-medium text-gray-900">Date</th>
+                    <th className="text-left p-3 font-medium text-gray-900">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedReviews.map((review) => (
+                    <tr
+                      key={review.$id}
+                      className={`border-b border-gray-100 hover:bg-gray-50 ${
+                        review.isHidden ? "bg-gray-50" : ""
+                      }`}
+                    >
+                      <td className="p-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedReviews.includes(review.$id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedReviews([...selectedReviews, review.$id]);
+                            } else {
+                              setSelectedReviews(
+                                selectedReviews.filter((id) => id !== review.$id)
+                              );
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                      </td>
+                      <td className="p-3">
+                        <div className="font-medium text-gray-900 max-w-[200px] truncate">
+                          {review.productName}
+                        </div>
+                        <div className="text-sm text-gray-500">{review.category}</div>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-gray-400" />
+                          <span className="text-sm max-w-[120px] truncate">
+                            {review.userName || "Anonymous"}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          {renderStars(review.rating)}
+                          <span className="text-sm text-gray-600">
+                            ({review.rating})
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="max-w-[300px] truncate text-sm text-gray-700">
+                          {review.comment}
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex flex-col gap-1">
+                          {review.isVerified && (
+                            <Badge variant="outline" className="bg-green-100 text-green-800 text-xs w-fit">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Verified
+                            </Badge>
+                          )}
+                          {review.isHidden && (
+                            <Badge variant="outline" className="text-red-600 text-xs w-fit">
+                              <EyeOff className="w-3 h-3 mr-1" />
+                              Hidden
+                            </Badge>
+                          )}
+                          {!review.isHidden && !review.isVerified && (
+                            <Badge variant="outline" className="text-xs w-fit">
+                              Visible
+                            </Badge>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="text-sm text-gray-600">
+                          {formatDate(review.createdAt)}
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedReviewForModal(review);
+                              setIsReviewModalOpen(true);
+                            }}
+                            title="View Details"
+                            className="h-8 w-8 p-0"
+                          >
+                            <Eye className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              toggleReviewVisibility(review.$id, review.isHidden)
+                            }
+                            title={review.isHidden ? "Show Review" : "Hide Review"}
+                            className="h-8 w-8 p-0"
+                          >
+                            {review.isHidden ? (
+                              <Eye className="w-3 h-3" />
+                            ) : (
+                              <EyeOff className="w-3 h-3" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteReview(review.$id)}
+                            title="Delete Review"
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              
               {filteredReviews.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                   No reviews found matching your criteria
                 </div>
               )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                <div className="text-sm text-gray-600">
+                  Showing {startIndex + 1} to {Math.min(endIndex, filteredReviews.length)} of {filteredReviews.length} results
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  
+                  {/* Page numbers */}
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(page => {
+                        // Show first page, last page, current page and pages around current
+                        return page === 1 || 
+                               page === totalPages || 
+                               Math.abs(page - currentPage) <= 1;
+                      })
+                      .map((page, index, array) => (
+                        <React.Fragment key={page}>
+                          {index > 0 && array[index - 1] !== page - 1 && (
+                            <span className="px-2 text-gray-400">...</span>
+                          )}
+                          <Button
+                            variant={currentPage === page ? "outline" : "ghost"}
+                            size="sm"
+                            onClick={() => setCurrentPage(page)}
+                            className="w-8 h-8 p-0"
+                          >
+                            {page}
+                          </Button>
+                        </React.Fragment>
+                      ))}
+                  </div>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
-        </div>
-      </div>
+        </Card>
 
       {/* Review Detail Modal */}
       {selectedReviewForModal && (
@@ -526,7 +652,7 @@ const ReviewsManagement: React.FC = () => {
               {/* Actions */}
               <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => {
                     toggleReviewVisibility(
                       selectedReviewForModal.$id,
@@ -550,11 +676,12 @@ const ReviewsManagement: React.FC = () => {
                 </Button>
 
                 <Button
-                  variant="destructive"
+                  variant="ghost"
                   onClick={() => {
                     deleteReview(selectedReviewForModal.$id);
                     setIsReviewModalOpen(false);
                   }}
+                  className="text-red-600 hover:text-red-700"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete Review

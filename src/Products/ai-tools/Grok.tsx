@@ -98,11 +98,6 @@ export default function Grok() {
           });
           setPriceList([
             {
-              title: "Grok Premium Shared Account",
-              categoryIcon: categoryIcons.Shared,
-              items: shared,
-            },
-            {
               title: "Grok Premium Personal Account",
               categoryIcon: categoryIcons.Personal,
               items: personal,

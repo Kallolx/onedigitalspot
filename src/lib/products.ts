@@ -29,6 +29,7 @@ export const mobileGames: Product[] = [
     category: "Action",
     buttonText: "Buy CP",
     route: "/mobile-games/cod-mobile",
+    
   },
   {
     title: "PUBG Mobile",
@@ -38,6 +39,7 @@ export const mobileGames: Product[] = [
     category: "Battle Royale",
     buttonText: "Buy UC",
     route: "/mobile-games/pubg-mobile",
+    popular: true,
   },
   {
     title: "Free Fire",
@@ -47,6 +49,7 @@ export const mobileGames: Product[] = [
     category: "Battle Royale",
     buttonText: "Buy Diamonds",
     route: "/mobile-games/free-fire",
+    popular: true,
   },
   {
     title: "Delta Force",

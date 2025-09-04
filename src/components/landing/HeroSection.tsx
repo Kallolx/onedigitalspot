@@ -20,6 +20,7 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import SearchComponent from "../custom/SearchComponent";
+import { Image01Icon } from "hugeicons-react";
 
 const fetchHeroBanners = async () => {
   const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
@@ -98,10 +99,9 @@ const HeroSection = () => {
                   </span>{" "}
                   <span className="whitespace-nowrap">Products</span>
                 </h1>
-                <p className="text-sm lg:text-base tracking-tight leading-tight text-muted-foreground mb-4 lg:mb-5 text-left max-w-sm lg:max-w-md mt-2">
-                  Buy digital products in{" "}
-                  <span className="text-secondary underline">Bangladesh</span>{" "}
-                  using bKash, Nagad, Rocket & more Fast, Easy & Reliable!
+                <p className="text-md font-anekbangla lg:text-base leading-tight text-muted-foreground mb-4 lg:mb-5 text-left max-w-sm lg:max-w-md mt-2">
+                  বাংলাদেশে বিকাশ, নগদ, রকেটসহ সব মাধ্যমে ডিজিটাল পণ্য কিনুন –
+                  দ্রুত, সহজ ও সম্পূর্ণ নির্ভরযোগ্যভাবে।
                 </p>
                 <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-8 mb-3 lg:mb-4 w-full">
                   <a href="/all-products">
@@ -152,14 +152,14 @@ const HeroSection = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <a
-                            href="https://tiktok.com/@oneditialspot"
+                            href="https://x.com/@oneditialspot"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:scale-110 transition-transform"
                           >
                             <img
-                              src="/assets/icons/social/tiktok.svg"
-                              alt="TikTok"
+                              src="/assets/icons/social/x.svg"
+                              alt="Twitter"
                               className="w-8 lg:w-10 h-8 lg:h-10"
                             />
                           </a>
@@ -241,15 +241,15 @@ const HeroSection = () => {
                     </CarouselContent>
                   </Carousel>
                 ) : (
-                                     // Custom skeleton loader with image placeholder and pulsing animation
-                   <div className="w-full h-full md:h-[320px] pt-4 md:pt-0">
-                     <div className="w-full h-full rounded-lg md:rounded-xl overflow-hidden bg-muted-foreground/20 relative flex items-center justify-center animate-pulse">
-                       {/* Image placeholder icon */}
-                       <div className="text-muted-foreground/40">
-                           <img src="/assets/only-icon-green.svg" alt="Hero placeholder" className="h-10" />
-                       </div>
-                     </div>
-                   </div>
+                  // Custom skeleton loader with image placeholder and pulsing animation
+                  <div className="w-full h-full md:h-[320px] pt-4 md:pt-0">
+                    <div className="w-full h-full rounded-lg md:rounded-xl overflow-hidden bg-muted-foreground/20 relative flex items-center justify-center animate-pulse">
+                      {/* Image placeholder icon */}
+                      <div className="text-muted-foreground/40">
+                        <Image01Icon className="h-10 w-10" />
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

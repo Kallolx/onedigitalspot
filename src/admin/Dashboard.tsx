@@ -67,9 +67,6 @@ const Dashboard = () => {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-4">
-            <div className={`p-3 rounded-xl ${gradient} shadow-lg`}>
-              <Icon className="w-6 h-6 text-white" />
-            </div>
             <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
               changeType === 'positive' 
                 ? 'bg-emerald-100 text-emerald-700' 
@@ -84,11 +81,15 @@ const Dashboard = () => {
             </div>
           </div>
           <div>
+            <div className="flex items-center justify-between">
             <h3 className="text-3xl font-bold text-gray-900 mb-1">{value}</h3>
+            <div className="flex flex-col">
             <p className="text-sm font-medium text-gray-600">{title}</p>
             {description && (
               <p className="text-xs text-gray-500 mt-1">{description}</p>
             )}
+            </div>
+            </div>
           </div>
         </div>
       </div>

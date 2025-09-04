@@ -203,7 +203,7 @@ const CartPage: React.FC = () => {
   if (!items || items.length === 0) {
     return (
       <div className="min-h-screen flex items-start justify-center px-4 pt-12 md:pt-20">
-        <div className="max-w-md w-full border rounded-lg p-8 text-center">
+        <div className="max-w-md w-full p-8 text-center">
           <img
             src="/assets/icons/others/empty.svg"
             alt="Empty cart"
@@ -212,11 +212,6 @@ const CartPage: React.FC = () => {
           <h1 className="text-2xl font-semibold text-gray-900">
             Your cart is empty
           </h1>
-          <p className="text-gray-600 mt-2">
-            Looks like you haven't added anything to your cart yet. Start
-            shopping to fill it up!
-          </p>
-
           <div className="flex items-center justify-center gap-3 mt-6">
             <Button onClick={() => navigate("/")} className="px-4 py-2">
               Shop Again

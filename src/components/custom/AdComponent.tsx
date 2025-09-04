@@ -22,12 +22,14 @@ interface AdData {
 interface AdComponentProps {
   adData: AdData;
   onClose?: () => void;
+  onAdClick?: () => void;
   delay?: number; // Delay before showing the ad
 }
 
 const AdComponent: React.FC<AdComponentProps> = ({
   adData,
   onClose,
+  onAdClick,
   delay = 2000,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -64,6 +66,9 @@ const AdComponent: React.FC<AdComponentProps> = ({
   };
 
   const handleCTAClick = () => {
+    // Call the onAdClick callback to track the click
+    onAdClick?.();
+    // Open the website in a new tab
     window.open(adData.websiteUrl, "_blank", "noopener,noreferrer");
   };
 

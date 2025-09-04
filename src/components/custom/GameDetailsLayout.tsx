@@ -266,7 +266,7 @@ const GameDetailsLayout: React.FC<
                   height={800}
                   className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                     imgLoaded && !imgError ? "opacity-100" : "opacity-0"
-                  }`}
+                  } ${(!priceList || priceList.length === 0) ? "filter grayscale" : ""}`}
                   onLoad={() => setImgLoaded(true)}
                   onError={() => setImgError(true)}
                   style={{ minHeight: 0, minWidth: 0 }}
@@ -305,23 +305,15 @@ const GameDetailsLayout: React.FC<
             {/* Price List with Categories */}
             <Card className="mb-6 p-4 bg-transparent order-1 lg:order-0">
               {!priceList || priceList.length === 0 ? (
-                <div className="flex flex-col gap-6">
-                  {/* Skeleton for 2 categories */}
-                  {[1, 2].map((catIdx) => (
-                    <div key={catIdx}>
-                      {/* Category title skeleton */}
-                      <div className="h-5 bg-primary/20 rounded mb-2 w-32 animate-pulse"></div>
-                      {/* Items grid skeleton */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {[1, 2, 3, 4].map((itemIdx) => (
-                          <div
-                            key={itemIdx}
-                            className="h-14 bg-primary/20 rounded animate-pulse"
-                          ></div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                <div className="text-center py-8">
+                  <img
+                    src="/assets/icons/others/error.svg"
+                    alt="Out of stock"
+                    className="h-20 mx-auto mb-4"
+                  />
+                  <h3 className="font-pixel text-xl text-foreground mb-2">
+                    This product is out of stocks
+                  </h3>
                 </div>
               ) : (
                 <div className="flex flex-col gap-6">
@@ -391,18 +383,16 @@ const GameDetailsLayout: React.FC<
             <Card className="mb-8 p-4 bg-transparent order-0 lg:order-1">
               {!priceList || priceList.length === 0 ? (
                 <div className="space-y-4">
-                  {/* Player ID field skeleton */}
-                  <div className="space-y-2">
+                  {/* Simple skeleton form fields */}
+                  <div className="space-y-2 opacity-30">
                     <div className="h-5 bg-primary/20 rounded w-24 animate-pulse"></div>
                     <div className="h-12 bg-primary/20 rounded animate-pulse"></div>
                   </div>
-                  {/* Zone ID field skeleton */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 opacity-30">
                     <div className="h-5 bg-primary/20 rounded w-20 animate-pulse"></div>
                     <div className="h-12 bg-primary/20 rounded animate-pulse"></div>
                   </div>
-                  {/* Submit button skeleton */}
-                  <div className="h-12 bg-primary/20 rounded animate-pulse"></div>
+                  <div className="h-12 bg-primary/20 rounded animate-pulse opacity-30"></div>
                 </div>
               ) : (
                 <form onSubmit={onSubmit || ((e) => e.preventDefault())}>
@@ -581,10 +571,10 @@ const GameDetailsLayout: React.FC<
                   <div className="rounded-xl border bg-primary/20 px-4 py-3 mb-3 shadow-sm">
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-between items-center">
-                        <span className="font-pixel text-lg text-foreground font-bold">
+                        <span className="font-sans text-lg text-foreground font-bold">
                           Total
                         </span>
-                        <span className="flex gap-2 font-anekbangla text-2xl text-foreground font-bold">
+                        <span className="flex gap-2 font-anekbangla text-2xl text-secondary font-bold">
                           ৳ {toBanglaNumber(totalAmount)} টাকা
                         </span>
                       </div>

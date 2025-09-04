@@ -552,27 +552,27 @@ const Orders = () => {
       {/* Statistics Cards */}
       {!loading && !error && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          <div className="rounded-lg p-4 border border-gray-200 shadow-sm">
             <div className="text-2xl font-bold text-foreground font-pixel">{stats.total}</div>
             <div className="text-sm text-gray-600">Total Orders</div>
           </div>
-          <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200 shadow-sm">
+          <div className="rounded-lg p-4 border border-yellow-200 shadow-sm">
             <div className="text-2xl font-bold text-yellow-600 font-pixel">{stats.pending}</div>
             <div className="text-sm text-yellow-700">Pending</div>
           </div>
-          <div className="bg-muted rounded-lg p-4 shadow-sm">
+          <div className="rounded-lg p-4 shadow-sm">
             <div className="text-2xl font-bold text-blue-600 font-pixel">{stats.processing}</div>
             <div className="text-sm text-blue-700">Processing</div>
           </div>
-          <div className="bg-green-50 rounded-lg p-4 border border-green-200 shadow-sm">
+          <div className="rounded-lg p-4 border border-green-200 shadow-sm">
             <div className="text-2xl font-bold text-green-600 font-pixel">{stats.completed}</div>
             <div className="text-sm text-green-700">Completed</div>
           </div>
-          <div className="bg-red-50 rounded-lg p-4 border border-red-200 shadow-sm">
+          <div className="rounded-lg p-4 border border-red-200 shadow-sm">
             <div className="text-2xl font-bold text-red-600 font-pixel">{stats.cancelled}</div>
             <div className="text-sm text-red-700">Cancelled</div>
           </div>
-          <div className="bg-primary rounded-lg p-4 border border-primary/20 shadow-sm">
+          <div className="rounded-lg p-4 border border-primary/20 shadow-sm">
             <div className="text-2xl font-bold text-foreground font-pixel">{stats.totalRevenue}৳</div>
             <div className="text-sm text-foreground/70">Revenue</div>
           </div>

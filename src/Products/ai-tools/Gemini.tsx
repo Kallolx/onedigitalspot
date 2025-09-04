@@ -126,11 +126,6 @@ export default function Gemini() {
           });
           setPriceList([
             {
-              title: "Gemini Premium Shared Account",
-              categoryIcon: categoryIcons.Shared,
-              items: shared,
-            },
-            {
               title: "Gemini Premium Personal Account",
               categoryIcon: categoryIcons.Personal,
               items: personal,

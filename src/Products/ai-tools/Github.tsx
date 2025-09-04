@@ -94,11 +94,6 @@ export default function GitHubPro() {
           });
           setPriceList([
             {
-              title: "GitHub Pro Personal",
-              categoryIcon: categoryIcons.Individual,
-              items: personal,
-            },
-            {
               title: "GitHub Pro Team",
               categoryIcon: categoryIcons.Team,
               items: team,

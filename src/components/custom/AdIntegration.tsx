@@ -27,18 +27,10 @@ const AdIntegration: React.FC = () => {
   const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_ADS_ID;
 
   useEffect(() => {
-    // Check if user has already closed the ad in this session
-    const adClosed = localStorage.getItem('adClosed');
-    const adClosedTimestamp = localStorage.getItem('adClosedTimestamp');
-    const currentTime = Date.now();
+    // Check if user has already clicked the ad in this browser session
+    const adClicked = sessionStorage.getItem('adClicked');
     
-    // If ad was closed more than 24 hours ago, reset the flag
-    if (adClosedTimestamp && (currentTime - parseInt(adClosedTimestamp)) > 24 * 60 * 60 * 1000) {
-      localStorage.removeItem('adClosed');
-      localStorage.removeItem('adClosedTimestamp');
-    }
-    
-    if (adClosed === 'true') {
+    if (adClicked === 'true') {
       setIsLoading(false);
       return;
     }
@@ -103,19 +95,25 @@ const AdIntegration: React.FC = () => {
       const adShownKey = `adShown_${currentAd.$id}`;
       const currentShows = parseInt(localStorage.getItem(adShownKey) || '0');
       localStorage.setItem(adShownKey, (currentShows + 1).toString());
-      
-      // If showOnce is true, mark this ad as closed permanently
-      if (currentAd.showOnce) {
-        localStorage.setItem('adClosed', 'true');
-        localStorage.setItem('adClosedTimestamp', Date.now().toString());
-      }
+    }
+  };
+
+  const handleAdClick = () => {
+    // Mark that the ad was clicked in this browser session
+    sessionStorage.setItem('adClicked', 'true');
+    setIsVisible(false);
+    
+    if (currentAd) {
+      // Track how many times this specific ad has been shown
+      const adShownKey = `adShown_${currentAd.$id}`;
+      const currentShows = parseInt(localStorage.getItem(adShownKey) || '0');
+      localStorage.setItem(adShownKey, (currentShows + 1).toString());
     }
   };
 
   // Function to clear ad tracking (for testing purposes)
   const clearAdTracking = () => {
-    localStorage.removeItem('adClosed');
-    localStorage.removeItem('adClosedTimestamp');
+    sessionStorage.removeItem('adClicked');
     // Clear all ad shown counters
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('adShown_')) {
@@ -134,6 +132,7 @@ const AdIntegration: React.FC = () => {
       <AdComponent
         adData={currentAd}
         onClose={handleClose}
+        onAdClick={handleAdClick}
         delay={0} // No delay since we're already managing visibility
       />
       
