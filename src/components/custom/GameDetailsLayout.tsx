@@ -305,21 +305,29 @@ const GameDetailsLayout: React.FC<
             {/* Price List with Categories */}
             <Card className="mb-6 p-4 bg-transparent order-1 lg:order-0">
               {!priceList || priceList.length === 0 ? (
-                <div className="text-center py-8">
-                  <img
-                    src="/assets/icons/others/error.svg"
-                    alt="Out of stock"
-                    className="h-20 mx-auto mb-4"
-                  />
-                  <h3 className="font-pixel text-xl text-foreground mb-2">
-                    This product is out of stocks
-                  </h3>
+                <div className="flex flex-col gap-6">
+                  {/* Skeleton for 2 categories */}
+                  {[1, 2].map((catIdx) => (
+                    <div key={catIdx}>
+                      {/* Category title skeleton */}
+                      <div className="h-5 bg-primary/20 rounded mb-2 w-32 animate-pulse"></div>
+                      {/* Items grid skeleton */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {[1, 2, 3, 4].map((itemIdx) => (
+                          <div
+                            key={itemIdx}
+                            className="h-14 bg-primary/20 rounded animate-pulse"
+                          ></div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="flex flex-col gap-6">
                   {priceList.map((category, catIdx) => (
                   <div key={catIdx}>
-                    <h3 className="font-pixel text-base text-foreground mb-2 pl-1 opacity-80">
+                    <h3 className="font-pixel whitespace-nowrap truncate text-base text-foreground mb-2 pl-1 opacity-80">
                       {category.title}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -362,7 +370,7 @@ const GameDetailsLayout: React.FC<
                             )}
                           </span>
                           <span
-                            className={`font-bold font-anekbangla transition-colors duration-150 ${
+                            className={`font-bold text-xl font-anekbangla transition-colors duration-150 ${
                               isItemSelected(catIdx, itemIdx)
                                 ? "text-foreground"
                                 : "text-secondary"

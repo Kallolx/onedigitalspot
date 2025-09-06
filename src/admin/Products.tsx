@@ -21,7 +21,8 @@ import {
   ArrowUp,
   ArrowDown,
   Grid3X3,
-  List
+  List,
+  Code
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,6 +86,7 @@ const categories = [
   { key: "giftCards", name: "Gift Cards", icon: Gift },
   { key: "aiTools", name: "AI Tools", icon: Bot },
   { key: "subscriptions", name: "Subscriptions", icon: BadgeDollarSign },
+  { key: "productivity", name: "Productivity", icon: Code },
 ];
 
 const Products = () => {
@@ -142,6 +144,7 @@ const Products = () => {
         aiTools: import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID,
         subscriptions: import.meta.env
           .VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID,
+        productivity: import.meta.env.VITE_APPWRITE_COLLECTION_PRODUCTIVITY_ID,
       };
 
       const results = await Promise.all(
@@ -170,6 +173,7 @@ const Products = () => {
         giftCards: [],
         aiTools: [],
         subscriptions: [],
+        productivity: [],
         all: [],
       };
 
@@ -183,6 +187,7 @@ const Products = () => {
         ...newProductsByCategory.giftCards,
         ...newProductsByCategory.aiTools,
         ...newProductsByCategory.subscriptions,
+        ...newProductsByCategory.productivity,
       ];
 
       setProductsByCategory(newProductsByCategory);
@@ -206,6 +211,7 @@ const Products = () => {
       giftCards: import.meta.env.VITE_APPWRITE_COLLECTION_GIFT_CARDS_ID,
       aiTools: import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID,
       subscriptions: import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID,
+      productivity: import.meta.env.VITE_APPWRITE_COLLECTION_PRODUCTIVITY_ID,
     };
 
     // Find which category this product belongs to
@@ -319,7 +325,6 @@ const Products = () => {
         price: editProduct.price,
         description: editProduct.description,
         priceList: editProduct.priceList || [],
-        status: true,
       };
 
       await databases.updateDocument(
@@ -426,6 +431,7 @@ const Products = () => {
         aiTools: import.meta.env.VITE_APPWRITE_COLLECTION_AI_TOOLS_ID,
         subscriptions: import.meta.env
           .VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID,
+        productivity: import.meta.env.VITE_APPWRITE_COLLECTION_PRODUCTIVITY_ID,
       };
 
       const collectionId = collectionMap[selectedCategory];
@@ -440,6 +446,7 @@ const Products = () => {
         giftCards: "Gift Cards",
         aiTools: "AI Tools",
         subscriptions: "Subscriptions",
+        productivity: "Productivity",
       };
 
       const productData = {

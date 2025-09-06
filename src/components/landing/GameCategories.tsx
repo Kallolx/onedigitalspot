@@ -33,19 +33,6 @@ const allProducts = [
 // Filter popular products
 const popularProducts = allProducts.filter((item) => item.popular);
 
-// Function to shuffle array (Fisher-Yates algorithm)
-const shuffleArray = (array: any[]) => {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-};
-
-// Shuffle popular products for random display
-const shuffledPopularProducts = shuffleArray(popularProducts);
-
 const GameCategories = () => (
   <section className="">
     <div className="container px-4 md:px-6">
@@ -85,13 +72,115 @@ const GameCategories = () => (
             </div>
           </div>
           <CategorySwiper
-            items={shuffledPopularProducts}
+            items={popularProducts}
             navigationPrevClass=".swiper-popular-prev"
             navigationNextClass=".swiper-popular-next"
             autoplay={true}
           />
         </div>
       )}
+
+      {/* Mobile Games */}
+      <div className="md:mb-4">
+        <div className="flex items-center justify-between md:mb-2">
+          <div className="flex items-center gap-2">
+            {/* Fire Animation */}
+            <Lottie
+              animationData={mobileAnimation}
+              loop={true}
+              autoplay={true}
+              style={{ width: 30, height: 30 }}
+            />
+
+            {/* Title */}
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
+              Mobile Games
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* See All */}
+            <a href="/mobile-games">
+              <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
+                See All
+              </Button>
+            </a>
+
+            {/* Swiper Arrows */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="swiper-mobile-prev rounded-full h-8 w-8 p-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="swiper-mobile-next rounded-full h-8 w-8 p-0"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        <CategorySwiper
+          items={mobileGames}
+          navigationPrevClass=".swiper-mobile-prev"
+          navigationNextClass=".swiper-mobile-next"
+        />
+      </div>
+
+      {/* PC & Console Games */}
+      <div className="">
+        <div className="flex items-center justify-between md:mb-2">
+          <div className="flex items-center gap-2">
+            {/* Fire Animation */}
+            <Lottie
+              animationData={pcAnimation}
+              loop={true}
+              autoplay={true}
+              style={{ width: 30, height: 30 }}
+            />
+
+            {/* Title */}
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
+              PC Games
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* See All */}
+            <a href="/pc-games">
+              <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
+                See All
+              </Button>
+            </a>
+
+            {/* Swiper Arrows */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="swiper-pc-prev rounded-full h-8 w-8 p-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="swiper-pc-next rounded-full h-8 w-8 p-0"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        <CategorySwiper
+          items={pcGames}
+          navigationPrevClass=".swiper-pc-prev"
+          navigationNextClass=".swiper-pc-next"
+        />
+      </div>
 
       {/* AI Tools */}
       <div className="md:mb-4">
@@ -144,58 +233,7 @@ const GameCategories = () => (
         />
       </div>
 
-      {/* Subscriptions */}
-      <div className="md:mb-4">
-        <div className="flex items-center justify-between md:mb-2">
-          <div className="flex items-center gap-2">
-            {/* Fire Animation */}
-            <Lottie
-              animationData={netflixAnimation}
-              loop={true}
-              autoplay={true}
-              style={{ width: 40, height: 40 }}
-            />
-
-            {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
-              Subscriptions
-            </h2>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* See All */}
-            <a href="/subscriptions">
-              <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
-                See All
-              </Button>
-            </a>
-
-            {/* Swiper Arrows */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="swiper-sub-prev rounded-full h-8 w-8 p-0"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="swiper-sub-next rounded-full h-8 w-8 p-0"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        <CategorySwiper
-          items={subscriptions}
-          isSubscription={true}
-          navigationPrevClass=".swiper-sub-prev"
-          navigationNextClass=".swiper-sub-next"
-        />
-      </div>
-
+      
       {/* Productivity */}
       <div className="md:mb-4">
         <div className="flex items-center justify-between md:mb-2">
@@ -299,27 +337,27 @@ const GameCategories = () => (
         />
       </div>
 
-      {/* Mobile Games */}
+      {/* Subscriptions */}
       <div className="md:mb-4">
         <div className="flex items-center justify-between md:mb-2">
           <div className="flex items-center gap-2">
             {/* Fire Animation */}
             <Lottie
-              animationData={mobileAnimation}
+              animationData={netflixAnimation}
               loop={true}
               autoplay={true}
-              style={{ width: 30, height: 30 }}
+              style={{ width: 40, height: 40 }}
             />
 
             {/* Title */}
             <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
-              Mobile Games
+              Subscriptions
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
             {/* See All */}
-            <a href="/mobile-games">
+            <a href="/subscriptions">
               <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
                 See All
               </Button>
@@ -329,14 +367,14 @@ const GameCategories = () => (
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-mobile-prev rounded-full h-8 w-8 p-0"
+              className="swiper-sub-prev rounded-full h-8 w-8 p-0"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="swiper-mobile-next rounded-full h-8 w-8 p-0"
+              className="swiper-sub-next rounded-full h-8 w-8 p-0"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -344,71 +382,18 @@ const GameCategories = () => (
         </div>
 
         <CategorySwiper
-          items={mobileGames}
-          navigationPrevClass=".swiper-mobile-prev"
-          navigationNextClass=".swiper-mobile-next"
-        />
-      </div>
-
-      {/* PC & Console Games */}
-      <div className="">
-        <div className="flex items-center justify-between md:mb-2">
-          <div className="flex items-center gap-2">
-            {/* Fire Animation */}
-            <Lottie
-              animationData={pcAnimation}
-              loop={true}
-              autoplay={true}
-              style={{ width: 30, height: 30 }}
-            />
-
-            {/* Title */}
-            <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold font-pixel tracking-tighter">
-              PC Games
-            </h2>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* See All */}
-            <a href="/pc-games">
-              <Button variant="link" size="sm" className="h-8 px-2 lg:px-4">
-                See All
-              </Button>
-            </a>
-
-            {/* Swiper Arrows */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="swiper-pc-prev rounded-full h-8 w-8 p-0"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="swiper-pc-next rounded-full h-8 w-8 p-0"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        <CategorySwiper
-          items={pcGames}
-          navigationPrevClass=".swiper-pc-prev"
-          navigationNextClass=".swiper-pc-next"
+          items={subscriptions}
+          isSubscription={true}
+          navigationPrevClass=".swiper-sub-prev"
+          navigationNextClass=".swiper-sub-next"
         />
       </div>
     </div>
+    
     {/* See All Button at the bottom */}
     <div className="flex justify-center mt-4 md:mt-8 mb-4">
       <a href="/all-products">
-        <Button
-          variant="outline"
-          size="sm"
-          className="font-pixel"
-        >
+        <Button variant="outline" size="sm" className="font-pixel">
           See All Products
           <Folder02Icon className="w-4 h-4" />
         </Button>

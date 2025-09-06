@@ -21,17 +21,7 @@ export const mobileGames: Product[] = [
     buttonText: "Buy Diamonds",
     route: "/mobile-games/mobile-legends",
   },
-  {
-    title: "Call of Duty Mobile",
-    image: "/products/mobile-games/cod-mobile.avif",
-    price: "399",
-    rating: 5,
-    category: "Action",
-    buttonText: "Buy CP",
-    route: "/mobile-games/cod-mobile",
-    
-  },
-  {
+    {
     title: "PUBG Mobile",
     image: "/products/mobile-games/pubg-mobile.avif",
     price: "499",
@@ -41,6 +31,7 @@ export const mobileGames: Product[] = [
     route: "/mobile-games/pubg-mobile",
     popular: true,
   },
+  
   {
     title: "Free Fire",
     image: "/products/mobile-games/free-fire.avif",
@@ -50,6 +41,15 @@ export const mobileGames: Product[] = [
     buttonText: "Buy Diamonds",
     route: "/mobile-games/free-fire",
     popular: true,
+  },
+  {
+    title: "Call of Duty Mobile",
+    image: "/products/mobile-games/cod-mobile.avif",
+    price: "399",
+    rating: 5,
+    category: "Action",
+    buttonText: "Buy CP",
+    route: "/mobile-games/cod-mobile",
   },
   {
     title: "Delta Force",
@@ -180,7 +180,6 @@ export const pcGames: Product[] = [
     category: "FPS",
     buttonText: "Buy Now",
     route: "/pc-games/cod-black-ops-7",
-    popular: true,
   },
   {
     title: "Valorant",
@@ -190,6 +189,7 @@ export const pcGames: Product[] = [
     category: "FPS",
     buttonText: "Buy VP",
     route: "/pc-games/valorant",
+    popular: true,    
   },
   {
     title: "Apex Legends",
@@ -199,6 +199,7 @@ export const pcGames: Product[] = [
     category: "Battle Royale",
     buttonText: "Buy Coins",
     route: "/pc-games/apex-legends",
+    
   },
   {
     title: "Grand Theft Auto V",
@@ -208,7 +209,7 @@ export const pcGames: Product[] = [
     category: "Open World",
     buttonText: "Buy Now",
     route: "/pc-games/gta-v",
-    popular: true,
+    
   },
   {
     title: "RDR 2",
@@ -218,7 +219,7 @@ export const pcGames: Product[] = [
     category: "Open World",
     buttonText: "Buy Now",
     route: "/pc-games/red-dead-redemption-2",
-    popular: true,
+    
   },
   {
     title: "Cyberpunk 2077",
@@ -246,7 +247,7 @@ export const pcGames: Product[] = [
     category: "Sports",
     buttonText: "Buy Points",
     route: "/pc-games/fifa-24",
-    popular: true,
+    
   },
   {
     title: "PUBG: Battlegrounds",
@@ -305,7 +306,7 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/google-play",
-    popular: true,
+    
   },
   {
     title: "Apple Gift Card",
@@ -324,7 +325,7 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/steam-wallet",
-    popular: true,
+    
   },
   {
     title: "PlayStation",
@@ -370,7 +371,7 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/discord-nitro",
-    popular: true,
+    
   },
   {
     title: "Roblox Gift Cards",
@@ -389,7 +390,7 @@ export const giftCards: Product[] = [
     category: "Gift Cards",
     buttonText: "Buy Now",
     route: "/gift-cards/spotify",
-    popular: true,
+    
   },
 ];
 
@@ -397,7 +398,7 @@ export const aiTools: Product[] = [
   {
     title: "ChatGPT Premium",
     image: "/products/ai-tools/chatgpt.avif",
-    price: "1999",
+    price: "2649",
     rating: 5,
     category: "AI Assistant",
     buttonText: "Subscribe",
@@ -407,7 +408,7 @@ export const aiTools: Product[] = [
   {
     title: "Perplexity Premium",
     image: "/products/ai-tools/prop-ai.avif",
-    price: "1599",
+    price: "2699",
     rating: 5,
     category: "AI Assistant",
     buttonText: "Subscribe",
@@ -416,7 +417,7 @@ export const aiTools: Product[] = [
   {
     title: "Claude Premium",
     image: "/products/ai-tools/claude-ai.avif",
-    price: "1799",
+    price: "2399",
     rating: 5,
     category: "AI Assistant",
     buttonText: "Subscribe",
@@ -426,7 +427,7 @@ export const aiTools: Product[] = [
   {
     title: "Grok Premium",
     image: "/products/ai-tools/grok-ai.avif",
-    price: "1299",
+    price: "3899",
     rating: 5,
     category: "AI Assistant",
     buttonText: "Subscribe",
@@ -435,7 +436,7 @@ export const aiTools: Product[] = [
   {
     title: "Gemini Premium",
     image: "/products/ai-tools/gemini-ai.avif",
-    price: "1899",
+    price: "2749",
     rating: 5,
     category: "AI Assistant",
     buttonText: "Subscribe",
@@ -445,7 +446,7 @@ export const aiTools: Product[] = [
   {
     title: "GitHub Pro",
     image: "/products/ai-tools/github-pro.avif",
-    price: "999",
+    price: "649",
     rating: 5,
     category: "AI Coding",
     buttonText: "Subscribe",
@@ -454,17 +455,17 @@ export const aiTools: Product[] = [
   {
     title: "Cursor IDE",
     image: "/products/ai-tools/cursor-ide.avif",
-    price: "1499",
+    price: "2700",
     rating: 5,
     category: "AI Coding",
     buttonText: "Subscribe",
-    popular: true,
+    
     route: "/ai-tools/cursor",
   },
   {
     title: "Windsurf IDE",
     image: "/products/ai-tools/windsurf.avif",
-    price: "1299",
+    price: "1999",
     rating: 5,
     category: "AI Coding",
     buttonText: "Subscribe",
@@ -473,11 +474,10 @@ export const aiTools: Product[] = [
 ];
 
 export const subscriptions: Product[] = [
-  // Entertainment
   {
     title: "Netflix",
     image: "/products/subscriptions/netflix.avif",
-    price: "1499",
+    price: "350",
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
@@ -485,131 +485,38 @@ export const subscriptions: Product[] = [
     popular: true,
   },
   {
-    title: "Hulu",
-    image: "/products/subscriptions/hulu.avif",
-    price: "899",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/hulu",
-  },
-  {
-    title: "Amazon Prime",
-    image: "/products/subscriptions/amazon-prime.avif",
-    price: "1299",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/amazon-prime",
-  },
-  {
-    title: "Disney Plus",
-    image: "/products/subscriptions/disney.avif",
-    price: "999",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/disney-plus",
-    popular: true,
-  },
-  {
-    title: "ZEE5",
-    image: "/products/subscriptions/zee5.avif",
-    price: "599",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/zee5",
-  },
-  {
     title: "Sony Liv",
     image: "/products/subscriptions/sony-liv.avif",
-    price: "699",
+    price: "480",
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
     route: "/subscriptions/SonyLiv",
   },
-  {
-    title: "Ullu Premium",
-    image: "/products/subscriptions/ullu.avif",
-    price: "399",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/ullu",
-  },
-  {
-    title: "Alt Balaji",
-    image: "/products/subscriptions/alt-balaji.avif",
-    price: "499",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/alt-balaji",
-  },
-  {
-    title: "HBO Max",
-    image: "/products/subscriptions/hbo.avif",
-    price: "1199",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/hbo-max",
-  },
-  {
-    title: "Apple TV",
-    image: "/products/subscriptions/apple-tv.avif",
-    price: "799",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/apple-tv",
-  },
+ 
   {
     title: "YouTube Premium",
     image: "/products/subscriptions/yt-premium.avif",
-    price: "399",
+    price: "280",
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
     route: "/subscriptions/youtube-premium",
-  },
-  {
-    title: "Apple Music",
-    image: "/products/subscriptions/apple-music.avif",
-    price: "399",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
-    route: "/subscriptions/apple-music",
-  },
-  {
-    title: "Crunchyroll",
-    image: "/products/subscriptions/crunchy.avif",
-    price: "799",
-    rating: 5,
-    category: "Entertainment",
-    buttonText: "Subscribe",
     popular: true,
-    route: "/subscriptions/crunchyroll",
   },
   {
     title: "Spotify Premium",
     image: "/products/subscriptions/spotify.avif",
-    price: "299",
+    price: "899",
     rating: 5,
     category: "Entertainment",
     buttonText: "Subscribe",
     route: "/subscriptions/spotify",
   },
-  // Gaming
   {
     title: "Xbox Game Pass",
     image: "/products/subscriptions/x-box.avif",
-    price: "1299",
+    price: "1649",
     rating: 5,
     category: "Gaming",
     buttonText: "Subscribe",
@@ -618,14 +525,21 @@ export const subscriptions: Product[] = [
   {
     title: "Ubisoft+",
     image: "/products/subscriptions/ubisoft.avif",
-    price: "1599",
+    price: "1150",
     rating: 5,
     category: "Gaming",
     buttonText: "Subscribe",
     route: "/subscriptions/ubisoft-plus",
   },
-  // Productivity
- 
+    {
+    title: "Crunchyroll",
+    image: "/products/subscriptions/crunchy.avif",
+    price: "1150",
+    rating: 5,
+    category: "Gaming",
+    buttonText: "Subscribe",
+    route: "/subscriptions/crunchyroll",
+  },
 ];
 
 export const productivity: Product[] = [
@@ -636,8 +550,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/canva-pro",
-    popular: true,
+    route: "/productivity/canva-pro",    
   },
   {
     title: "Duolingo Plus",
@@ -646,7 +559,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/duolingo",
+    route: "/productivity/duolingo",
   },
   {
     title: "Quillbot",
@@ -655,7 +568,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/quillbot",
+    route: "/productivity/quillbot",
   },
   {
     title: "Grammarly",
@@ -664,8 +577,8 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/grammarly",
+    
+    route: "/productivity/grammarly",
   },
   {
     title: "Office 365",
@@ -674,8 +587,8 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/office-365",
+    
+    route: "/productivity/office-365",
   },
   {
     title: "Google One",
@@ -684,7 +597,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/google-one",
+    route: "/productivity/google-one",
   },
   {
     title: "Capcut Pro",
@@ -694,7 +607,7 @@ export const productivity: Product[] = [
     category: "Productivity",
     buttonText: "Subscribe",
     popular: true,
-    route: "/subscriptions/capcut-pro",
+    route: "/productivity/capcut-pro",
   },
   {
     title: "Figma Pro",
@@ -703,8 +616,8 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/figma-pro",
+    
+    route: "/productivity/figma-pro",
   },
   {
     title: "Notion Pro",
@@ -713,7 +626,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/notion-pro",
+    route: "/productivity/notion-pro",
   },
   {
     title: "Zoom Pro",
@@ -722,7 +635,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/zoom-pro",
+    route: "/productivity/zoom-pro",
   },
   {
     title: "iCloud+",
@@ -731,7 +644,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/icloud-plus",
+    route: "/productivity/icloud-plus",
   },
   {
     title: "CodePen Pro",
@@ -740,7 +653,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Productivity",
     buttonText: "Subscribe",
-    route: "/subscriptions/codepen-pro",
+    route: "/productivity/codepen-pro",
   },
 
   // Security & VPN
@@ -751,7 +664,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Security",
     buttonText: "Subscribe",
-    route: "/subscriptions/nordvpn",
+    route: "/productivity/nordvpn",
   },
   {
     title: "ExpressVPN",
@@ -760,8 +673,8 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Security",
     buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/expressvpn",
+    
+    route: "/productivity/expressvpn",
   },
   // Social
   {
@@ -771,8 +684,8 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Social",
     buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/tinder-plus",
+    
+    route: "/productivity/tinder-plus",
   },
   {
     title: "Bumble Plus",
@@ -781,8 +694,8 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Social",
     buttonText: "Subscribe",
-    popular: true,
-    route: "/subscriptions/bumble-plus",
+    
+    route: "/productivity/bumble-plus",
   },
   {
     title: "Telegram Stars",
@@ -791,7 +704,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Social",
     buttonText: "Buy Stars",
-    route: "/subscriptions/telegram-stars",
+    route: "/productivity/telegram-stars",
   },
   {
     title: "Discord Nitro",
@@ -800,7 +713,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Social",
     buttonText: "Subscribe",
-    popular: true,
+    
     route: "/gift-cards/discord-nitro",
   },
   {
@@ -810,7 +723,7 @@ export const productivity: Product[] = [
     rating: 5,
     category: "Social",
     buttonText: "Subscribe",
-    route: "/subscriptions/linkedin",
+    route: "/productivity/linkedin",
   },
 ];
 

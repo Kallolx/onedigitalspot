@@ -61,7 +61,7 @@ export default function NotionSubscription() {
     async function fetchSubscriptions() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_PRODUCTIVITY_ID;
         // fetch all documents from the subscriptions collection (no fixed cap)
         const allDocs: any[] = [];
         let offset = 0;

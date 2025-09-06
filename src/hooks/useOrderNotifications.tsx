@@ -45,7 +45,7 @@ export const useOrderNotifications = () => {
         // Filter for orders created since last check
         const newOrders = orders.filter((order: any) => {
           const orderId = order.$id || order.id;
-          const orderTime = new Date(order.createdAt);
+          const orderTime = new Date(order.$createdAt || order.createdAt);
           
           // Check if this is a truly new order (not in our known set and created recently)
           const isNewOrder = orderId && !knownOrdersRef.current.has(orderId);

@@ -61,7 +61,7 @@ export default function CodePenSubscription() {
     async function fetchSubscriptions() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_PRODUCTIVITY_ID;
         // page through all documents to avoid default 25-doc cap
         const pageSize = 100;
         let offset = 0;

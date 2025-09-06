@@ -953,7 +953,7 @@ Please process this order as soon as possible.`;
                   <h3 className="font-medium text-muted-foreground mb-1">
                     Delivery Method
                   </h3>
-                  <p className="text-secondary font-anekbangla mb-3 text-sm">
+                  <p className="text-secondary font-semibold font-anekbangla mb-3 text-sm">
                     দ্রুত ডেলিভারি পেতে হোয়াটসঅ্যাপ সিলেক্ট করুন
                   </p>
 

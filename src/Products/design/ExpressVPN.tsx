@@ -60,7 +60,7 @@ export default function ExpressVPN() {
     async function fetchSubscriptions() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_PRODUCTIVITY_ID;
 
         const pageSize = 100;
         let offset = 0;

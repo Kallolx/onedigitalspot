@@ -88,7 +88,7 @@ export const getUserOrders = async (userId: string) => {
       ORDERS_COLLECTION_ID,
       [
         Query.equal('userId', userId),
-        Query.orderDesc('createdAt')
+        Query.orderDesc('$createdAt')
       ]
     );
     
@@ -105,7 +105,7 @@ export const getAllOrders = async () => {
       DATABASE_ID,
       ORDERS_COLLECTION_ID,
       [
-        Query.orderDesc('createdAt')
+        Query.orderDesc('$createdAt')
       ]
     );
     

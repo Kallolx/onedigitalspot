@@ -46,7 +46,7 @@ export default function GrammarlySubscription() {
     async function fetchSubscriptions() {
       try {
         const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_SUBSCRIPTIONS_ID;
+        const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_PRODUCTIVITY_ID;
         const response = await databases.listDocuments(databaseId, collectionId);
         const products = response.documents;
         const grammarlyProduct = products.find(

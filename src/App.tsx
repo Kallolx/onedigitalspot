@@ -72,7 +72,6 @@ import Grammarly from "./Products/design/Grammerly";
 import Hulu from "./Products/subscriptions/Hulu";
 import LinkedIn from "./Products/design/LinkedIn";
 import Office365 from "./Products/design/Office365";
-import Photoshop from "./Products/design/Photoshop";
 import YoutubePremium from "./Products/subscriptions/YoutubePremium";
 import ZoomPro from "./Products/design/ZoomPro";
 import Productivity from "./pages/routes/Productivity";
@@ -286,24 +285,24 @@ const App = () => {
                 element={<AppleMusic />}
               />
               <Route path="/subscriptions/apple-tv" element={<AppleTV />} />
-              <Route path="/subscriptions/canva-pro" element={<CanvaPro />} />
+              <Route path="/productivity/canva-pro" element={<CanvaPro />} />
               <Route
                 path="/subscriptions/disney-plus"
                 element={<DisneyPlus />}
               />
-              <Route path="/subscriptions/duolingo" element={<Duolingo />} />
+              <Route path="/productivity/duolingo" element={<Duolingo />} />
               <Route path="/subscriptions/zee5" element={<Zee5 />} />
               <Route path="/subscriptions/hbo-max" element={<HboMax />} />
               <Route path="/subscriptions/ullu" element={<Ullu />} />
               <Route path="/subscriptions/alt-balaji" element={<AltBalaji />} />
               <Route path="/subscriptions/sonyliv" element={<SonyLiv />} />
-              <Route path="/subscriptions/capcut-pro" element={<CapCut />} />
-              <Route path="/subscriptions/google-one" element={<GoogleOne />} />
-              <Route path="/subscriptions/grammarly" element={<Grammarly />} />
+              <Route path="/productivity/capcut-pro" element={<CapCut />} />
+              <Route path="/productivity/google-one" element={<GoogleOne />} />
+              <Route path="/productivity/grammarly" element={<Grammarly />} />
               <Route path="/subscriptions/hulu" element={<Hulu />} />
-              <Route path="/subscriptions/linkedin" element={<LinkedIn />} />
-              <Route path="/subscriptions/office-365" element={<Office365 />} />
-              <Route path="/subscriptions/photoshop" element={<Photoshop />} />
+              <Route path="/productivity/linkedin" element={<LinkedIn />} />
+              <Route path="/productivity/office-365" element={<Office365 />} />
+         
               <Route path="/subscriptions/spotify" element={<SpotifySubscription />} />
               <Route
                 path="/subscriptions/crunchyroll"
@@ -317,23 +316,23 @@ const App = () => {
                 path="/subscriptions/ubisoft-plus"
                 element={<UbisoftPlus />}
               />
-              <Route path="/subscriptions/quillbot" element={<Quillbot />} />
-              <Route path="/subscriptions/figma-pro" element={<Figma />} />
-              <Route path="/subscriptions/notion-pro" element={<Notion />} />
-              <Route path="/subscriptions/icloud-plus" element={<Icloud />} />
-              <Route path="/subscriptions/codepen-pro" element={<CodePen />} />
-              <Route path="/subscriptions/nordvpn" element={<NordVPN />} />
+              <Route path="/productivity/quillbot" element={<Quillbot />} />
+              <Route path="/productivity/figma-pro" element={<Figma />} />
+              <Route path="/productivity/notion-pro" element={<Notion />} />
+              <Route path="/productivity/icloud-plus" element={<Icloud />} />
+              <Route path="/productivity/codepen-pro" element={<CodePen />} />
+              <Route path="/productivity/nordvpn" element={<NordVPN />} />
               <Route
-                path="/subscriptions/expressvpn"
+                path="/productivity/expressvpn"
                 element={<ExpressVPN />}
               />
               <Route
-                path="/subscriptions/tinder-plus"
+                path="/productivity/tinder-plus"
                 element={<TinderPlus />}
               />
-              <Route path="/subscriptions/bumble-plus" element={<Bumble />} />
+              <Route path="/productivity/bumble-plus" element={<Bumble />} />
               <Route
-                path="/subscriptions/telegram-stars"
+                path="/productivity/telegram-stars"
                 element={<TelegramStars />}
               />
 
@@ -341,7 +340,7 @@ const App = () => {
                 path="/subscriptions/youtube-premium"
                 element={<YoutubePremium />}
               />
-              <Route path="/subscriptions/zoom-pro" element={<ZoomPro />} />
+              <Route path="/productivity/zoom-pro" element={<ZoomPro />} />
             </Route>
 
             {/* Admin Panel Routes */}
@@ -363,7 +362,6 @@ const App = () => {
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <CookieConsent />
           <TawkToWidget />
         </BrowserRouter>
       </TooltipProvider>
