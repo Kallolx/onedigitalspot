@@ -104,7 +104,6 @@ const Checkout: React.FC = () => {
   const [availableDeliveryMethods, setAvailableDeliveryMethods] = useState<
     any[]
   >([
-    { id: "email", name: "Email", icon: "email", active: true },
     { id: "whatsapp", name: "WhatsApp", icon: "whatsapp", active: true },
   ]);
   const [countryCode, setCountryCode] = useState("+88");

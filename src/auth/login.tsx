@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft02Icon } from "hugeicons-react";
 import { toast } from "sonner"; // ✅ import Sonner
 import Footer from "@/components/landing/Footer";
+import { OAuthProvider } from "appwrite";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +27,106 @@ export default function LoginPage() {
     const saved = localStorage.getItem("auth.email");
     if (saved) setEmail(saved);
   }, []);
+
+  // If we were redirected back from OAuth, some browsers may need a short delay
+  // to persist cross-site cookies before JS makes API calls. Do a one-time
+  // delayed reload to give the browser time to attach the session cookie.
+  useEffect(() => {
+    try {
+      const alreadyReloaded = sessionStorage.getItem('appwrite_oauth_reloaded');
+      const hasStateParam = new URLSearchParams(window.location.search).has('state');
+      const hasHashOnly = window.location.hash === '#';
+
+      if (!alreadyReloaded && (hasStateParam || hasHashOnly)) {
+        // mark so we don't loop
+        sessionStorage.setItem('appwrite_oauth_reloaded', '1');
+        // small delay to allow cookies to be persisted by the browser
+        setTimeout(() => {
+          // Reload without the hash to avoid repeating the redirect
+          const cleanUrl = window.location.pathname + window.location.search;
+          window.location.replace(cleanUrl);
+        }, 450);
+      }
+    } catch (e) {
+      // ignore errors
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // After the one-time reload we attempt to read the account with retries.
+  // This helps when the first request after the OAuth redirect still doesn't
+  // include the session cookie due to timing.
+  useEffect(() => {
+    let mounted = true;
+
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    const getAccountWithRetry = async (attempts = 8, delayMs = 400) => {
+      for (let i = 0; i < attempts && mounted; i++) {
+        try {
+          console.debug(`[auth] account.get() attempt ${i + 1}`);
+          const user = await account.get();
+          console.debug('[auth] account.get() success', user?.$id);
+          return user;
+        } catch (e: any) {
+          // If unauthorized, wait and retry (exponential/backoff-ish)
+          const wait = delayMs * (i + 1);
+          console.debug(`[auth] account.get() failed attempt ${i + 1}, retrying in ${wait}ms`, e?.message);
+          await sleep(wait);
+        }
+      }
+      console.debug('[auth] account.get() failed after retries');
+      throw new Error('account.get() failed after retries');
+    };
+
+    (async () => {
+      try {
+        const reloaded = sessionStorage.getItem('appwrite_oauth_reloaded');
+        if (reloaded) {
+          // Try to obtain account; if successful, redirect to intended path
+          const user = await getAccountWithRetry(6, 350);
+          // clear flag so this effect won't run again
+          sessionStorage.removeItem('appwrite_oauth_reloaded');
+
+          const labels = (user && (user.labels || user.prefs?.labels)) || [];
+          if (Array.isArray(labels) && labels.includes('admin')) {
+            window.location.href = '/admin';
+          } else {
+            navigate(redirectPath);
+          }
+        }
+      } catch (err) {
+        // If retries failed, remove the flag and show helpful guidance
+        sessionStorage.removeItem('appwrite_oauth_reloaded');
+        try {
+          toast.error(
+            'Sign-in appears blocked by browser privacy settings or an ad-blocker. Please allow third-party cookies for this site, disable Brave/Shields or try another browser.'
+          );
+        } catch (e) {
+          // ignore toast errors
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleGoogleLogin = async () => {
+    try {
+      // Create OAuth2 session with Google
+      await account.createOAuth2Session(
+        OAuthProvider.Google,
+        `${window.location.origin}${redirectPath}`, // Success URL
+        `${window.location.origin}/auth/login` // Failure URL
+      );
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      toast.error('Google login failed. Please try again.');
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +157,9 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  // --- Debug helpers: run a credentialed fetch to /v1/account and show result ---
+  // debug helper removed; show user-facing guidance if OAuth session isn't detected
 
   useEffect(() => {
     if (remember) {
@@ -207,30 +311,19 @@ export default function LoginPage() {
                 </div>
 
                 {/* Social logins */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="w-full">
                   <Button
                     variant="outline"
-                    className="font-sans border-2 hover:border-primary/50 hover:bg-primary/5"
+                    className="w-full font-sans border-2 hover:border-primary/50 hover:bg-primary/5"
                     type="button"
+                    onClick={handleGoogleLogin}
                   >
                     <img
                       src="/assets/icons/social/google.svg"
                       alt="Google logo"
-                      className="w-5 h-5"
+                      className="w-5 h-5 mr-2"
                     />
-                    Google
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="font-sans border-2 hover:border-primary/50 hover:bg-primary/5"
-                    type="button"
-                  >
-                    <img
-                      src="/assets/icons/social/facebook.svg"
-                      alt="Facebook logo"
-                      className="w-5 h-5"
-                    />
-                    Facebook
+                    Continue with Google
                   </Button>
                 </div>
               </form>
@@ -247,6 +340,8 @@ export default function LoginPage() {
                   </a>
                 </p>
               </div>
+
+              {/* Debug panel removed; replaced by friendly toast on failure */}
             </CardContent>
           </Card>
         </div>

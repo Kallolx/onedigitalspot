@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { 
   TrendingUp, 
@@ -12,7 +12,7 @@ import {
   Plus, 
   Bell, 
   Search, 
-  Filter, 
+  Filter,
   Calendar, 
   Download,
   MoreHorizontal,
@@ -22,74 +22,200 @@ import {
   AlertCircle
 } from 'lucide-react';
 import NotificationDropdown from '../components/custom/NotificationDropdown';
+import { databases, account } from '@/lib/appwrite';
+import { getAllOrders } from '@/lib/orders';
+import { RotateLoader } from 'react-spinners';
 
+
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const USERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_USERS_ID;
 
 const Dashboard = () => {
   const [timeRange, setTimeRange] = useState('7d');
   const [selectedMetric, setSelectedMetric] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Real data states
+  const [orders, setOrders] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    totalUsers: 0,
+    totalProducts: 0
+  });
+  const [salesData, setSalesData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
-  // Enhanced sample data
-  const salesData = [
-    { name: 'Mon', revenue: 2400, orders: 24, customers: 18 },
-    { name: 'Tue', revenue: 1398, orders: 18, customers: 15 },
-    { name: 'Wed', revenue: 9800, orders: 45, customers: 32 },
-    { name: 'Thu', revenue: 3908, orders: 38, customers: 28 },
-    { name: 'Fri', revenue: 4800, orders: 42, customers: 35 },
-    { name: 'Sat', revenue: 3800, orders: 35, customers: 29 },
-    { name: 'Sun', revenue: 4300, orders: 40, customers: 31 },
-  ];
+  // Fetch all data
+  useEffect(() => {
+    fetchDashboardData();
+  }, [timeRange]);
 
-  const categoryData = [
-    { name: 'Mobile Games', value: 1200, color: '#3B82F6', percentage: 35 },
-    { name: 'PC Games', value: 950, color: '#8B5CF6', percentage: 28 },
-    { name: 'Top Up', value: 700, color: '#10B981', percentage: 20 },
-    { name: 'Gift Cards', value: 500, color: '#F59E0B', percentage: 12 },
-    { name: 'AI Tools', value: 150, color: '#EF4444', percentage: 5 },
-  ];
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const recentOrders = [
-    { id: '#ORD-001', customer: 'Alex Johnson', product: 'Premium Gaming Pack', amount: 249.99, status: 'completed', time: '2 min ago', avatar: 'AJ' },
-    { id: '#ORD-002', customer: 'Sarah Davis', product: 'Mobile Top-up Bundle', amount: 189.50, status: 'processing', time: '5 min ago', avatar: 'SD' },
-    { id: '#ORD-003', customer: 'Mike Wilson', product: 'Steam Gift Card', amount: 99.99, status: 'completed', time: '12 min ago', avatar: 'MW' },
-    { id: '#ORD-004', customer: 'Emma Brown', product: 'AI Tool Subscription', amount: 299.99, status: 'pending', time: '18 min ago', avatar: 'EB' },
-    { id: '#ORD-005', customer: 'David Lee', product: 'Game Credit Pack', amount: 149.99, status: 'completed', time: '25 min ago', avatar: 'DL' },
-  ];
+      // Fetch orders
+      const ordersData = await getAllOrders();
+      setOrders(ordersData);
 
-  const quickActions = [
-    { title: 'Add Product', icon: Plus, color: 'bg-blue-500', bgColor: 'bg-blue-50', hoverColor: 'hover:bg-blue-100' },
-    { title: 'Create Order', icon: ShoppingCart, color: 'bg-green-500', bgColor: 'bg-green-50', hoverColor: 'hover:bg-green-100' },
-    { title: 'Manage Users', icon: Users, color: 'bg-purple-500', bgColor: 'bg-purple-50', hoverColor: 'hover:bg-purple-100' },
-    { title: 'View Analytics', icon: Activity, color: 'bg-orange-500', bgColor: 'bg-orange-50', hoverColor: 'hover:bg-orange-100' },
-  ];
+      // Fetch users
+      let usersData = [];
+      try {
+        const usersResponse = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID);
+        usersData = usersResponse.documents;
+        setUsers(usersData);
+      } catch (err) {
+        // If users collection fails, get current user
+        try {
+          const currentUser = await account.get();
+          usersData = [currentUser];
+          setUsers(usersData);
+        } catch (userErr) {
+          console.warn('Could not fetch users:', userErr);
+        }
+      }
 
-  const StatCard = ({ title, value, change, changeType, icon: Icon, gradient, description }) => (
+      // Calculate statistics
+      calculateStats(ordersData);
+      
+      // Generate charts data
+      generateChartsData(ordersData);
+      
+      // Set recent orders
+      setRecentOrders(ordersData.slice(0, 5));
+
+    } catch (err: any) {
+      console.error('Error fetching dashboard data:', err);
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateStats = (ordersData: any[]) => {
+    const totalRevenue = ordersData
+      .filter(order => order.status?.toLowerCase() === 'completed')
+      .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+    
+    const totalOrders = ordersData.length;
+    const totalUsers = users.length;
+    
+    // Count unique products
+    const uniqueProducts = new Set(ordersData.map(order => order.productName)).size;
+    
+    setStats({
+      totalRevenue,
+      totalOrders,
+      totalUsers,
+      totalProducts: uniqueProducts
+    });
+  };
+
+  const generateChartsData = (ordersData: any[]) => {
+    // Filter orders based on time range
+    const now = new Date();
+    const daysToSubtract = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+    const startDate = new Date(now.getTime() - (daysToSubtract * 24 * 60 * 60 * 1000));
+    
+    const filteredOrders = ordersData.filter(order => {
+      const orderDate = new Date(order.createdAt || order.$createdAt);
+      return orderDate >= startDate;
+    });
+
+    // Generate daily sales data
+    const salesByDay = {};
+    const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+    
+    // Initialize days
+    for (let i = 0; i < days; i++) {
+      const date = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
+      const dayKey = timeRange === '24h' ? 
+        date.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false }) :
+        date.toLocaleDateString('en-US', { weekday: 'short' });
+      
+      salesByDay[dayKey] = { name: dayKey, revenue: 0, orders: 0, customers: 0 };
+    }
+
+    // Populate with real data
+    filteredOrders.forEach(order => {
+      const orderDate = new Date(order.createdAt || order.$createdAt);
+      const dayKey = timeRange === '24h' ? 
+        orderDate.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false }) :
+        orderDate.toLocaleDateString('en-US', { weekday: 'short' });
+      
+      if (salesByDay[dayKey]) {
+        salesByDay[dayKey].revenue += order.totalAmount || 0;
+        salesByDay[dayKey].orders += 1;
+        salesByDay[dayKey].customers += 1; // Simplified - could track unique customers
+      }
+    });
+
+    setSalesData(Object.values(salesByDay).reverse());
+
+    // Generate category data
+    const categoryStats = {};
+    const categoryColors = {
+      'Mobile Games': '#3B82F6',
+      'PC Games': '#8B5CF6', 
+      'Gift Cards': '#10B981',
+      'AI Tools': '#F59E0B',
+      'Subscriptions': '#EF4444',
+      'Productivity': '#06B6D4'
+    };
+
+    filteredOrders.forEach(order => {
+      const category = order.productType || 'Other';
+      if (!categoryStats[category]) {
+        categoryStats[category] = {
+          name: category,
+          value: 0,
+          count: 0,
+          color: categoryColors[category] || '#6B7280'
+        };
+      }
+      categoryStats[category].value += order.totalAmount || 0;
+      categoryStats[category].count += 1;
+    });
+
+    // Calculate percentages
+    const totalValue = Object.values(categoryStats).reduce((sum: number, cat: any) => sum + (Number(cat.value) || 0), 0) as number;
+    const categoryDataWithPercentage = Object.values(categoryStats).map((cat: any) => {
+      const catValue = Number(cat.value) || 0;
+      return {
+        ...cat,
+        percentage: totalValue > 0 ? Math.round((catValue / totalValue) * 100) : 0
+      };
+    });
+
+    setCategoryData(categoryDataWithPercentage);
+  };
+
+  const timeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 60) return `${diffInMinutes} min ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hour(s) ago`;
+    return `${Math.floor(diffInMinutes / 1440)} day(s) ago`;
+  };
+
+  const StatCard = ({ title, value, description }) => (
     <div className="group relative bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-              changeType === 'positive' 
-                ? 'bg-emerald-100 text-emerald-700' 
-                : 'bg-red-100 text-red-700'
-            }`}>
-              {changeType === 'positive' ? (
-                <TrendingUp className="w-3 h-3" />
-              ) : (
-                <TrendingDown className="w-3 h-3" />
-              )}
-              {change}%
-            </div>
-          </div>
           <div>
-            <div className="flex items-center justify-between">
             <h3 className="text-3xl font-bold text-gray-900 mb-1">{value}</h3>
-            <div className="flex flex-col">
             <p className="text-sm font-medium text-gray-600">{title}</p>
             {description && (
               <p className="text-xs text-gray-500 mt-1">{description}</p>
             )}
-            </div>
-            </div>
           </div>
         </div>
       </div>
@@ -206,39 +332,23 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="Total Revenue"
-            value="$45,210"
-            change="12.5"
-            changeType="positive"
-            icon={DollarSign}
-            gradient="bg-gradient-to-br from-emerald-500 to-emerald-600"
-            description="vs last month"
+            value={`$${stats.totalRevenue.toLocaleString()}`}
+            description="Total earnings this period"
           />
           <StatCard
-            title="Products Sold"
-            value="3,240"
-            change="8.2"
-            changeType="positive"
-            icon={Package}
-            gradient="bg-gradient-to-br from-blue-500 to-blue-600"
-            description="items this month"
+            title="Orders"
+            value={stats.totalOrders.toLocaleString()}
+            description="Total orders placed"
           />
           <StatCard
-            title="Active Users"
-            value="1,180"
-            change="15.3"
-            changeType="positive"
-            icon={Users}
-            gradient="bg-gradient-to-br from-purple-500 to-purple-600"
-            description="online now"
+            title="Customers"
+            value={stats.totalUsers.toLocaleString()}
+            description="Registered users"
           />
           <StatCard
-            title="Total Orders"
-            value="2,450"
-            change="4.1"
-            changeType="positive"
-            icon={ShoppingCart}
-            gradient="bg-gradient-to-br from-orange-500 to-orange-600"
-            description="processed today"
+            title="Products"
+            value={stats.totalProducts.toLocaleString()}
+            description="Active products"
           />
         </div>
 

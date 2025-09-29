@@ -20,7 +20,6 @@ import {
   ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
-  TruckIcon,
   ShoppingBagIcon,
   SearchIcon,
   EyeIcon,
@@ -1316,19 +1315,22 @@ const MyOrders = () => {
                     <Button
                       variant="ghost"
                       className="w-full text-md justify-center"
-                      aria-label="Message us"
+                      aria-label="Message us on WhatsApp"
                       onClick={() => {
-                        const api = (window as any).Tawk_API;
-                        if (!api) return;
-                        if (typeof api.maximize === "function") api.maximize();
-                        else if (typeof api.toggle === "function") api.toggle();
-                        else if (typeof api.showWidget === "function")
-                          api.showWidget();
-                        else if (typeof api.popup === "function") api.popup();
+                        const phone = "8801831624571";
+                        const orderId = selectedOrder.orderID || "";
+                        const productName = selectedOrder.productName || "";
+                        const message = encodeURIComponent(
+                          `Hello, I need help with my order.\nOrder ID: ${orderId}\nProduct: ${productName}`
+                        );
+                        window.open(
+                          `https://wa.me/${phone}?text=${message}`,
+                          "_blank"
+                        );
                       }}
                     >
                       <Message01Icon className="w-6 h-6" />
-                      Message us
+                      Message us on WhatsApp
                     </Button>
                   </div>
                 )}

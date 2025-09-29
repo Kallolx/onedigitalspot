@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { account, databases } from "@/lib/appwrite";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft02Icon } from "hugeicons-react";
+import { OAuthProvider } from "appwrite";
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const USERS_COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_USERS_ID;
@@ -22,6 +23,41 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+
+  // If we were redirected back from OAuth, delay then reload once so the
+  // browser can persist cross-site cookies before subsequent API calls.
+  React.useEffect(() => {
+    try {
+      const alreadyReloaded = sessionStorage.getItem('appwrite_oauth_reloaded');
+      const hasStateParam = new URLSearchParams(window.location.search).has('state');
+      const hasHashOnly = window.location.hash === '#';
+
+      if (!alreadyReloaded && (hasStateParam || hasHashOnly)) {
+        sessionStorage.setItem('appwrite_oauth_reloaded', '1');
+        setTimeout(() => {
+          const cleanUrl = window.location.pathname + window.location.search;
+          window.location.replace(cleanUrl);
+        }, 450);
+      }
+    } catch (e) {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleGoogleSignup = async () => {
+    try {
+      // Create OAuth2 session with Google
+      await account.createOAuth2Session(
+        OAuthProvider.Google,
+        `${window.location.origin}/`, // Success URL
+        `${window.location.origin}/auth/signup` // Failure URL
+      );
+    } catch (error: any) {
+      console.error('Google signup error:', error);
+      toast.error('Google signup failed. Please try again.');
+    }
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -264,30 +300,19 @@ export default function SignupPage() {
                   </span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="w-full">
                 <Button
                   variant="outline"
-                  className="font-sans border-2 hover:border-primary/50 hover:bg-primary/5"
+                  className="w-full font-sans border-2 hover:border-primary/50 hover:bg-primary/5"
                   type="button"
+                  onClick={handleGoogleSignup}
                 >
                   <img
-                    src="/assets/icons/google.svg"
+                    src="/assets/icons/social/google.svg"
                     alt="Google logo"
-                    className="w-5 h-5"
+                    className="w-5 h-5 mr-2"
                   />
-                  Google
-                </Button>
-                <Button
-                  variant="outline"
-                  className="font-sans border-2 hover:border-primary/50 hover:bg-primary/5"
-                  type="button"
-                >
-                  <img
-                    src="/assets/facebook.svg"
-                    alt="Facebook logo"
-                    className="w-5 h-5"
-                  />
-                  Facebook
+                  Continue with Google
                 </Button>
               </div>
               <div className="text-center">
